@@ -1,11 +1,9 @@
 import {
-  AfterInsert,
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
   Index,
-  InsertEvent,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,7 +11,6 @@ import {
 
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { generateUlid } from '../../../../utils/ulid.generator';
-import { generateCode } from '../../../../utils/code.generator';
 import { BranchEntity } from './branch.entity';
 
 @Index('UQ_customer_ulid', ['ulid'], { unique: true })
@@ -66,18 +63,5 @@ export class CustomerEntity extends EntityRelationalHelper {
     if (!this.ulid) {
       this.ulid = generateUlid();
     }
-  }
-
-  @AfterInsert()
-  async assignCode(event: InsertEvent<CustomerEntity>): Promise<void> {
-    if (this.code || this.id === undefined || this.id === null) {
-      return;
-    }
-    this.code = generateCode(this.id);
-    await event.queryRunner?.manager.update(
-      CustomerEntity,
-      this.id,
-      { code: this.code } as never,
-    );
   }
 }

@@ -8,27 +8,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var BranchEntity_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BranchEntity = void 0;
 const typeorm_1 = require("typeorm");
 const relational_entity_helper_1 = require("../../../../../utils/relational-entity-helper");
 const ulid_generator_1 = require("../../../../utils/ulid.generator");
-const code_generator_1 = require("../../../../utils/code.generator");
 const customer_entity_1 = require("./customer.entity");
 const staff_entity_1 = require("./staff.entity");
-let BranchEntity = BranchEntity_1 = class BranchEntity extends relational_entity_helper_1.EntityRelationalHelper {
+let BranchEntity = class BranchEntity extends relational_entity_helper_1.EntityRelationalHelper {
     assignUlid() {
         if (!this.ulid) {
             this.ulid = (0, ulid_generator_1.generateUlid)();
         }
-    }
-    async assignCode(event) {
-        if (this.code || this.id === undefined || this.id === null) {
-            return;
-        }
-        this.code = (0, code_generator_1.generateCode)(this.id);
-        await event.queryRunner?.manager.update(BranchEntity_1, this.id, { code: this.code });
     }
 };
 exports.BranchEntity = BranchEntity;
@@ -109,13 +100,7 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], BranchEntity.prototype, "assignUlid", null);
-__decorate([
-    (0, typeorm_1.AfterInsert)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], BranchEntity.prototype, "assignCode", null);
-exports.BranchEntity = BranchEntity = BranchEntity_1 = __decorate([
+exports.BranchEntity = BranchEntity = __decorate([
     (0, typeorm_1.Index)('UQ_branch_ulid', ['ulid'], { unique: true }),
     (0, typeorm_1.Index)('UQ_branch_code', ['code'], { unique: true })
     // Max 1 head office per customer — partial unique index.

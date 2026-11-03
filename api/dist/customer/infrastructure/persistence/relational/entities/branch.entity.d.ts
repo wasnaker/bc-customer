@@ -1,4 +1,3 @@
-import { InsertEvent } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { CustomerEntity } from './customer.entity';
 import { StaffEntity } from './staff.entity';
@@ -6,7 +5,7 @@ export declare class BranchEntity extends EntityRelationalHelper {
     id: bigint;
     /** 26-char ULID, generated in beforeInsert. */
     ulid: string | null;
-    /** 6-char Crockford Base32 code derived from id, generated in afterInsert. */
+    /** 6-char Crockford Base32 code derived from id — diisi DB trigger. */
     code: string | null;
     /** Owning customer (bigint PK, intra-module). Cascade delete via FK. */
     customer: CustomerEntity;
@@ -31,5 +30,4 @@ export declare class BranchEntity extends EntityRelationalHelper {
     updatedAt: Date;
     staff?: StaffEntity[];
     assignUlid(): void;
-    assignCode(event: InsertEvent<BranchEntity>): Promise<void>;
 }

@@ -8,6 +8,6 @@ export declare const moduleDefinition: {
     manifest: import("./customer.manifest").BackendModuleManifest;
     registerAsync: (options: CustomerModuleAsyncOptions) => DynamicModule;
     entities: readonly [typeof import("./customer.entities").CustomerEntity, typeof import("./customer.entities").BranchEntity, typeof import("./customer.entities").StaffEntity, typeof import("./customer.entities").CustomerDocumentEntity];
-    migrations: readonly [typeof import("./database/migrations").CreateCustomerCoreTables1793820000000000];
+    migrations: readonly [typeof import("./database/migrations").CreateCustomerCoreTables1793820000000000, typeof import("./database/migrations").AddCustomerCodeTriggers1793850000000000000];
     seedServices: readonly [];
 };

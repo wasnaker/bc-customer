@@ -1,11 +1,9 @@
 import {
-  AfterInsert,
   BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
   Index,
-  InsertEvent,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -14,7 +12,6 @@ import {
 
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { generateUlid } from '../../../../utils/ulid.generator';
-import { generateCode } from '../../../../utils/code.generator';
 import { CustomerEntity } from './customer.entity';
 import { StaffEntity } from './staff.entity';
 
@@ -34,7 +31,7 @@ export class BranchEntity extends EntityRelationalHelper {
   @Column({ type: 'varchar', length: 26, nullable: true })
   ulid: string | null;
 
-  /** 6-char Crockford Base32 code derived from id, generated in afterInsert. */
+  /** 6-char Crockford Base32 code derived from id — diisi DB trigger. */
   @Column({ type: 'varchar', length: 6, nullable: true })
   code: string | null;
 
@@ -96,18 +93,5 @@ export class BranchEntity extends EntityRelationalHelper {
     if (!this.ulid) {
       this.ulid = generateUlid();
     }
-  }
-
-  @AfterInsert()
-  async assignCode(event: InsertEvent<BranchEntity>): Promise<void> {
-    if (this.code || this.id === undefined || this.id === null) {
-      return;
-    }
-    this.code = generateCode(this.id);
-    await event.queryRunner?.manager.update(
-      BranchEntity,
-      this.id,
-      { code: this.code } as never,
-    );
   }
 }

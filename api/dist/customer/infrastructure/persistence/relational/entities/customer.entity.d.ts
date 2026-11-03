@@ -1,4 +1,3 @@
-import { InsertEvent } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
 import { BranchEntity } from './branch.entity';
 export declare class CustomerEntity extends EntityRelationalHelper {
@@ -22,5 +21,4 @@ export declare class CustomerEntity extends EntityRelationalHelper {
      * row is written, so it is assigned in @AfterInsert.
      */
     assignUlid(): void;
-    assignCode(event: InsertEvent<CustomerEntity>): Promise<void>;
 }
