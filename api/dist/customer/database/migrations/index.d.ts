@@ -1,7 +1,7 @@
 import { CreateCustomerCoreTables1793820000000000 } from './1793820000000000-CreateCustomerCoreTables';
-import { AddCustomerCodeTriggers1793850000000000000 } from './1793850000000000000-AddCustomerCodeTriggers';
+import { AddCustomerCodeTriggers1793850000000000001 } from './1793850000000000001-AddCustomerCodeTriggers';
 export { CreateCustomerCoreTables1793820000000000 };
-export { AddCustomerCodeTriggers1793850000000000000 };
+export { AddCustomerCodeTriggers1793850000000000001 };
 /**
  * Standard package contract consumed by the host's generated registry.
  *
@@ -10,4 +10,4 @@ export { AddCustomerCodeTriggers1793850000000000000 };
  * module — region is a hard dependency (`requires: ['region']`) and its
  * migrations create the tables these FKs point at.
  */
-export declare const moduleMigrations: readonly [typeof CreateCustomerCoreTables1793820000000000, typeof AddCustomerCodeTriggers1793850000000000000];
+export declare const moduleMigrations: readonly [typeof CreateCustomerCoreTables1793820000000000, typeof AddCustomerCodeTriggers1793850000000000001];

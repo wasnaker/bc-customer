@@ -1,5 +1,6 @@
-import { MigrationInterface, QueryRunner } from 'typeorm';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AddCustomerCodeTriggers1793850000000000001 = void 0;
 /**
  * `code` (6-char Crockford Base32) dihitung dari id langsung di database
  * memakai trigger AFTER INSERT — bukan hook TypeORM:
@@ -12,13 +13,12 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * - salt            = 1 (placeholder; nanti dibekukan per modul via Settings, I7/I8)
  * - alphabet Crockford Base32 tanpa I/L/O/U.
  */
-export class AddCustomerCodeTriggers1793850000000000000
-  implements MigrationInterface
-{
-  name = 'AddCustomerCodeTriggers1793850000000000000';
-
-  public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`
+class AddCustomerCodeTriggers1793850000000000001 {
+    constructor() {
+        this.name = 'AddCustomerCodeTriggers1793850000000000001';
+    }
+    async up(queryRunner) {
+        await queryRunner.query(`
       CREATE OR REPLACE FUNCTION "bc_customer_code6"(value bigint, salt bigint)
       RETURNS text AS $fn$
       DECLARE
@@ -38,8 +38,7 @@ export class AddCustomerCodeTriggers1793850000000000000
       END;
       $fn$ LANGUAGE plpgsql IMMUTABLE;
     `);
-
-    await queryRunner.query(`
+        await queryRunner.query(`
       CREATE OR REPLACE FUNCTION "bc_customer_assign_code"() RETURNS trigger AS $fn$
       BEGIN
         IF NEW."code" IS NULL THEN
@@ -51,13 +50,12 @@ export class AddCustomerCodeTriggers1793850000000000000
       END;
       $fn$ LANGUAGE plpgsql;
     `);
-    await queryRunner.query(`
+        await queryRunner.query(`
       CREATE TRIGGER "trg_customer_code"
       AFTER INSERT ON "customer"
       FOR EACH ROW EXECUTE FUNCTION "bc_customer_assign_code"();
     `);
-
-    await queryRunner.query(`
+        await queryRunner.query(`
       CREATE OR REPLACE FUNCTION "bc_branch_assign_code"() RETURNS trigger AS $fn$
       BEGIN
         IF NEW."code" IS NULL THEN
@@ -69,18 +67,18 @@ export class AddCustomerCodeTriggers1793850000000000000
       END;
       $fn$ LANGUAGE plpgsql;
     `);
-    await queryRunner.query(`
+        await queryRunner.query(`
       CREATE TRIGGER "trg_branch_code"
       AFTER INSERT ON "branch"
       FOR EACH ROW EXECUTE FUNCTION "bc_branch_assign_code"();
     `);
-  }
-
-  public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP TRIGGER IF EXISTS "trg_branch_code" ON "branch"');
-    await queryRunner.query('DROP TRIGGER IF EXISTS "trg_customer_code" ON "customer"');
-    await queryRunner.query('DROP FUNCTION IF EXISTS "bc_branch_assign_code"');
-    await queryRunner.query('DROP FUNCTION IF EXISTS "bc_customer_assign_code"');
-    await queryRunner.query('DROP FUNCTION IF EXISTS "bc_customer_code6"');
-  }
+    }
+    async down(queryRunner) {
+        await queryRunner.query('DROP TRIGGER IF EXISTS "trg_branch_code" ON "branch"');
+        await queryRunner.query('DROP TRIGGER IF EXISTS "trg_customer_code" ON "customer"');
+        await queryRunner.query('DROP FUNCTION IF EXISTS "bc_branch_assign_code"');
+        await queryRunner.query('DROP FUNCTION IF EXISTS "bc_customer_assign_code"');
+        await queryRunner.query('DROP FUNCTION IF EXISTS "bc_customer_code6"');
+    }
 }
+exports.AddCustomerCodeTriggers1793850000000000001 = AddCustomerCodeTriggers1793850000000000001;

@@ -1,8 +1,8 @@
 import { CreateCustomerCoreTables1793820000000000 } from './1793820000000000-CreateCustomerCoreTables';
-import { AddCustomerCodeTriggers1793850000000000000 } from './1793850000000000000-AddCustomerCodeTriggers';
+import { AddCustomerCodeTriggers1793850000000000001 } from './1793850000000000001-AddCustomerCodeTriggers';
 
 export { CreateCustomerCoreTables1793820000000000 };
-export { AddCustomerCodeTriggers1793850000000000000 };
+export { AddCustomerCodeTriggers1793850000000000001 };
 
 /**
  * Standard package contract consumed by the host's generated registry.
@@ -14,5 +14,5 @@ export { AddCustomerCodeTriggers1793850000000000000 };
  */
 export const moduleMigrations = [
   CreateCustomerCoreTables1793820000000000,
-  AddCustomerCodeTriggers1793850000000000000,
+  AddCustomerCodeTriggers1793850000000000001,
 ] as const;
