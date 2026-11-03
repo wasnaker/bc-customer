@@ -767,8 +767,8 @@ kan bbisa beda kota beda provinsi
 | Fase 1 | region 0.4.0: kode BPS regency (514/514 terisi), seed id eksplisit + `setval`, endpoint referensi cukup JWT (mutasi tetap `read:region`). Host backend & frontend di-pin ke SHA `5452302`, migrasi + seed sudah jalan di produksi. Tag `v0.4.0` | ✅ Selesai |
 | Fase 2 | Skrip `scripts/rename-from-region.mjs` (reusable utk 29 modul lain, ikut disimpan di bc-region); rename penuh region → customer (package `@wasnaker/module-customer`, permission `*:customer`, i18n `module-customer.json`, route `customer`). Commit pertama `c8896a5` | ✅ Selesai |
 | Fase 3 | Entity + migrasi sesuai kontrak §7: `customer`, `branch` (addressLine wajib semua cabang, provinceId+cityId RESTRICT, partial unique HO), `staff` (tanpa code, userId nullable unique, nip/addressLine/region nullable), `customer_document` (ownerType+ownerId polimorfik, type/number, issuedAt/expiresAt). ULID + code Crockford Base32 otomatis. Commit `17819ca` | ✅ Selesai |
-| Fase 4 | API: service + controller 3 entitas, 12 permission, validasi (maks 1 HO, create customer = buat HO sekaligus), seed contoh | ⬜ Berikutnya |
-| Fase 5 | Frontend: 3 halaman SmallTable + menu (customer 100, branch 101, staff 102), integrasi host, uji CRUD/master-detail | ⬜ |
+| Fase 4 | API: service + controller 3 entitas + dokumen, 12 permission (`read/create/update/delete` × `customer/branch/staff`), guard per-resource, validasi (maks 1 HO friendly 422, create customer = buat HO sekaligus dalam 1 transaksi, staff userId unik, validasi city∈province via raw query ke tabel region), DTO + repository (pattern bc-region), manifest `requires: ['region']`, migrasi lama bawaan template dihapus. Commit `40b40e4` | ✅ Selesai |
+| Fase 5 | Frontend: 3 halaman SmallTable + menu (customer 100, branch 101, staff 102), integrasi host (backend registry + frontend), uji CRUD/master-detail | ⬜ Berikutnya |
 | Fase 6 | Ukur waktu build Next.js dengan 1/3/10 modul → keputusan transpilePackages vs prebuilt | ⬜ |
 
 Catatan teknis Fase 3:
