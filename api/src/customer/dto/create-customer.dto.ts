@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsDefined,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -8,6 +9,7 @@ import {
   IsString,
   MaxLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
 /** Address block shared by customers (head office), branches and staff. */
@@ -107,6 +109,8 @@ export class CreateCustomerDto {
    * (contract J1) — this block is the HO branch payload.
    */
   @ApiProperty({ type: HeadOfficeDto })
+  @IsDefined()
+  @ValidateNested()
   @Type(() => HeadOfficeDto)
   headOffice: HeadOfficeDto;
 

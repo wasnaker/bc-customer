@@ -121,6 +121,8 @@ __decorate([
 ], CreateCustomerDto.prototype, "nibNumber", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: HeadOfficeDto }),
+    (0, class_validator_1.IsDefined)(),
+    (0, class_validator_1.ValidateNested)(),
     (0, class_transformer_1.Type)(() => HeadOfficeDto),
     __metadata("design:type", HeadOfficeDto)
 ], CreateCustomerDto.prototype, "headOffice", void 0);
