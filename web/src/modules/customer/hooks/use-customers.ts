@@ -1,109 +1,87 @@
+import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
-import {
-  useGetProvincesService,
-  useGetProvinceService,
-  useCreateProvinceService,
-  useUpdateProvinceService,
-  useDeleteProvinceService,
-  useGetRegenciesService,
-  useGetRegencyService,
-  useCreateRegencyService,
-  useUpdateRegencyService,
-  useDeleteRegencyService,
-} from "../services/customer-api";
-import type { Province, Regency } from "../types/customer";
 import { useTable } from "@/core/table/use-table";
 import { SortEnum } from "@/services/api/types/sort-type";
+import {
+  useGetCustomersService,
+  useGetCustomerService,
+  useCreateCustomerService,
+  useUpdateCustomerService,
+  useDeleteCustomerService,
+  useGetCustomerDocumentsService,
+  useCreateCustomerDocumentService,
+  useUpdateCustomerDocumentService,
+  useDeleteCustomerDocumentService,
+} from "../services/customer-api";
+import { CustomerApiError } from "../services/api-error";
+import type { SearchableSelectOption } from "../components/searchable-select";
+import type { Customer, CustomerDocument } from "../types/customer";
 
-// ── Province hooks ─────────────────────────────────────────────────────────
-
-export function useProvinces(
-  page = 1,
-  limit = 10,
-  filters?: Record<string, string | number | boolean>
-) {
-  const service = useGetProvincesService();
-  return useQuery({
-    queryKey: ["customer", "provinces", page, limit, filters],
-    queryFn: async () => {
-      const res = await service({ page, limit, filters });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
-      }
-      return res.data;
-    },
-  });
+function assertOk(status: number, data: unknown): void {
+  if (status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
+    const errors = (data as { errors?: Record<string, string> } | undefined)
+      ?.errors;
+    if (errors && typeof errors === "object") {
+      throw new CustomerApiError(errors);
+    }
+    throw new CustomerApiError({ unknown: "unknown" });
+  }
 }
 
-/**
- * Hook server-side untuk provinces — menggunakan useTable.
- * Search, filter, sorting, dan pagination diterapkan backend sebelum
- * pagination; total selalu berasal dari hasil count backend.
- */
-export function useProvincesServerSide() {
-  const service = useGetProvincesService();
-  return useTable<Province>({
-    queryKey: ["customer", "provinces"],
-    // Default page size mengikuti Core Settings.
+// ── List (server-side, dipakai SmallTable + useTable) ───────────────────────
+
+export function useCustomersServerSide() {
+  const service = useGetCustomersService();
+  return useTable<Customer>({
+    queryKey: ["customer", "customers"],
     searchDebounce: 300,
     defaultSort: { field: "name", order: "ASC" },
-    fetchFn: async ({ page, limit, search, sort, filters, signal }) => {
-      // Search digabung dengan filter lain, bukan menggantikan filter yang ada.
-      const activeFilters = Object.fromEntries(
-        Object.entries(filters ?? {}).filter(([, value]) => value != null)
-      ) as Record<string, string | number | boolean>;
-
-      if (search) activeFilters.search = search;
+    fetchFn: async ({ page, limit, search, sort, signal }) => {
+      // Endpoint customer memakai `filters[name]` (ILike), bukan param `search`.
+      const filters = search ? { name: search } : undefined;
 
       const res = await service(
         {
           page,
           limit,
-          filters: Object.keys(activeFilters).length ? activeFilters : undefined,
+          filters,
           sort: sort
-            ? [{
-                orderBy: sort.field as keyof Province,
-                order: sort.order === "ASC" ? SortEnum.ASC : SortEnum.DESC,
-              }]
+            ? [
+                {
+                  orderBy: sort.field as keyof Customer,
+                  order: sort.order === "ASC" ? SortEnum.ASC : SortEnum.DESC,
+                },
+              ]
             : undefined,
         },
-        { signal }
+        { signal },
       );
 
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data?.errors ?? {}).join(", "));
-      }
+      assertOk(res.status, res.data);
       if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
-        throw new Error("Gagal memuat data provinsi");
-      }
-
-      // Endpoint Customer mengembalikan total hasil SETELAH filter/search.
-      // Jangan mengestimasi total dari hasNextPage karena pagination bisa salah.
-      const response = res.data as {
-        data?: Province[];
-        total?: number;
-      };
-      if (typeof response.total !== "number") {
-        throw new Error("Respons API provinsi tidak menyertakan total hasil");
+        throw new Error("Failed to load customers");
       }
 
       return {
-        data: response.data ?? [],
-        total: response.total,
+        data: res.data.data ?? [],
+        total: typeof res.data.total === "number" ? res.data.total : 0,
       };
     },
   });
 }
 
-export function useProvince(id: Province["id"] | null) {
-  const service = useGetProvinceService();
+// ── Detail ──────────────────────────────────────────────────────────────────
+
+export function useCustomer(id: string | null) {
+  const service = useGetCustomerService();
   return useQuery({
-    queryKey: ["customer", "province", id],
+    queryKey: ["customer", "customer", id],
     queryFn: async () => {
-      const res = await service({ id: id as Province["id"] });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
+      const res = await service({ id: id as string });
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to load customer");
       }
       return res.data;
     },
@@ -111,169 +89,187 @@ export function useProvince(id: Province["id"] | null) {
   });
 }
 
-export function useCreateProvince() {
-  const service = useCreateProvinceService();
+// ── Mutations ───────────────────────────────────────────────────────────────
+
+export function useCreateCustomer() {
+  const service = useCreateCustomerService();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: Parameters<typeof service>[0]) => {
       const res = await service(data);
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to save customer");
       }
-      if (!res.data) throw new Error("Failed to save province");
       return res.data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["customer", "provinces"] });
+      qc.invalidateQueries({ queryKey: ["customer", "customers"] });
     },
   });
 }
 
-export function useUpdateProvince() {
-  const service = useUpdateProvinceService();
+export function useUpdateCustomer() {
+  const service = useUpdateCustomerService();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({
       id,
       data,
     }: {
-      id: Province["id"];
+      id: Customer["id"];
       data: Parameters<typeof service>[0]["data"];
     }) => {
       const res = await service({ id, data });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to save customer");
       }
-      if (!res.data) throw new Error("Failed to save province");
       return res.data;
     },
     onSuccess: (_res, vars) => {
-      qc.invalidateQueries({ queryKey: ["customer", "provinces"] });
-      qc.invalidateQueries({ queryKey: ["customer", "province", vars.id] });
+      qc.invalidateQueries({ queryKey: ["customer", "customers"] });
+      qc.invalidateQueries({ queryKey: ["customer", "customer", vars.id] });
     },
   });
 }
 
-export function useDeleteProvince() {
-  const service = useDeleteProvinceService();
+export function useDeleteCustomer() {
+  const service = useDeleteCustomerService();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id }: { id: Province["id"] }) => {
+    mutationFn: async ({ id }: { id: Customer["id"] }) => {
       const res = await service({ id });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
-      }
+      assertOk(res.status, res.data);
       if (res.status !== HTTP_CODES_ENUM.NO_CONTENT) {
-        throw new Error("Failed to delete province");
+        throw new Error("Failed to delete customer");
       }
       return undefined;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["customer", "provinces"] });
+      qc.invalidateQueries({ queryKey: ["customer"] });
     },
   });
 }
 
-// ── Regency hooks ──────────────────────────────────────────────────────────
+// ── Options untuk SearchableSelect (pemilih customer) ───────────────────────
 
-export function useRegencies(
-  provinceId: Province["id"] | null,
+/**
+ * Fetcher opsi customer untuk SearchableSelect — search dikirim sebagai
+ * `filters[name]` (ILike) ke server, tidak pernah fetch-all di client.
+ */
+export function useCustomerOptionsFetcher() {
+  const service = useGetCustomersService();
+  return useCallback(
+    async (
+      search: string,
+      signal?: AbortSignal,
+    ): Promise<SearchableSelectOption[]> => {
+      const res = await service(
+        {
+          page: 1,
+          limit: 50,
+          filters: search ? { name: search } : undefined,
+        },
+        { signal },
+      );
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to load customers");
+      }
+      return (res.data.data ?? []).map((customer) => ({
+        value: String(customer.id),
+        label: customer.name,
+        hint: customer.code ?? undefined,
+      }));
+    },
+    [service],
+  );
+}
+
+// ── Documents (polymorphic) ─────────────────────────────────────────────────
+
+export function useCustomerDocuments(
+  ownerType: CustomerDocument["ownerType"],
+  ownerId: string | null,
   page = 1,
-  limit = 10
+  limit = 20,
 ) {
-  const service = useGetRegenciesService();
+  const service = useGetCustomerDocumentsService();
   return useQuery({
-    queryKey: ["customer", "regencies", provinceId, page, limit],
+    queryKey: ["customer", "documents", ownerType, ownerId, page, limit],
     queryFn: async () => {
       const res = await service({
+        ownerType,
+        ownerId: ownerId as string,
         page,
         limit,
-        filters:
-          provinceId != null ? { provinceId: String(provinceId) } : undefined,
       });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to load documents");
       }
       return res.data;
     },
-    enabled: provinceId != null,
+    enabled: ownerId != null,
   });
 }
 
-export function useRegency(id: Regency["id"] | null) {
-  const service = useGetRegencyService();
-  return useQuery({
-    queryKey: ["customer", "regency", id],
-    queryFn: async () => {
-      const res = await service({ id: id as Regency["id"] });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
-      }
-      return res.data;
-    },
-    enabled: id != null,
-  });
-}
-
-export function useCreateRegency() {
-  const service = useCreateRegencyService();
+export function useCreateCustomerDocument() {
+  const service = useCreateCustomerDocumentService();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (data: Parameters<typeof service>[0]) => {
       const res = await service(data);
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to save document");
       }
-      if (!res.data) throw new Error("Failed to save regency");
       return res.data;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["customer", "regencies"] });
+      qc.invalidateQueries({ queryKey: ["customer", "documents"] });
     },
   });
 }
 
-export function useUpdateRegency() {
-  const service = useUpdateRegencyService();
+export function useUpdateCustomerDocument() {
+  const service = useUpdateCustomerDocumentService();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({
       id,
       data,
     }: {
-      id: Regency["id"];
+      id: CustomerDocument["id"];
       data: Parameters<typeof service>[0]["data"];
     }) => {
       const res = await service({ id, data });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to save document");
       }
-      if (!res.data) throw new Error("Failed to save regency");
       return res.data;
     },
-    onSuccess: (_res, vars) => {
-      qc.invalidateQueries({ queryKey: ["customer", "regencies"] });
-      qc.invalidateQueries({ queryKey: ["customer", "regency", vars.id] });
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["customer", "documents"] });
     },
   });
 }
 
-export function useDeleteRegency() {
-  const service = useDeleteRegencyService();
+export function useDeleteCustomerDocument() {
+  const service = useDeleteCustomerDocumentService();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id }: { id: Regency["id"] }) => {
+    mutationFn: async ({ id }: { id: CustomerDocument["id"] }) => {
       const res = await service({ id });
-      if (res.status === HTTP_CODES_ENUM.UNPROCESSABLE_ENTITY) {
-        throw new Error(Object.values(res.data.errors).join(", "));
-      }
+      assertOk(res.status, res.data);
       if (res.status !== HTTP_CODES_ENUM.NO_CONTENT) {
-        throw new Error("Failed to delete regency");
+        throw new Error("Failed to delete document");
       }
       return undefined;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["customer", "regencies"] });
+      qc.invalidateQueries({ queryKey: ["customer", "documents"] });
     },
   });
 }

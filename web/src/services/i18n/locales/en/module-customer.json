@@ -1,12 +1,83 @@
 {
-  "menu": "Customer",
-  "title": "Customer",
-  "subtitle": "Data referensi wilayah administrasi Indonesia",
+  "menu": {
+    "customer": "Customers",
+    "branch": "Customer Branches",
+    "staff": "Customer Staff"
+  },
+  "customer": {
+    "title": "Customers",
+    "subtitle": "Manage customers and their head-office data",
+    "search": "Search customers…",
+    "searchLabel": "Search customers by name",
+    "empty": "No customers yet.",
+    "create": "Add Customer",
+    "edit": "Edit Customer",
+    "headOfficeSection": "Head Office",
+    "headOfficeEditHint": "Head-office data is managed on the Customer Branches page."
+  },
+  "branch": {
+    "title": "Customer Branches",
+    "subtitle": "Manage branches of a selected customer",
+    "search": "Search branches…",
+    "searchLabel": "Search branches by name",
+    "empty": "No branches yet for this customer.",
+    "create": "Add Branch",
+    "edit": "Edit Branch",
+    "selectCustomer": "Customer",
+    "selectCustomerPlaceholder": "Select a customer…",
+    "selectCustomerFirst": "Select a customer to see its branches.",
+    "headOfficeBadge": "Head Office",
+    "headOfficeTaken": "This customer already has a head office."
+  },
+  "staff": {
+    "title": "Customer Staff",
+    "subtitle": "Manage staff of a customer branch",
+    "search": "Search staff…",
+    "searchLabel": "Search staff by name",
+    "empty": "No staff yet for this branch.",
+    "create": "Add Staff",
+    "edit": "Edit Staff",
+    "selectCustomer": "Customer",
+    "selectCustomerPlaceholder": "Select a customer…",
+    "selectCustomerFirst": "Select a customer and a branch to see its staff.",
+    "selectBranch": "Branch",
+    "selectBranchPlaceholder": "Select a branch…",
+    "selectBranchNeedCustomer": "Select a customer first",
+    "selectBranchFirst": "Select a branch to see its staff."
+  },
+  "table": {
+    "code": "Code",
+    "name": "Name",
+    "npwpNumber": "NPWP Number",
+    "nibNumber": "NIB Number",
+    "isActive": "Status",
+    "isHeadOffice": "Type",
+    "addressLine": "Address",
+    "province": "Province",
+    "city": "City / Regency",
+    "vatType": "VAT Type",
+    "position": "Position",
+    "phone": "Phone",
+    "email": "Email",
+    "userId": "Linked User",
+    "active": "Active",
+    "inactive": "Inactive",
+    "loading": "Loading…",
+    "of": "of",
+    "error": "Unable to load data. Please try again."
+  },
+  "detail": {
+    "overview": "Overview",
+    "empty": "No data.",
+    "headOffice": "Head Office",
+    "headOfficeEmpty": "This customer has no head office yet."
+  },
+  "picker": {
+    "loading": "Loading…",
+    "empty": "No matches found.",
+    "error": "Failed to load options."
+  },
   "actions": {
-    "create_province": "Add Province",
-    "create_regency": "Add Regency",
-    "edit_province": "Edit Province",
-    "edit_regency": "Edit Regency",
     "edit": "Edit",
     "delete": "Delete",
     "save": "Save",
@@ -17,54 +88,70 @@
     "prev_page": "Previous",
     "next_page": "Next"
   },
-  "table": {
-    "name": "Name",
-    "isoCode": "Code",
-    "coordinates": "Coordinates",
-    "latitude": "Latitude",
-    "longitude": "Longitude",
-    "loading": "Loading…",
-    "empty": "No provinces yet.",
-    "of": "of",
-    "page": "Page {{page}} of {{total}}",
-    "search": "Search provinces…",
-    "search_label": "Search provinces by name or ISO code",
-    "error": "Unable to load data. Please try again."
-  },
-  "detail": {
-    "overview": "Overview",
-    "regencies": "Regencies",
-    "empty": "No data.",
-    "regencies_empty": "No regencies yet."
-  },
-  "dashboard": {
-    "provinces": "Total Provinces",
-    "regencies": "Total Regencies / Cities",
-    "open_module": "Open Customer module",
-    "load_error": "Unable to load data"
-  },
   "confirm": {
     "delete": {
-      "message": "Delete this item? This action cannot be undone."
+      "message": "Delete this item? This action cannot be undone.",
+      "customer": "Delete this customer? All of its branches will also be deleted. This action cannot be undone."
     }
   },
   "form": {
     "field": {
       "name": "Name",
-      "isoCode": "Code (ISO)",
-      "latitude": "Latitude",
-      "longitude": "Longitude",
+      "npwpNumber": "NPWP Number",
+      "nibNumber": "NIB Number",
+      "isActive": "Active",
+      "headOfficeName": "Head Office Name",
+      "branchName": "Branch Name",
+      "addressLine": "Address",
       "province": "Province",
-      "type": "Type",
-      "isActive": "Active"
+      "city": "City / Regency",
+      "postalCode": "Postal Code",
+      "nitkuNumber": "NITKU Number",
+      "vatType": "VAT Type",
+      "position": "Position",
+      "phone": "Phone",
+      "email": "Email",
+      "nip": "NIP",
+      "userId": "Linked User ID",
+      "photoId": "Photo File ID",
+      "isHeadOffice": "Head Office"
     },
     "placeholder": {
-      "name": "e.g. West Java",
-      "province": "Select province"
+      "customerName": "e.g. PT Wasnaker Mandiri",
+      "staffName": "e.g. Budi Santoso",
+      "branchName": "e.g. Bandung Branch",
+      "headOfficeName": "e.g. Jakarta Head Office",
+      "npwpNumber": "01.234.567.8-901.000",
+      "nibNumber": "1234567890123456",
+      "addressLine": "Street, number, district",
+      "province": "Select province",
+      "city": "Select city / regency",
+      "cityNeedProvince": "Select a province first",
+      "postalCode": "e.g. 12190",
+      "nitkuNumber": "123456789012345678901234",
+      "position": "e.g. Manager",
+      "phone": "+6281234567890",
+      "email": "name@example.com",
+      "nip": "e.g. 19800001",
+      "userId": "e.g. 5",
+      "photoId": "File UUID"
     },
     "validation": {
       "required": "This field is required.",
-      "number": "Must be a valid number."
+      "email": "Must be a valid email address.",
+      "positiveInt": "Must be a positive whole number."
     }
+  },
+  "errors": {
+    "customerNameAlreadyExists": "A customer with this name already exists.",
+    "customerAlreadyHasHeadOffice": "This customer already has a head office.",
+    "staffUserAlreadyLinked": "This user is already linked to another staff member.",
+    "cityNotInProvince": "The selected city does not belong to the selected province.",
+    "provinceNotFound": "Province not found.",
+    "branchHasStaff": "This branch still has staff. Remove them before deleting the branch.",
+    "customerHasStaff": "This customer still has staff in its branches. Remove them before deleting.",
+    "branchNotExists": "Branch not found.",
+    "customerNotExists": "Customer not found.",
+    "unknown": "Something went wrong. Please try again."
   }
 }

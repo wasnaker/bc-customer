@@ -2,27 +2,33 @@ import { useCallback } from "react";
 import useFetch from "@/services/api/use-fetch";
 import { API_URL } from "@/services/api/config";
 import wrapperFetchJsonResponse from "@/services/api/wrapper-fetch-json-response";
-import type { InfinityPaginationType } from "@/services/api/types/infinity-pagination";
 import type { SortEnum } from "@/services/api/types/sort-type";
 import type { RequestConfigType } from "@/services/api/services/types/request-config";
-import type { Province, Regency } from "../types/customer";
+import type {
+  Customer,
+  CustomerDocument,
+  CustomerDocumentOwnerType,
+  CustomerPagination,
+  HeadOfficeInput,
+} from "../types/customer";
 
-// ── Province ────────────────────────────────────────────────────────────────
+// ── Customer ────────────────────────────────────────────────────────────────
 
-export type ProvinceListRequest = {
+export type CustomerListRequest = {
   page: number;
   limit: number;
+  /** Filter API: `name` (ILike) & `isActive`. Search dipetakan ke `name`. */
   filters?: Record<string, string | number | boolean>;
-  sort?: Array<{ orderBy: keyof Province; order: SortEnum }>;
+  sort?: Array<{ orderBy: keyof Customer; order: SortEnum }>;
 };
 
-export type ProvinceListResponse = InfinityPaginationType<Province>;
+export type CustomerListResponse = CustomerPagination<Customer>;
 
-export function useGetProvincesService() {
+export function useGetCustomersService() {
   const fetch = useFetch();
   return useCallback(
-    (data: ProvinceListRequest, requestConfig?: RequestConfigType) => {
-      const url = new URL(`${API_URL}/v1/customer/provinces`);
+    (data: CustomerListRequest, requestConfig?: RequestConfigType) => {
+      const url = new URL(`${API_URL}/v1/customer`);
       url.searchParams.append("page", String(data.page));
       url.searchParams.append("limit", String(data.limit));
       if (data.filters) {
@@ -32,100 +38,114 @@ export function useGetProvincesService() {
         url.searchParams.append("sort", JSON.stringify(data.sort));
       }
       return fetch(url, { method: "GET", ...requestConfig }).then(
-        wrapperFetchJsonResponse<ProvinceListResponse>
+        wrapperFetchJsonResponse<CustomerListResponse>,
       );
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type ProvinceGetRequest = { id: Province["id"] };
-export type ProvinceGetResponse = Province;
+export type CustomerGetRequest = { id: Customer["id"] };
+export type CustomerGetResponse = Customer;
 
-export function useGetProvinceService() {
+export function useGetCustomerService() {
   const fetch = useFetch();
   return useCallback(
-    (data: ProvinceGetRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/provinces/${data.id}`, {
+    (data: CustomerGetRequest, requestConfig?: RequestConfigType) => {
+      return fetch(`${API_URL}/v1/customer/${data.id}`, {
         method: "GET",
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<ProvinceGetResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerGetResponse>);
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type ProvincePostRequest = Pick<Province, "name" | "isoCode" | "latitude" | "longitude">;
-export type ProvincePostResponse = Province;
+export type CustomerPostRequest = {
+  name: string;
+  npwpNumber?: string | null;
+  nibNumber?: string | null;
+  isActive?: boolean;
+  /** Kontrak J1: membuat customer SELALU membuat kantor pusatnya (satu transaksi). */
+  headOffice: HeadOfficeInput;
+};
+export type CustomerPostResponse = Customer;
 
-export function useCreateProvinceService() {
+export function useCreateCustomerService() {
   const fetch = useFetch();
   return useCallback(
-    (data: ProvincePostRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/provinces`, {
+    (data: CustomerPostRequest, requestConfig?: RequestConfigType) => {
+      return fetch(`${API_URL}/v1/customer`, {
         method: "POST",
         body: JSON.stringify(data),
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<ProvincePostResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerPostResponse>);
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type ProvincePatchRequest = {
-  id: Province["id"];
-  data: Partial<Omit<ProvincePostRequest, never>>;
+export type CustomerPatchRequest = {
+  id: Customer["id"];
+  /** Head office TIDAK diupdate di sini — pakai endpoint branch. */
+  data: Partial<
+    Pick<Customer, "name" | "npwpNumber" | "nibNumber" | "isActive">
+  >;
 };
-export type ProvincePatchResponse = Province;
+export type CustomerPatchResponse = Customer;
 
-export function useUpdateProvinceService() {
+export function useUpdateCustomerService() {
   const fetch = useFetch();
   return useCallback(
-    (data: ProvincePatchRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/provinces/${data.id}`, {
+    (data: CustomerPatchRequest, requestConfig?: RequestConfigType) => {
+      return fetch(`${API_URL}/v1/customer/${data.id}`, {
         method: "PATCH",
         body: JSON.stringify(data.data),
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<ProvincePatchResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerPatchResponse>);
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type ProvinceDeleteRequest = { id: Province["id"] };
-export type ProvinceDeleteResponse = undefined;
+export type CustomerDeleteRequest = { id: Customer["id"] };
+export type CustomerDeleteResponse = undefined;
 
-export function useDeleteProvinceService() {
+export function useDeleteCustomerService() {
   const fetch = useFetch();
   return useCallback(
-    (data: ProvinceDeleteRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/provinces/${data.id}`, {
+    (data: CustomerDeleteRequest, requestConfig?: RequestConfigType) => {
+      return fetch(`${API_URL}/v1/customer/${data.id}`, {
         method: "DELETE",
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<ProvinceDeleteResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerDeleteResponse>);
     },
-    [fetch]
+    [fetch],
   );
 }
 
-// ── Regency ─────────────────────────────────────────────────────────────────
+// ── Documents (polymorphic: ownerType = customer | branch | staff) ──────────
 
-export type RegencyListRequest = {
+export type CustomerDocumentListRequest = {
   page: number;
   limit: number;
+  ownerType: CustomerDocumentOwnerType;
+  ownerId: CustomerDocument["ownerId"];
   filters?: Record<string, string | number | boolean>;
-  sort?: Array<{ orderBy: keyof Regency; order: SortEnum }>;
+  sort?: Array<{ orderBy: keyof CustomerDocument; order: SortEnum }>;
 };
 
-export type RegencyListResponse = InfinityPaginationType<Regency>;
+export type CustomerDocumentListResponse = CustomerPagination<CustomerDocument>;
 
-export function useGetRegenciesService() {
+export function useGetCustomerDocumentsService() {
   const fetch = useFetch();
   return useCallback(
-    (data: RegencyListRequest, requestConfig?: RequestConfigType) => {
-      const url = new URL(`${API_URL}/v1/customer/regencies`);
+    (data: CustomerDocumentListRequest, requestConfig?: RequestConfigType) => {
+      const url = new URL(`${API_URL}/v1/customer/documents`);
       url.searchParams.append("page", String(data.page));
       url.searchParams.append("limit", String(data.limit));
+      url.searchParams.append("ownerType", data.ownerType);
+      url.searchParams.append("ownerId", String(data.ownerId));
       if (data.filters) {
         url.searchParams.append("filters", JSON.stringify(data.filters));
       }
@@ -133,94 +153,73 @@ export function useGetRegenciesService() {
         url.searchParams.append("sort", JSON.stringify(data.sort));
       }
       return fetch(url, { method: "GET", ...requestConfig }).then(
-        wrapperFetchJsonResponse<RegencyListResponse>
+        wrapperFetchJsonResponse<CustomerDocumentListResponse>,
       );
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type RegencyGetRequest = { id: Regency["id"] };
-export type RegencyGetResponse = Regency;
+export type CustomerDocumentPostRequest = {
+  ownerType: CustomerDocumentOwnerType;
+  ownerId: CustomerDocument["ownerId"];
+  type: string;
+  number?: string | null;
+  fileId: string;
+  issuedAt?: string | null;
+  expiresAt?: string | null;
+};
+export type CustomerDocumentPostResponse = CustomerDocument;
 
-export function useGetRegencyService() {
+export function useCreateCustomerDocumentService() {
   const fetch = useFetch();
   return useCallback(
-    (data: RegencyGetRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/regencies/${data.id}`, {
-        method: "GET",
-        ...requestConfig,
-      }).then(wrapperFetchJsonResponse<RegencyGetResponse>);
-    },
-    [fetch]
-  );
-}
-
-export type RegencyPostRequest = Pick<Regency, "provinceId" | "name" | "type" | "isActive">;
-export type RegencyPostResponse = Regency;
-
-export function useCreateRegencyService() {
-  const fetch = useFetch();
-  return useCallback(
-    (data: RegencyPostRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/regencies`, {
+    (data: CustomerDocumentPostRequest, requestConfig?: RequestConfigType) => {
+      return fetch(`${API_URL}/v1/customer/documents`, {
         method: "POST",
         body: JSON.stringify(data),
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<RegencyPostResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerDocumentPostResponse>);
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type RegencyPatchRequest = {
-  id: Regency["id"];
-  data: Partial<Omit<RegencyPostRequest, never>>;
+export type CustomerDocumentPatchRequest = {
+  id: CustomerDocument["id"];
+  data: Partial<Omit<CustomerDocumentPostRequest, "ownerType" | "ownerId">>;
 };
-export type RegencyPatchResponse = Regency;
+export type CustomerDocumentPatchResponse = CustomerDocument;
 
-export function useUpdateRegencyService() {
+export function useUpdateCustomerDocumentService() {
   const fetch = useFetch();
   return useCallback(
-    (data: RegencyPatchRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/regencies/${data.id}`, {
+    (data: CustomerDocumentPatchRequest, requestConfig?: RequestConfigType) => {
+      return fetch(`${API_URL}/v1/customer/documents/${data.id}`, {
         method: "PATCH",
         body: JSON.stringify(data.data),
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<RegencyPatchResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerDocumentPatchResponse>);
     },
-    [fetch]
+    [fetch],
   );
 }
 
-export type RegencyDeleteRequest = { id: Regency["id"] };
-export type RegencyDeleteResponse = undefined;
+export type CustomerDocumentDeleteRequest = { id: CustomerDocument["id"] };
+export type CustomerDocumentDeleteResponse = undefined;
 
-export function useDeleteRegencyService() {
+export function useDeleteCustomerDocumentService() {
   const fetch = useFetch();
   return useCallback(
-    (data: RegencyDeleteRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/regencies/${data.id}`, {
+    (
+      data: CustomerDocumentDeleteRequest,
+      requestConfig?: RequestConfigType,
+    ) => {
+      return fetch(`${API_URL}/v1/customer/documents/${data.id}`, {
         method: "DELETE",
         ...requestConfig,
-      }).then(wrapperFetchJsonResponse<RegencyDeleteResponse>);
+      }).then(wrapperFetchJsonResponse<CustomerDocumentDeleteResponse>);
     },
-    [fetch]
+    [fetch],
   );
-}
-
-/**
- * Convenience helper — non-hook, returns raw fetch promise.
- * Gunakan di dalam useEffect/detail-tab untuk fetch regencies by provinceId.
- */
-export function fetchRegenciesByProvince(
-  provinceId: Province["id"],
-  limit = 100,
-  fetch: ReturnType<typeof import("@/services/api/use-fetch").default> | null = null
-): Promise<Response> {
-  const url = new URL(`${API_URL}/v1/customer/regencies`);
-  url.searchParams.append("page", "1");
-  url.searchParams.append("limit", String(limit));
-  url.searchParams.append("filters", JSON.stringify({ provinceId: String(provinceId) }));
-  return (fetch ?? globalThis.fetch)(url, { method: "GET" });
 }
