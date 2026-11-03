@@ -32,7 +32,7 @@ export class AddCustomerCodeTriggers1793850000000000001
         n := (((value % modulus) * 48271) + salt) % modulus;
         FOR i IN 1..6 LOOP
           result := substr(alphabet, (n % 32)::int + 1, 1) || result;
-          n := n div 32;
+          n := n / 32;
         END LOOP;
         RETURN result;
       END;
