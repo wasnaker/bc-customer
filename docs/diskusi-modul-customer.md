@@ -757,3 +757,23 @@ kan bbisa beda kota beda provinsi
 - (c) Fase 1 lalu Fase 2 berurutan *(rekomendasi)*
 
 **Aturan default**: kalau J1–J3 tidak dijawab, saya pakai rekomendasi di atas dan mulai Fase 1.
+
+---
+
+## 9. Log Progres Pengerjaan
+
+| Fase | Isi | Status |
+| --- | --- | --- |
+| Fase 1 | region 0.4.0: kode BPS regency (514/514 terisi), seed id eksplisit + `setval`, endpoint referensi cukup JWT (mutasi tetap `read:region`). Host backend & frontend di-pin ke SHA `5452302`, migrasi + seed sudah jalan di produksi. Tag `v0.4.0` | ✅ Selesai |
+| Fase 2 | Skrip `scripts/rename-from-region.mjs` (reusable utk 29 modul lain, ikut disimpan di bc-region); rename penuh region → customer (package `@wasnaker/module-customer`, permission `*:customer`, i18n `module-customer.json`, route `customer`). Commit pertama `c8896a5` | ✅ Selesai |
+| Fase 3 | Entity + migrasi sesuai kontrak §7: `customer`, `branch` (addressLine wajib semua cabang, provinceId+cityId RESTRICT, partial unique HO), `staff` (tanpa code, userId nullable unique, nip/addressLine/region nullable), `customer_document` (ownerType+ownerId polimorfik, type/number, issuedAt/expiresAt). ULID + code Crockford Base32 otomatis. Commit `17819ca` | ✅ Selesai |
+| Fase 4 | API: service + controller 3 entitas, 12 permission, validasi (maks 1 HO, create customer = buat HO sekaligus), seed contoh | ⬜ Berikutnya |
+| Fase 5 | Frontend: 3 halaman SmallTable + menu (customer 100, branch 101, staff 102), integrasi host, uji CRUD/master-detail | ⬜ |
+| Fase 6 | Ukur waktu build Next.js dengan 1/3/10 modul → keputusan transpilePackages vs prebuilt | ⬜ |
+
+Catatan teknis Fase 3:
+- `code` diisi otomatis setelah insert (`@AfterInsert`) karena butuh id dari database. Salt masih placeholder `1` — nanti dipindah ke Settings host (I7/I8).
+- `staff.branchId` RESTRICT: branch tidak bisa dihapus kalau masih ada staff (harus pindahkan staff dulu).
+- Semua FK keluar modul mengikuti tipe pemilik: region `int`, user host `int`, file host `uuid`.
+
+> File diskusi ini sebelumnya sempat hilang karena tertimpa sinkronisasi folder; salinan aman ada di `/www/wwwroot/brocoders/diskusi-modul-customer.md` dan sekarang kembali diverken di `docs/`.
