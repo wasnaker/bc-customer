@@ -1,0 +1,126 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { FindOptionsWhere, ILike, Repository } from 'typeorm';
+import { BranchEntity } from '../entities/branch.entity';
+import { NullableType } from '../../../../../utils/types/nullable.type';
+import { FilterBranchDto, SortBranchDto } from '../../../../dto/query-branch.dto';
+import { Branch } from '../../../../domain/branch';
+import { BranchRepository } from '../../branch.repository';
+import { BranchMapper } from '../mappers/branch.mapper';
+import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+
+@Injectable()
+export class BranchesRelationalRepository implements BranchRepository {
+  constructor(
+    @InjectRepository(BranchEntity)
+    private readonly branchRepository: Repository<BranchEntity>,
+  ) {}
+
+  async create(
+    data: Omit<Branch, 'id' | 'createdAt' | 'updatedAt' | 'ulid' | 'code'>,
+  ): Promise<Branch> {
+    const persistenceModel = BranchMapper.toPersistence(data as Branch);
+    const newEntity = await this.branchRepository.save(
+      this.branchRepository.create(persistenceModel),
+    );
+    return BranchMapper.toDomain(newEntity);
+  }
+
+  async findManyByCustomerId({
+    customerId,
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+  }: {
+    customerId: Branch['customerId'];
+    filterOptions?: FilterBranchDto | null;
+    sortOptions?: SortBranchDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<Branch[]> {
+    const where: FindOptionsWhere<BranchEntity> = {
+      customerId: BigInt(customerId),
+    };
+    if (filterOptions?.name) {
+      where.name = ILike(`%${filterOptions.name}%`);
+    }
+    if (filterOptions?.isHeadOffice !== undefined) {
+      where.isHeadOffice = filterOptions.isHeadOffice;
+    }
+
+    const entities = await this.branchRepository.find({
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+      where,
+      order: sortOptions?.reduce(
+        (accumulator, sort) => ({
+          ...accumulator,
+          [sort.orderBy]: sort.order,
+        }),
+        { isHeadOffice: 'DESC', name: 'ASC' },
+      ),
+    });
+
+    return entities.map((branch) => BranchMapper.toDomain(branch));
+  }
+
+  async findById(id: Branch['id']): Promise<NullableType<Branch>> {
+    const entity = await this.branchRepository.findOne({
+      where: { id: BigInt(id) },
+    });
+    return entity ? BranchMapper.toDomain(entity) : null;
+  }
+
+  async findHeadOfficeByCustomerId(
+    customerId: Branch['customerId'],
+  ): Promise<NullableType<Branch>> {
+    const entity = await this.branchRepository.findOne({
+      where: { customerId: BigInt(customerId), isHeadOffice: true },
+    });
+    return entity ? BranchMapper.toDomain(entity) : null;
+  }
+
+  async countByCustomerId(
+    customerId: Branch['customerId'],
+    filterOptions?: FilterBranchDto | null,
+  ): Promise<number> {
+    const where: FindOptionsWhere<BranchEntity> = {
+      customerId: BigInt(customerId),
+    };
+    if (filterOptions?.name) {
+      where.name = ILike(`%${filterOptions.name}%`);
+    }
+    if (filterOptions?.isHeadOffice !== undefined) {
+      where.isHeadOffice = filterOptions.isHeadOffice;
+    }
+    return this.branchRepository.count({ where });
+  }
+
+  async update(
+    id: Branch['id'],
+    payload: Partial<Branch>,
+  ): Promise<Branch | null> {
+    const entity = await this.branchRepository.findOne({
+      where: { id: BigInt(id) },
+    });
+
+    if (!entity) {
+      return null;
+    }
+
+    const updatedEntity = await this.branchRepository.save(
+      this.branchRepository.create(
+        BranchMapper.toPersistence({
+          ...BranchMapper.toDomain(entity),
+          ...payload,
+        }),
+      ),
+    );
+
+    return BranchMapper.toDomain(updatedEntity);
+  }
+
+  async remove(id: Branch['id']): Promise<void> {
+    await this.branchRepository.delete({ id: BigInt(id) });
+  }
+}

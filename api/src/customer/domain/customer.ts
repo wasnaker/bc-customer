@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Branch } from './branch';
 
 export class Customer {
   @ApiProperty({ example: '1', description: 'Bigint PK serialized as string' })
@@ -28,6 +29,10 @@ export class Customer {
 
   @ApiProperty({ example: true })
   isActive: boolean;
+
+  /** Populated when the head office is requested alongside the customer. */
+  @ApiPropertyOptional({ type: Branch })
+  headOffice?: Branch;
 
   @ApiPropertyOptional()
   createdAt: Date;

@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Customer = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const branch_1 = require("./branch");
 class Customer {
 }
 exports.Customer = Customer;
@@ -50,6 +51,10 @@ __decorate([
     (0, swagger_1.ApiProperty)({ example: true }),
     __metadata("design:type", Boolean)
 ], Customer.prototype, "isActive", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ type: branch_1.Branch }),
+    __metadata("design:type", branch_1.Branch)
+], Customer.prototype, "headOffice", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)(),
     __metadata("design:type", Date)
