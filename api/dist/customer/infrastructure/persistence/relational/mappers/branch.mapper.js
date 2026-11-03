@@ -6,10 +6,13 @@ const branch_entity_1 = require("../entities/branch.entity");
 class BranchMapper {
     static toDomain(raw) {
         const domainEntity = new branch_1.Branch();
-        domainEntity.id = raw.id;
+        domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
         domainEntity.ulid = raw.ulid;
         domainEntity.code = raw.code;
-        domainEntity.customerId = raw.customerId;
+        domainEntity.customerId =
+            raw.customerId === null || raw.customerId === undefined
+                ? raw.customerId
+                : String(raw.customerId);
         domainEntity.name = raw.name;
         domainEntity.isHeadOffice = raw.isHeadOffice;
         domainEntity.addressLine = raw.addressLine;

@@ -4,9 +4,12 @@ import { StaffEntity } from '../entities/staff.entity';
 export class StaffMapper {
   static toDomain(raw: StaffEntity): Staff {
     const domainEntity = new Staff();
-    domainEntity.id = raw.id;
+    domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
     domainEntity.ulid = raw.ulid;
-    domainEntity.branchId = raw.branchId;
+    domainEntity.branchId =
+      raw.branchId === null || raw.branchId === undefined
+        ? raw.branchId
+        : String(raw.branchId);
     domainEntity.name = raw.name;
     domainEntity.userId = raw.userId;
     domainEntity.position = raw.position;

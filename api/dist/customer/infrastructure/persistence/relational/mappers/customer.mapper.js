@@ -6,7 +6,7 @@ const customer_entity_1 = require("../entities/customer.entity");
 class CustomerMapper {
     static toDomain(raw) {
         const domainEntity = new customer_1.Customer();
-        domainEntity.id = raw.id;
+        domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
         domainEntity.ulid = raw.ulid;
         domainEntity.code = raw.code;
         domainEntity.name = raw.name;

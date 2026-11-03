@@ -4,7 +4,7 @@ import { CustomerEntity } from '../entities/customer.entity';
 export class CustomerMapper {
   static toDomain(raw: CustomerEntity): Customer {
     const domainEntity = new Customer();
-    domainEntity.id = raw.id;
+    domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
     domainEntity.ulid = raw.ulid;
     domainEntity.code = raw.code;
     domainEntity.name = raw.name;

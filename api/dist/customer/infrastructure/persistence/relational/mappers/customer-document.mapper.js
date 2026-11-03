@@ -6,11 +6,14 @@ const customer_document_entity_1 = require("../entities/customer-document.entity
 class CustomerDocumentMapper {
     static toDomain(raw) {
         const domainEntity = new customer_document_1.CustomerDocument();
-        domainEntity.id = raw.id;
+        domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
         domainEntity.ulid = raw.ulid;
         domainEntity.ownerType =
             raw.ownerType;
-        domainEntity.ownerId = raw.ownerId;
+        domainEntity.ownerId =
+            raw.ownerId === null || raw.ownerId === undefined
+                ? raw.ownerId
+                : String(raw.ownerId);
         domainEntity.type = raw.type;
         domainEntity.number = raw.number;
         domainEntity.fileId = raw.fileId;
