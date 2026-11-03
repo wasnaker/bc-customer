@@ -1,0 +1,48 @@
+/** 38 provinsi Indonesia — sumber: fityannugroho/idn-area-data (Kemendagri). */
+export interface ProvinceSeedRow {
+  /** Id eksplisit agar deterministik di semua environment */
+  id: number;
+  isoCode: string;
+  name: string;
+}
+
+export const PROVINCE_SEED: ProvinceSeedRow[] = [
+  { id: 1, isoCode: '11', name: 'Aceh' },
+  { id: 2, isoCode: '12', name: 'Sumatera Utara' },
+  { id: 3, isoCode: '13', name: 'Sumatera Barat' },
+  { id: 4, isoCode: '14', name: 'Riau' },
+  { id: 5, isoCode: '15', name: 'Jambi' },
+  { id: 6, isoCode: '16', name: 'Sumatera Selatan' },
+  { id: 7, isoCode: '17', name: 'Bengkulu' },
+  { id: 8, isoCode: '18', name: 'Lampung' },
+  { id: 9, isoCode: '19', name: 'Kepulauan Bangka Belitung' },
+  { id: 10, isoCode: '21', name: 'Kepulauan Riau' },
+  { id: 11, isoCode: '31', name: 'DKI Jakarta' },
+  { id: 12, isoCode: '32', name: 'Jawa Barat' },
+  { id: 13, isoCode: '33', name: 'Jawa Tengah' },
+  { id: 14, isoCode: '34', name: 'DI Yogyakarta' },
+  { id: 15, isoCode: '35', name: 'Jawa Timur' },
+  { id: 16, isoCode: '36', name: 'Banten' },
+  { id: 17, isoCode: '51', name: 'Bali' },
+  { id: 18, isoCode: '52', name: 'Nusa Tenggara Barat' },
+  { id: 19, isoCode: '53', name: 'Nusa Tenggara Timur' },
+  { id: 20, isoCode: '61', name: 'Kalimantan Barat' },
+  { id: 21, isoCode: '62', name: 'Kalimantan Tengah' },
+  { id: 22, isoCode: '63', name: 'Kalimantan Selatan' },
+  { id: 23, isoCode: '64', name: 'Kalimantan Timur' },
+  { id: 24, isoCode: '65', name: 'Kalimantan Utara' },
+  { id: 25, isoCode: '71', name: 'Sulawesi Utara' },
+  { id: 26, isoCode: '72', name: 'Sulawesi Tengah' },
+  { id: 27, isoCode: '73', name: 'Sulawesi Selatan' },
+  { id: 28, isoCode: '74', name: 'Sulawesi Tenggara' },
+  { id: 29, isoCode: '75', name: 'Gorontalo' },
+  { id: 30, isoCode: '76', name: 'Sulawesi Barat' },
+  { id: 31, isoCode: '81', name: 'Maluku' },
+  { id: 32, isoCode: '82', name: 'Maluku Utara' },
+  { id: 33, isoCode: '91', name: 'Papua' },
+  { id: 34, isoCode: '92', name: 'Papua Barat' },
+  { id: 35, isoCode: '93', name: 'Papua Selatan' },
+  { id: 36, isoCode: '94', name: 'Papua Tengah' },
+  { id: 37, isoCode: '95', name: 'Papua Pegunungan' },
+  { id: 38, isoCode: '96', name: 'Papua Barat Daya' },
+];
