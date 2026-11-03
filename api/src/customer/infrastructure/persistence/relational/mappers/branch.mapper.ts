@@ -1,0 +1,63 @@
+import { Branch } from '../../../../domain/branch';
+import { BranchEntity } from '../entities/branch.entity';
+
+export class BranchMapper {
+  static toDomain(raw: BranchEntity): Branch {
+    const domainEntity = new Branch();
+    domainEntity.id = raw.id;
+    domainEntity.ulid = raw.ulid;
+    domainEntity.code = raw.code;
+    domainEntity.customerId = raw.customerId;
+    domainEntity.name = raw.name;
+    domainEntity.isHeadOffice = raw.isHeadOffice;
+    domainEntity.addressLine = raw.addressLine;
+    domainEntity.provinceId = raw.provinceId;
+    domainEntity.cityId = raw.cityId;
+    domainEntity.postalCode = raw.postalCode;
+    domainEntity.nitkuNumber = raw.nitkuNumber;
+    domainEntity.vatType = raw.vatType as Branch['vatType'];
+    domainEntity.isActive = raw.isActive;
+    domainEntity.createdAt = raw.createdAt;
+    domainEntity.updatedAt = raw.updatedAt;
+    return domainEntity;
+  }
+
+  static toPersistence(domainEntity: Partial<Branch>): BranchEntity {
+    const persistenceEntity = new BranchEntity();
+    if (domainEntity.id !== undefined && domainEntity.id !== null) {
+      persistenceEntity.id = BigInt(domainEntity.id);
+    }
+    if (domainEntity.ulid !== undefined) {
+      persistenceEntity.ulid = domainEntity.ulid;
+    }
+    if (domainEntity.code !== undefined) {
+      persistenceEntity.code = domainEntity.code;
+    }
+    if (
+      domainEntity.customerId !== undefined &&
+      domainEntity.customerId !== null
+    ) {
+      persistenceEntity.customerId = BigInt(domainEntity.customerId);
+    }
+    persistenceEntity.name = domainEntity.name as string;
+    if (domainEntity.isHeadOffice !== undefined) {
+      persistenceEntity.isHeadOffice = domainEntity.isHeadOffice;
+    }
+    persistenceEntity.addressLine = domainEntity.addressLine as string;
+    if (domainEntity.provinceId !== undefined && domainEntity.provinceId !== null) {
+      persistenceEntity.provinceId = domainEntity.provinceId;
+    }
+    if (domainEntity.cityId !== undefined && domainEntity.cityId !== null) {
+      persistenceEntity.cityId = domainEntity.cityId;
+    }
+    persistenceEntity.postalCode = domainEntity.postalCode ?? null;
+    persistenceEntity.nitkuNumber = domainEntity.nitkuNumber ?? null;
+    if (domainEntity.vatType !== undefined) {
+      persistenceEntity.vatType = domainEntity.vatType;
+    }
+    if (domainEntity.isActive !== undefined) {
+      persistenceEntity.isActive = domainEntity.isActive;
+    }
+    return persistenceEntity;
+  }
+}

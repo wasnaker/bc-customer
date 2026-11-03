@@ -9,20 +9,16 @@ var CustomerModule_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomerModule = exports.CUSTOMER_MODULE_OPTIONS = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
-const province_entity_1 = require("./infrastructure/persistence/relational/entities/province.entity");
-const regency_entity_1 = require("./infrastructure/persistence/relational/entities/regency.entity");
-const customer_service_1 = require("./services/customer.service");
-const customer_controller_1 = require("./controllers/customer.controller");
-const customer_seed_service_1 = require("./database/customer-seed.service");
-const province_repository_1 = require("./infrastructure/persistence/province.repository");
-const regency_repository_1 = require("./infrastructure/persistence/regency.repository");
-const province_repository_2 = require("./infrastructure/persistence/relational/repositories/province.repository");
-const regency_repository_2 = require("./infrastructure/persistence/relational/repositories/regency.repository");
 const customer_access_guard_1 = require("./security/customer-access.guard");
 const customer_options_1 = require("./customer.options");
 var customer_options_2 = require("./customer.options");
 Object.defineProperty(exports, "CUSTOMER_MODULE_OPTIONS", { enumerable: true, get: function () { return customer_options_2.CUSTOMER_MODULE_OPTIONS; } });
+/**
+ * Phase 3 (entities) module shell: entities, migrations and ULID/code hooks
+ * travel with the entity classes (method-level listeners), so no subscriber
+ * registration is required here. Services/controllers arrive in a later
+ * phase and will be added to providers/controllers then.
+ */
 let CustomerModule = CustomerModule_1 = class CustomerModule {
     static registerAsync(options) {
         const optionsProvider = {
@@ -40,15 +36,7 @@ let CustomerModule = CustomerModule_1 = class CustomerModule {
 exports.CustomerModule = CustomerModule;
 exports.CustomerModule = CustomerModule = CustomerModule_1 = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([province_entity_1.ProvinceEntity, regency_entity_1.RegencyEntity])],
-        providers: [
-            customer_service_1.CustomerService,
-            customer_seed_service_1.CustomerSeedService,
-            customer_access_guard_1.CustomerAccessGuard,
-            { provide: province_repository_1.ProvinceRepository, useClass: province_repository_2.ProvincesRelationalRepository },
-            { provide: regency_repository_1.RegencyRepository, useClass: regency_repository_2.RegenciesRelationalRepository },
-        ],
-        controllers: [customer_controller_1.CustomerController],
-        exports: [customer_service_1.CustomerService, customer_seed_service_1.CustomerSeedService],
+        providers: [customer_access_guard_1.CustomerAccessGuard],
+        exports: [customer_access_guard_1.CustomerAccessGuard],
     })
 ], CustomerModule);
