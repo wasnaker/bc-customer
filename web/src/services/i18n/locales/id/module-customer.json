@@ -27,6 +27,8 @@
     "selectCustomer": "Pelanggan",
     "selectCustomerPlaceholder": "Pilih pelanggan…",
     "selectCustomerFirst": "Pilih pelanggan untuk melihat cabangnya.",
+    "clearCustomerFilter": "Hapus filter pelanggan",
+    "filterAllCustomers": "Semua pelanggan",
     "headOfficeBadge": "Kantor Pusat",
     "headOfficeTaken": "Pelanggan ini sudah memiliki kantor pusat."
   },
@@ -65,7 +67,8 @@
     "inactive": "Nonaktif",
     "loading": "Memuat…",
     "of": "dari",
-    "error": "Gagal memuat data. Silakan coba lagi."
+    "error": "Gagal memuat data. Silakan coba lagi.",
+    "customer": "Pelanggan"
   },
   "detail": {
     "overview": "Ringkasan",

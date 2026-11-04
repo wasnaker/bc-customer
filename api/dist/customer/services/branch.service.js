@@ -26,7 +26,7 @@ let BranchService = class BranchService {
             throw new common_1.UnprocessableEntityException({
                 status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
-                    customer: 'customerNotExists',
+                    customer: "customerNotExists",
                 },
             });
         }
@@ -43,7 +43,7 @@ let BranchService = class BranchService {
             cityId: createBranchDto.cityId,
             postalCode: createBranchDto.postalCode ?? null,
             nitkuNumber: createBranchDto.nitkuNumber ?? null,
-            vatType: createBranchDto.vatType ?? 'npwp',
+            vatType: createBranchDto.vatType ?? "npwp",
             isActive: createBranchDto.isActive ?? true,
         });
     }
@@ -53,7 +53,7 @@ let BranchService = class BranchService {
             throw new common_1.UnprocessableEntityException({
                 status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
-                    customer: 'customerNotExists',
+                    customer: "customerNotExists",
                 },
             });
         }
@@ -63,6 +63,38 @@ let BranchService = class BranchService {
             sortOptions,
             paginationOptions,
         });
+    }
+    /**
+     * List branch global (lintas customer) untuk tabel Branch mandiri.
+     * `customerId` bersifat filter opsional — divalidasi bila diisi.
+     */
+    async findMany({ customerId, filterOptions, sortOptions, paginationOptions, }) {
+        if (customerId != null) {
+            await this.assertCustomerExists(customerId);
+        }
+        return this.branchRepository.findMany({
+            customerId,
+            filterOptions,
+            sortOptions,
+            paginationOptions,
+        });
+    }
+    async countMany(customerId, filterOptions) {
+        if (customerId != null) {
+            await this.assertCustomerExists(customerId);
+        }
+        return this.branchRepository.countMany(customerId, filterOptions);
+    }
+    async assertCustomerExists(customerId) {
+        const customer = await this.customerRepository.findById(customerId);
+        if (!customer) {
+            throw new common_1.UnprocessableEntityException({
+                status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                errors: {
+                    customer: "customerNotExists",
+                },
+            });
+        }
     }
     async countByCustomerId(customerId, filterOptions) {
         return this.branchRepository.countByCustomerId(customerId, filterOptions);
@@ -76,7 +108,7 @@ let BranchService = class BranchService {
             throw new common_1.UnprocessableEntityException({
                 status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
-                    branch: 'branchNotExists',
+                    branch: "branchNotExists",
                 },
             });
         }
@@ -96,7 +128,7 @@ let BranchService = class BranchService {
             throw new common_1.UnprocessableEntityException({
                 status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
-                    branch: 'branchNotExists',
+                    branch: "branchNotExists",
                 },
             });
         }
@@ -108,7 +140,7 @@ let BranchService = class BranchService {
             throw new common_1.UnprocessableEntityException({
                 status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
-                    branch: 'branchNotExists',
+                    branch: "branchNotExists",
                 },
             });
         }
@@ -118,13 +150,13 @@ let BranchService = class BranchService {
         }
         catch (error) {
             if (error &&
-                typeof error === 'object' &&
-                'code' in error &&
-                error.code === '23503') {
+                typeof error === "object" &&
+                "code" in error &&
+                error.code === "23503") {
                 throw new common_1.UnprocessableEntityException({
                     status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                     errors: {
-                        branch: 'branchHasStaff',
+                        branch: "branchHasStaff",
                     },
                 });
             }
@@ -142,7 +174,7 @@ let BranchService = class BranchService {
             throw new common_1.UnprocessableEntityException({
                 status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
                 errors: {
-                    isHeadOffice: 'customerAlreadyHasHeadOffice',
+                    isHeadOffice: "customerAlreadyHasHeadOffice",
                 },
             });
         }

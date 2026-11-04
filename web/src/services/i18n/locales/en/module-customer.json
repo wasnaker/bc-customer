@@ -27,6 +27,8 @@
     "selectCustomer": "Customer",
     "selectCustomerPlaceholder": "Select a customer…",
     "selectCustomerFirst": "Select a customer to see its branches.",
+    "clearCustomerFilter": "Clear customer filter",
+    "filterAllCustomers": "All customers",
     "headOfficeBadge": "Head Office",
     "headOfficeTaken": "This customer already has a head office."
   },
@@ -65,7 +67,8 @@
     "inactive": "Inactive",
     "loading": "Loading…",
     "of": "of",
-    "error": "Unable to load data. Please try again."
+    "error": "Unable to load data. Please try again.",
+    "customer": "Customer"
   },
   "detail": {
     "overview": "Overview",

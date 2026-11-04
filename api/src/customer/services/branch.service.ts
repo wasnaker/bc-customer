@@ -2,16 +2,16 @@ import {
   HttpStatus,
   Injectable,
   UnprocessableEntityException,
-} from '@nestjs/common';
-import { CreateBranchDto } from '../dto/create-branch.dto';
-import { UpdateBranchDto } from '../dto/update-branch.dto';
-import { FilterBranchDto, SortBranchDto } from '../dto/query-branch.dto';
-import { Branch } from '../domain/branch';
-import { CustomerRepository } from '../infrastructure/persistence/customer.repository';
-import { BranchRepository } from '../infrastructure/persistence/branch.repository';
-import { NullableType } from '../../utils/types/nullable.type';
-import { IPaginationOptions } from '../../utils/types/pagination-options';
-import { RegionValidationService } from './region-validation.service';
+} from "@nestjs/common";
+import { CreateBranchDto } from "../dto/create-branch.dto";
+import { UpdateBranchDto } from "../dto/update-branch.dto";
+import { FilterBranchDto, SortBranchDto } from "../dto/query-branch.dto";
+import { Branch } from "../domain/branch";
+import { CustomerRepository } from "../infrastructure/persistence/customer.repository";
+import { BranchRepository } from "../infrastructure/persistence/branch.repository";
+import { NullableType } from "../../utils/types/nullable.type";
+import { IPaginationOptions } from "../../utils/types/pagination-options";
+import { RegionValidationService } from "./region-validation.service";
 
 @Injectable()
 export class BranchService {
@@ -22,7 +22,7 @@ export class BranchService {
   ) {}
 
   async create(
-    customerId: Branch['customerId'],
+    customerId: Branch["customerId"],
     createBranchDto: CreateBranchDto,
   ): Promise<Branch> {
     const customer = await this.customerRepository.findById(customerId);
@@ -30,7 +30,7 @@ export class BranchService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          customer: 'customerNotExists',
+          customer: "customerNotExists",
         },
       });
     }
@@ -53,7 +53,7 @@ export class BranchService {
       cityId: createBranchDto.cityId,
       postalCode: createBranchDto.postalCode ?? null,
       nitkuNumber: createBranchDto.nitkuNumber ?? null,
-      vatType: createBranchDto.vatType ?? 'npwp',
+      vatType: createBranchDto.vatType ?? "npwp",
       isActive: createBranchDto.isActive ?? true,
     });
   }
@@ -64,7 +64,7 @@ export class BranchService {
     sortOptions,
     paginationOptions,
   }: {
-    customerId: Branch['customerId'];
+    customerId: Branch["customerId"];
     filterOptions?: FilterBranchDto | null;
     sortOptions?: SortBranchDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -74,7 +74,7 @@ export class BranchService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          customer: 'customerNotExists',
+          customer: "customerNotExists",
         },
       });
     }
@@ -87,19 +87,69 @@ export class BranchService {
     });
   }
 
+  /**
+   * List branch global (lintas customer) untuk tabel Branch mandiri.
+   * `customerId` bersifat filter opsional — divalidasi bila diisi.
+   */
+  async findMany({
+    customerId,
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+  }: {
+    customerId?: Branch["customerId"] | null;
+    filterOptions?: FilterBranchDto | null;
+    sortOptions?: SortBranchDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<Branch[]> {
+    if (customerId != null) {
+      await this.assertCustomerExists(customerId);
+    }
+    return this.branchRepository.findMany({
+      customerId,
+      filterOptions,
+      sortOptions,
+      paginationOptions,
+    });
+  }
+
+  async countMany(
+    customerId?: Branch["customerId"] | null,
+    filterOptions?: FilterBranchDto | null,
+  ): Promise<number> {
+    if (customerId != null) {
+      await this.assertCustomerExists(customerId);
+    }
+    return this.branchRepository.countMany(customerId, filterOptions);
+  }
+
+  private async assertCustomerExists(
+    customerId: Branch["customerId"],
+  ): Promise<void> {
+    const customer = await this.customerRepository.findById(customerId);
+    if (!customer) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          customer: "customerNotExists",
+        },
+      });
+    }
+  }
+
   async countByCustomerId(
-    customerId: Branch['customerId'],
+    customerId: Branch["customerId"],
     filterOptions?: FilterBranchDto | null,
   ): Promise<number> {
     return this.branchRepository.countByCustomerId(customerId, filterOptions);
   }
 
-  async findBranchById(id: Branch['id']): Promise<NullableType<Branch>> {
+  async findBranchById(id: Branch["id"]): Promise<NullableType<Branch>> {
     return this.branchRepository.findById(id);
   }
 
   async update(
-    id: Branch['id'],
+    id: Branch["id"],
     updateBranchDto: UpdateBranchDto,
   ): Promise<Branch> {
     const branch = await this.branchRepository.findById(id);
@@ -107,7 +157,7 @@ export class BranchService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          branch: 'branchNotExists',
+          branch: "branchNotExists",
         },
       });
     }
@@ -132,20 +182,20 @@ export class BranchService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          branch: 'branchNotExists',
+          branch: "branchNotExists",
         },
       });
     }
     return updated;
   }
 
-  async remove(id: Branch['id']): Promise<void> {
+  async remove(id: Branch["id"]): Promise<void> {
     const branch = await this.branchRepository.findById(id);
     if (!branch) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          branch: 'branchNotExists',
+          branch: "branchNotExists",
         },
       });
     }
@@ -156,14 +206,14 @@ export class BranchService {
     } catch (error) {
       if (
         error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        (error as { code?: string }).code === '23503'
+        typeof error === "object" &&
+        "code" in error &&
+        (error as { code?: string }).code === "23503"
       ) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
           errors: {
-            branch: 'branchHasStaff',
+            branch: "branchHasStaff",
           },
         });
       }
@@ -177,16 +227,15 @@ export class BranchService {
    * readable error instead of a constraint violation.
    */
   private async assertHeadOfficeAvailable(
-    customerId: Branch['customerId'],
+    customerId: Branch["customerId"],
   ): Promise<void> {
-    const headOffice = await this.branchRepository.findHeadOfficeByCustomerId(
-      customerId,
-    );
+    const headOffice =
+      await this.branchRepository.findHeadOfficeByCustomerId(customerId);
     if (headOffice) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          isHeadOffice: 'customerAlreadyHasHeadOffice',
+          isHeadOffice: "customerAlreadyHasHeadOffice",
         },
       });
     }

@@ -27,6 +27,8 @@
     "selectCustomer": "고객",
     "selectCustomerPlaceholder": "고객 선택…",
     "selectCustomerFirst": "고객을 선택하면 지점이 표시됩니다.",
+    "clearCustomerFilter": "고객 필터 지우기",
+    "filterAllCustomers": "모든 고객",
     "headOfficeBadge": "본사",
     "headOfficeTaken": "이 고객에게는 이미 본사가 있습니다."
   },
@@ -65,7 +67,8 @@
     "inactive": "비활성",
     "loading": "불러오는 중…",
     "of": "/",
-    "error": "데이터를 불러오지 못했습니다. 다시 시도해 주세요."
+    "error": "데이터를 불러오지 못했습니다. 다시 시도해 주세요.",
+    "customer": "고객"
   },
   "detail": {
     "overview": "개요",

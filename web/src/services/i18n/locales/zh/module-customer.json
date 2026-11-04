@@ -27,6 +27,8 @@
     "selectCustomer": "客户",
     "selectCustomerPlaceholder": "选择客户…",
     "selectCustomerFirst": "请先选择客户以查看其分支。",
+    "clearCustomerFilter": "清除客户筛选",
+    "filterAllCustomers": "所有客户",
     "headOfficeBadge": "总部",
     "headOfficeTaken": "该客户已设有总部。"
   },
@@ -65,7 +67,8 @@
     "inactive": "停用",
     "loading": "加载中…",
     "of": "/",
-    "error": "数据加载失败，请重试。"
+    "error": "数据加载失败，请重试。",
+    "customer": "客户"
   },
   "detail": {
     "overview": "概览",

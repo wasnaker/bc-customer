@@ -17,7 +17,7 @@ class FilterBranchDto {
 }
 exports.FilterBranchDto = FilterBranchDto;
 __decorate([
-    (0, swagger_1.ApiPropertyOptional)({ example: 'Kantor Pusat' }),
+    (0, swagger_1.ApiPropertyOptional)({ example: "Kantor Pusat" }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -25,7 +25,7 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ example: false }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_transformer_1.Transform)(({ value }) => value === 'true' || value === true),
+    (0, class_transformer_1.Transform)(({ value }) => value === "true" || value === true),
     (0, class_validator_1.IsBoolean)(),
     __metadata("design:type", Boolean)
 ], FilterBranchDto.prototype, "isHeadOffice", void 0);
@@ -39,9 +39,9 @@ __decorate([
     __metadata("design:type", Object)
 ], SortBranchDto.prototype, "orderBy", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ enum: ['ASC', 'DESC'] }),
+    (0, swagger_1.ApiProperty)({ enum: ["ASC", "DESC"] }),
     (0, class_transformer_1.Transform)(({ value }) => String(value).toUpperCase()),
-    (0, class_validator_1.IsIn)(['ASC', 'DESC']),
+    (0, class_validator_1.IsIn)(["ASC", "DESC"]),
     __metadata("design:type", String)
 ], SortBranchDto.prototype, "order", void 0);
 class QueryBranchDto {
@@ -49,7 +49,7 @@ class QueryBranchDto {
 exports.QueryBranchDto = QueryBranchDto;
 __decorate([
     (0, swagger_1.ApiPropertyOptional)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value === undefined || value === '' ? 1 : Number(value))),
+    (0, class_transformer_1.Transform)(({ value }) => value === undefined || value === "" ? 1 : Number(value)),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     (0, class_validator_1.IsOptional)(),
@@ -57,13 +57,19 @@ __decorate([
 ], QueryBranchDto.prototype, "page", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)(),
-    (0, class_transformer_1.Transform)(({ value }) => (value === undefined || value === '' ? 10 : Number(value))),
+    (0, class_transformer_1.Transform)(({ value }) => value === undefined || value === "" ? 10 : Number(value)),
     (0, class_validator_1.IsInt)(),
     (0, class_validator_1.Min)(1),
     (0, class_validator_1.Max)(50),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], QueryBranchDto.prototype, "limit", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ example: "11", description: "Bigint PK as string" }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], QueryBranchDto.prototype, "customerId", void 0);
 __decorate([
     (0, swagger_1.ApiPropertyOptional)({ type: String }),
     (0, class_validator_1.IsOptional)(),

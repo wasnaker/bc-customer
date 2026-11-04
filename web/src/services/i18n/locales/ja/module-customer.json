@@ -27,6 +27,8 @@
     "selectCustomer": "顧客",
     "selectCustomerPlaceholder": "顧客を選択…",
     "selectCustomerFirst": "顧客を選択すると支店が表示されます。",
+    "clearCustomerFilter": "顧客フィルターを解除",
+    "filterAllCustomers": "すべての顧客",
     "headOfficeBadge": "本社",
     "headOfficeTaken": "この顧客には既に本社があります。"
   },
@@ -65,7 +67,8 @@
     "inactive": "無効",
     "loading": "読み込み中…",
     "of": "/",
-    "error": "データを読み込めませんでした。もう一度お試しください。"
+    "error": "データを読み込めませんでした。もう一度お試しください。",
+    "customer": "顧客"
   },
   "detail": {
     "overview": "概要",

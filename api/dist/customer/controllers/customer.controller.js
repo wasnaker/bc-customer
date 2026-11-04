@@ -79,6 +79,23 @@ let CustomerController = class CustomerController {
     removeDocument(id) {
         return this.customerDocumentService.remove(id);
     }
+    // ─── Branches (global list) ────────────────────────────────────────────────
+    // Declared before the `:id` customer routes so 'branches' is not captured
+    // as an id param by NestJS route matching.
+    async findAllBranches(query) {
+        const page = query?.page ?? 1;
+        const limit = Math.min(query?.limit ?? 10, 50);
+        const filterOptions = query.filters ?? null;
+        const customerId = query.customerId?.trim() || null;
+        const data = await this.branchService.findMany({
+            customerId,
+            filterOptions,
+            sortOptions: query.sort ?? null,
+            paginationOptions: { page, limit },
+        });
+        const total = await this.branchService.countMany(customerId, filterOptions);
+        return (0, infinity_pagination_1.infinityPagination)(data, { page, limit }, total);
+    }
     // ─── Customers ─────────────────────────────────────────────────────────────
     createCustomer(createCustomerDto) {
         return this.customerService.create(createCustomerDto);
@@ -95,6 +112,11 @@ let CustomerController = class CustomerController {
         return (0, infinity_pagination_1.infinityPagination)(data, { page, limit }, total);
     }
     findCustomerById(id) {
+        // Route ini menangkap SEMUA segmen tunggal (mis. /customer/branch).
+        // Id non-numerik bukan customer — balas 404, bukan 500 BigInt.
+        if (!/^\d+$/.test(id)) {
+            throw new common_1.NotFoundException();
+        }
         return this.customerService.findCustomerById(id);
     }
     updateCustomer(id, updateCustomerDto) {
@@ -159,7 +181,7 @@ let CustomerController = class CustomerController {
 exports.CustomerController = CustomerController;
 __decorate([
     (0, swagger_1.ApiCreatedResponse)({ type: customer_document_1.CustomerDocument }),
-    (0, common_1.Post)('documents'),
+    (0, common_1.Post)("documents"),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -168,7 +190,7 @@ __decorate([
 ], CustomerController.prototype, "createDocument", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: (0, infinity_pagination_response_dto_1.InfinityPaginationResponse)(customer_document_1.CustomerDocument) }),
-    (0, common_1.Get)('documents'),
+    (0, common_1.Get)("documents"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -177,24 +199,34 @@ __decorate([
 ], CustomerController.prototype, "findDocuments", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: customer_document_1.CustomerDocument }),
-    (0, common_1.Patch)('documents/:id'),
+    (0, common_1.Patch)("documents/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_customer_document_dto_1.UpdateCustomerDocumentDto]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "updateDocument", null);
 __decorate([
-    (0, common_1.Delete)('documents/:id'),
+    (0, common_1.Delete)("documents/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "removeDocument", null);
+__decorate([
+    (0, swagger_1.ApiOkResponse)({ type: (0, infinity_pagination_response_dto_1.InfinityPaginationResponse)(branch_1.Branch) }),
+    (0, customer_resource_decorator_1.CustomerResource)("branch"),
+    (0, common_1.Get)("branches"),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [query_branch_dto_1.QueryBranchDto]),
+    __metadata("design:returntype", Promise)
+], CustomerController.prototype, "findAllBranches", null);
 __decorate([
     (0, swagger_1.ApiCreatedResponse)({ type: customer_1.Customer }),
     (0, common_1.Post)(),
@@ -215,41 +247,41 @@ __decorate([
 ], CustomerController.prototype, "findCustomers", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: customer_1.Customer }),
-    (0, common_1.Get)(':id'),
+    (0, common_1.Get)(":id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "findCustomerById", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: customer_1.Customer }),
-    (0, common_1.Patch)(':id'),
+    (0, common_1.Patch)(":id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_customer_dto_1.UpdateCustomerDto]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "updateCustomer", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Delete)(":id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "removeCustomer", null);
 __decorate([
     (0, swagger_1.ApiCreatedResponse)({ type: branch_1.Branch }),
-    (0, customer_resource_decorator_1.CustomerResource)('branch'),
-    (0, common_1.Post)(':customerId/branches'),
+    (0, customer_resource_decorator_1.CustomerResource)("branch"),
+    (0, common_1.Post)(":customerId/branches"),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
-    (0, swagger_1.ApiParam)({ name: 'customerId', type: String, required: true }),
-    __param(0, (0, common_1.Param)('customerId')),
+    (0, swagger_1.ApiParam)({ name: "customerId", type: String, required: true }),
+    __param(0, (0, common_1.Param)("customerId")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, create_branch_dto_1.CreateBranchDto]),
@@ -257,11 +289,11 @@ __decorate([
 ], CustomerController.prototype, "createBranch", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: (0, infinity_pagination_response_dto_1.InfinityPaginationResponse)(branch_1.Branch) }),
-    (0, customer_resource_decorator_1.CustomerResource)('branch'),
-    (0, common_1.Get)(':customerId/branches'),
+    (0, customer_resource_decorator_1.CustomerResource)("branch"),
+    (0, common_1.Get)(":customerId/branches"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'customerId', type: String, required: true }),
-    __param(0, (0, common_1.Param)('customerId')),
+    (0, swagger_1.ApiParam)({ name: "customerId", type: String, required: true }),
+    __param(0, (0, common_1.Param)("customerId")),
     __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, query_branch_dto_1.QueryBranchDto]),
@@ -269,44 +301,44 @@ __decorate([
 ], CustomerController.prototype, "findBranches", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: branch_1.Branch }),
-    (0, customer_resource_decorator_1.CustomerResource)('branch'),
-    (0, common_1.Get)('branches/:id'),
+    (0, customer_resource_decorator_1.CustomerResource)("branch"),
+    (0, common_1.Get)("branches/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "findBranchById", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: branch_1.Branch }),
-    (0, customer_resource_decorator_1.CustomerResource)('branch'),
-    (0, common_1.Patch)('branches/:id'),
+    (0, customer_resource_decorator_1.CustomerResource)("branch"),
+    (0, common_1.Patch)("branches/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_branch_dto_1.UpdateBranchDto]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "updateBranch", null);
 __decorate([
-    (0, customer_resource_decorator_1.CustomerResource)('branch'),
-    (0, common_1.Delete)('branches/:id'),
+    (0, customer_resource_decorator_1.CustomerResource)("branch"),
+    (0, common_1.Delete)("branches/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "removeBranch", null);
 __decorate([
     (0, swagger_1.ApiCreatedResponse)({ type: staff_1.Staff }),
-    (0, customer_resource_decorator_1.CustomerResource)('staff'),
-    (0, common_1.Post)('branches/:branchId/staff'),
+    (0, customer_resource_decorator_1.CustomerResource)("staff"),
+    (0, common_1.Post)("branches/:branchId/staff"),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
-    (0, swagger_1.ApiParam)({ name: 'branchId', type: String, required: true }),
-    __param(0, (0, common_1.Param)('branchId')),
+    (0, swagger_1.ApiParam)({ name: "branchId", type: String, required: true }),
+    __param(0, (0, common_1.Param)("branchId")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, create_staff_dto_1.CreateStaffDto]),
@@ -314,11 +346,11 @@ __decorate([
 ], CustomerController.prototype, "createStaff", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: (0, infinity_pagination_response_dto_1.InfinityPaginationResponse)(staff_1.Staff) }),
-    (0, customer_resource_decorator_1.CustomerResource)('staff'),
-    (0, common_1.Get)('branches/:branchId/staff'),
+    (0, customer_resource_decorator_1.CustomerResource)("staff"),
+    (0, common_1.Get)("branches/:branchId/staff"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'branchId', type: String, required: true }),
-    __param(0, (0, common_1.Param)('branchId')),
+    (0, swagger_1.ApiParam)({ name: "branchId", type: String, required: true }),
+    __param(0, (0, common_1.Param)("branchId")),
     __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, query_staff_dto_1.QueryStaffDto]),
@@ -326,42 +358,42 @@ __decorate([
 ], CustomerController.prototype, "findStaff", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: staff_1.Staff }),
-    (0, customer_resource_decorator_1.CustomerResource)('staff'),
-    (0, common_1.Get)('staff/:id'),
+    (0, customer_resource_decorator_1.CustomerResource)("staff"),
+    (0, common_1.Get)("staff/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "findStaffById", null);
 __decorate([
     (0, swagger_1.ApiOkResponse)({ type: staff_1.Staff }),
-    (0, customer_resource_decorator_1.CustomerResource)('staff'),
-    (0, common_1.Patch)('staff/:id'),
+    (0, customer_resource_decorator_1.CustomerResource)("staff"),
+    (0, common_1.Patch)("staff/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, update_staff_dto_1.UpdateStaffDto]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "updateStaff", null);
 __decorate([
-    (0, customer_resource_decorator_1.CustomerResource)('staff'),
-    (0, common_1.Delete)('staff/:id'),
+    (0, customer_resource_decorator_1.CustomerResource)("staff"),
+    (0, common_1.Delete)("staff/:id"),
     (0, common_1.HttpCode)(common_1.HttpStatus.NO_CONTENT),
-    (0, swagger_1.ApiParam)({ name: 'id', type: String, required: true }),
-    __param(0, (0, common_1.Param)('id')),
+    (0, swagger_1.ApiParam)({ name: "id", type: String, required: true }),
+    __param(0, (0, common_1.Param)("id")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CustomerController.prototype, "removeStaff", null);
 exports.CustomerController = CustomerController = __decorate([
     (0, swagger_1.ApiBearerAuth)(),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), customer_access_guard_1.CustomerAccessGuard),
-    (0, swagger_1.ApiTags)('Customer'),
-    (0, common_1.Controller)({ path: 'customer', version: '1' }),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), customer_access_guard_1.CustomerAccessGuard),
+    (0, swagger_1.ApiTags)("Customer"),
+    (0, common_1.Controller)({ path: "customer", version: "1" }),
     __metadata("design:paramtypes", [customer_service_1.CustomerService,
         branch_service_1.BranchService,
         staff_service_1.StaffService,

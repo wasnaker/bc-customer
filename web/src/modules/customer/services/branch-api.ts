@@ -9,7 +9,8 @@ import type { Branch, CustomerPagination, VatType } from "../types/customer";
 // ── Branch (nested di bawah customer) ───────────────────────────────────────
 
 export type BranchListRequest = {
-  customerId: Branch["customerId"];
+  /** Opsional — bila kosong, list global (semua branch lintas customer). */
+  customerId?: Branch["customerId"] | null;
   page: number;
   limit: number;
   /** Filter API: `name` (ILike) & `isHeadOffice`. Search dipetakan ke `name`. */
@@ -23,7 +24,11 @@ export function useGetBranchesService() {
   const fetch = useFetch();
   return useCallback(
     (data: BranchListRequest, requestConfig?: RequestConfigType) => {
-      const url = new URL(`${API_URL}/v1/customer/${data.customerId}/branches`);
+      // Global list endpoint; customerId opsional sebagai filter server-side.
+      const url = new URL(`${API_URL}/v1/customer/branches`);
+      if (data.customerId != null) {
+        url.searchParams.append("customerId", String(data.customerId));
+      }
       url.searchParams.append("page", String(data.page));
       url.searchParams.append("limit", String(data.limit));
       if (data.filters) {

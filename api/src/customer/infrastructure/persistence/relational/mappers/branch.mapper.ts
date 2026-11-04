@@ -1,16 +1,19 @@
-import { Branch } from '../../../../domain/branch';
-import { BranchEntity } from '../entities/branch.entity';
+import { Branch } from "../../../../domain/branch";
+import { BranchEntity } from "../entities/branch.entity";
 
 export class BranchMapper {
   static toDomain(raw: BranchEntity): Branch {
     const domainEntity = new Branch();
-    domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
+    domainEntity.id =
+      raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
     domainEntity.ulid = raw.ulid;
     domainEntity.code = raw.code;
     domainEntity.customerId =
       raw.customerId === null || raw.customerId === undefined
         ? raw.customerId
         : String(raw.customerId);
+    // Nama customer hanya tersedia bila relasi di-load (list global).
+    domainEntity.customerName = raw.customer?.name ?? null;
     domainEntity.name = raw.name;
     domainEntity.isHeadOffice = raw.isHeadOffice;
     domainEntity.addressLine = raw.addressLine;
@@ -18,7 +21,7 @@ export class BranchMapper {
     domainEntity.cityId = raw.cityId;
     domainEntity.postalCode = raw.postalCode;
     domainEntity.nitkuNumber = raw.nitkuNumber;
-    domainEntity.vatType = raw.vatType as Branch['vatType'];
+    domainEntity.vatType = raw.vatType as Branch["vatType"];
     domainEntity.isActive = raw.isActive;
     domainEntity.createdAt = raw.createdAt;
     domainEntity.updatedAt = raw.updatedAt;
@@ -47,7 +50,10 @@ export class BranchMapper {
       persistenceEntity.isHeadOffice = domainEntity.isHeadOffice;
     }
     persistenceEntity.addressLine = domainEntity.addressLine as string;
-    if (domainEntity.provinceId !== undefined && domainEntity.provinceId !== null) {
+    if (
+      domainEntity.provinceId !== undefined &&
+      domainEntity.provinceId !== null
+    ) {
       persistenceEntity.provinceId = domainEntity.provinceId;
     }
     if (domainEntity.cityId !== undefined && domainEntity.cityId !== null) {

@@ -49,9 +49,47 @@ let BranchesRelationalRepository = class BranchesRelationalRepository {
             order: sortOptions?.reduce((accumulator, sort) => ({
                 ...accumulator,
                 [sort.orderBy]: sort.order,
-            }), { isHeadOffice: 'DESC', name: 'ASC' }),
+            }), { isHeadOffice: "DESC", name: "ASC" }),
         });
         return entities.map((branch) => branch_mapper_1.BranchMapper.toDomain(branch));
+    }
+    async findMany({ customerId, filterOptions, sortOptions, paginationOptions, }) {
+        const where = {};
+        if (customerId != null) {
+            where.customerId = BigInt(customerId);
+        }
+        if (filterOptions?.name) {
+            where.name = (0, typeorm_2.ILike)(`%${filterOptions.name}%`);
+        }
+        if (filterOptions?.isHeadOffice !== undefined) {
+            where.isHeadOffice = filterOptions.isHeadOffice;
+        }
+        const entities = await this.branchRepository.find({
+            skip: (paginationOptions.page - 1) * paginationOptions.limit,
+            take: paginationOptions.limit,
+            where,
+            // Relasi customer hanya untuk list global — kolom nama customer
+            // dibutuhkan tabel Branch mandiri (baris lintas customer).
+            relations: customerId == null ? { customer: true } : undefined,
+            order: sortOptions?.reduce((accumulator, sort) => ({
+                ...accumulator,
+                [sort.orderBy]: sort.order,
+            }), { isHeadOffice: "DESC", name: "ASC" }),
+        });
+        return entities.map((branch) => branch_mapper_1.BranchMapper.toDomain(branch));
+    }
+    async countMany(customerId, filterOptions) {
+        const where = {};
+        if (customerId != null) {
+            where.customerId = BigInt(customerId);
+        }
+        if (filterOptions?.name) {
+            where.name = (0, typeorm_2.ILike)(`%${filterOptions.name}%`);
+        }
+        if (filterOptions?.isHeadOffice !== undefined) {
+            where.isHeadOffice = filterOptions.isHeadOffice;
+        }
+        return this.branchRepository.count({ where });
     }
     async findById(id) {
         const entity = await this.branchRepository.findOne({

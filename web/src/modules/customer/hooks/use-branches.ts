@@ -32,9 +32,8 @@ export function useBranchesServerSide(customerId: string | null) {
     searchDebounce: 300,
     defaultSort: { field: "name", order: "ASC" },
     fetchFn: async ({ page, limit, search, sort, signal }) => {
-      if (customerId == null) {
-        return { data: [], total: 0 };
-      }
+      // Tanpa customer terpilih → list GLOBAL (semua branch); dengan customer
+      // → difilter server-side via query param customerId.
 
       // Search → `filters[name]` (ILike); search dikombinasikan dengan filter lain.
       const filters: Record<string, string> = {};
@@ -42,7 +41,7 @@ export function useBranchesServerSide(customerId: string | null) {
 
       const res = await service(
         {
-          customerId,
+          customerId: customerId ?? undefined,
           page,
           limit,
           filters: Object.keys(filters).length ? filters : undefined,

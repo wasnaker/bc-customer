@@ -6,13 +6,16 @@ const branch_entity_1 = require("../entities/branch.entity");
 class BranchMapper {
     static toDomain(raw) {
         const domainEntity = new branch_1.Branch();
-        domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
+        domainEntity.id =
+            raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
         domainEntity.ulid = raw.ulid;
         domainEntity.code = raw.code;
         domainEntity.customerId =
             raw.customerId === null || raw.customerId === undefined
                 ? raw.customerId
                 : String(raw.customerId);
+        // Nama customer hanya tersedia bila relasi di-load (list global).
+        domainEntity.customerName = raw.customer?.name ?? null;
         domainEntity.name = raw.name;
         domainEntity.isHeadOffice = raw.isHeadOffice;
         domainEntity.addressLine = raw.addressLine;
@@ -46,7 +49,8 @@ class BranchMapper {
             persistenceEntity.isHeadOffice = domainEntity.isHeadOffice;
         }
         persistenceEntity.addressLine = domainEntity.addressLine;
-        if (domainEntity.provinceId !== undefined && domainEntity.provinceId !== null) {
+        if (domainEntity.provinceId !== undefined &&
+            domainEntity.provinceId !== null) {
             persistenceEntity.provinceId = domainEntity.provinceId;
         }
         if (domainEntity.cityId !== undefined && domainEntity.cityId !== null) {

@@ -29,6 +29,8 @@ export interface Branch {
   ulid: string | null;
   code: string | null;
   customerId: string;
+  /** Nama customer induk — terisi pada list global, null bila tidak di-join. */
+  customerName?: string | null;
   name: string;
   isHeadOffice: boolean;
   addressLine: string;

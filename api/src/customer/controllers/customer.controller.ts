@@ -5,48 +5,52 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Query,
   UseGuards,
-} from '@nestjs/common';
+} from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiParam,
   ApiTags,
-} from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
-import { CreateCustomerDto } from '../dto/create-customer.dto';
-import { UpdateCustomerDto } from '../dto/update-customer.dto';
-import { QueryCustomerDto, FilterCustomerDto } from '../dto/query-customer.dto';
-import { CreateBranchDto } from '../dto/create-branch.dto';
-import { UpdateBranchDto } from '../dto/update-branch.dto';
-import { QueryBranchDto, FilterBranchDto } from '../dto/query-branch.dto';
-import { CreateStaffDto } from '../dto/create-staff.dto';
-import { UpdateStaffDto } from '../dto/update-staff.dto';
-import { QueryStaffDto, FilterStaffDto } from '../dto/query-staff.dto';
-import { CreateCustomerDocumentDto } from '../dto/create-customer-document.dto';
-import { UpdateCustomerDocumentDto } from '../dto/update-customer-document.dto';
-import { QueryCustomerDocumentDto, FilterCustomerDocumentDto } from '../dto/query-customer-document.dto';
-import { Customer } from '../domain/customer';
-import { Branch } from '../domain/branch';
-import { Staff } from '../domain/staff';
-import { CustomerDocument } from '../domain/customer-document';
-import { CustomerService } from '../services/customer.service';
-import { BranchService } from '../services/branch.service';
-import { StaffService } from '../services/staff.service';
-import { CustomerDocumentService } from '../services/customer-document.service';
-import { CustomerAccessGuard } from '../security/customer-access.guard';
-import { CustomerResource } from '../security/customer-resource.decorator';
-import { NullableType } from '../../utils/types/nullable.type';
+} from "@nestjs/swagger";
+import { AuthGuard } from "@nestjs/passport";
+import { CreateCustomerDto } from "../dto/create-customer.dto";
+import { UpdateCustomerDto } from "../dto/update-customer.dto";
+import { QueryCustomerDto, FilterCustomerDto } from "../dto/query-customer.dto";
+import { CreateBranchDto } from "../dto/create-branch.dto";
+import { UpdateBranchDto } from "../dto/update-branch.dto";
+import { QueryBranchDto, FilterBranchDto } from "../dto/query-branch.dto";
+import { CreateStaffDto } from "../dto/create-staff.dto";
+import { UpdateStaffDto } from "../dto/update-staff.dto";
+import { QueryStaffDto, FilterStaffDto } from "../dto/query-staff.dto";
+import { CreateCustomerDocumentDto } from "../dto/create-customer-document.dto";
+import { UpdateCustomerDocumentDto } from "../dto/update-customer-document.dto";
+import {
+  QueryCustomerDocumentDto,
+  FilterCustomerDocumentDto,
+} from "../dto/query-customer-document.dto";
+import { Customer } from "../domain/customer";
+import { Branch } from "../domain/branch";
+import { Staff } from "../domain/staff";
+import { CustomerDocument } from "../domain/customer-document";
+import { CustomerService } from "../services/customer.service";
+import { BranchService } from "../services/branch.service";
+import { StaffService } from "../services/staff.service";
+import { CustomerDocumentService } from "../services/customer-document.service";
+import { CustomerAccessGuard } from "../security/customer-access.guard";
+import { CustomerResource } from "../security/customer-resource.decorator";
+import { NullableType } from "../../utils/types/nullable.type";
 import {
   InfinityPaginationResponse,
   InfinityPaginationResponseDto,
-} from '../../utils/dto/infinity-pagination-response.dto';
-import { infinityPagination } from '../../utils/infinity-pagination';
+} from "../../utils/dto/infinity-pagination-response.dto";
+import { infinityPagination } from "../../utils/infinity-pagination";
 
 /**
  * The host supplies JWT authentication and resolves module-declared action
@@ -55,9 +59,9 @@ import { infinityPagination } from '../../utils/infinity-pagination';
  * and document ownerType for polymorphic document routes).
  */
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), CustomerAccessGuard)
-@ApiTags('Customer')
-@Controller({ path: 'customer', version: '1' })
+@UseGuards(AuthGuard("jwt"), CustomerAccessGuard)
+@ApiTags("Customer")
+@Controller({ path: "customer", version: "1" })
 export class CustomerController {
   constructor(
     private readonly customerService: CustomerService,
@@ -71,7 +75,7 @@ export class CustomerController {
   // as an id param by NestJS route matching.
 
   @ApiCreatedResponse({ type: CustomerDocument })
-  @Post('documents')
+  @Post("documents")
   @HttpCode(HttpStatus.CREATED)
   createDocument(
     @Body() createCustomerDocumentDto: CreateCustomerDocumentDto,
@@ -80,7 +84,7 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: InfinityPaginationResponse(CustomerDocument) })
-  @Get('documents')
+  @Get("documents")
   @HttpCode(HttpStatus.OK)
   async findDocuments(
     @Query() query: QueryCustomerDocumentDto,
@@ -108,21 +112,49 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: CustomerDocument })
-  @Patch('documents/:id')
+  @Patch("documents/:id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
+  @ApiParam({ name: "id", type: String, required: true })
   updateDocument(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateCustomerDocumentDto: UpdateCustomerDocumentDto,
   ): Promise<CustomerDocument> {
     return this.customerDocumentService.update(id, updateCustomerDocumentDto);
   }
 
-  @Delete('documents/:id')
+  @Delete("documents/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiParam({ name: 'id', type: String, required: true })
-  removeDocument(@Param('id') id: string): Promise<void> {
+  @ApiParam({ name: "id", type: String, required: true })
+  removeDocument(@Param("id") id: string): Promise<void> {
     return this.customerDocumentService.remove(id);
+  }
+
+  // ─── Branches (global list) ────────────────────────────────────────────────
+  // Declared before the `:id` customer routes so 'branches' is not captured
+  // as an id param by NestJS route matching.
+
+  @ApiOkResponse({ type: InfinityPaginationResponse(Branch) })
+  @CustomerResource("branch")
+  @Get("branches")
+  @HttpCode(HttpStatus.OK)
+  async findAllBranches(
+    @Query() query: QueryBranchDto,
+  ): Promise<InfinityPaginationResponseDto<Branch>> {
+    const page = query?.page ?? 1;
+    const limit = Math.min(query?.limit ?? 10, 50);
+
+    const filterOptions: FilterBranchDto | null = query.filters ?? null;
+    const customerId = query.customerId?.trim() || null;
+
+    const data = await this.branchService.findMany({
+      customerId,
+      filterOptions,
+      sortOptions: query.sort ?? null,
+      paginationOptions: { page, limit },
+    });
+    const total = await this.branchService.countMany(customerId, filterOptions);
+
+    return infinityPagination(data, { page, limit }, total);
   }
 
   // ─── Customers ─────────────────────────────────────────────────────────────
@@ -130,7 +162,9 @@ export class CustomerController {
   @ApiCreatedResponse({ type: Customer })
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  createCustomer(@Body() createCustomerDto: CreateCustomerDto): Promise<Customer> {
+  createCustomer(
+    @Body() createCustomerDto: CreateCustomerDto,
+  ): Promise<Customer> {
     return this.customerService.create(createCustomerDto);
   }
 
@@ -156,52 +190,57 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: Customer })
-  @Get(':id')
+  @Get(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
-  findCustomerById(@Param('id') id: string): Promise<NullableType<Customer>> {
+  @ApiParam({ name: "id", type: String, required: true })
+  findCustomerById(@Param("id") id: string): Promise<NullableType<Customer>> {
+    // Route ini menangkap SEMUA segmen tunggal (mis. /customer/branch).
+    // Id non-numerik bukan customer — balas 404, bukan 500 BigInt.
+    if (!/^\d+$/.test(id)) {
+      throw new NotFoundException();
+    }
     return this.customerService.findCustomerById(id);
   }
 
   @ApiOkResponse({ type: Customer })
-  @Patch(':id')
+  @Patch(":id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
+  @ApiParam({ name: "id", type: String, required: true })
   updateCustomer(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
   ): Promise<Customer> {
     return this.customerService.update(id, updateCustomerDto);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiParam({ name: 'id', type: String, required: true })
-  removeCustomer(@Param('id') id: string): Promise<void> {
+  @ApiParam({ name: "id", type: String, required: true })
+  removeCustomer(@Param("id") id: string): Promise<void> {
     return this.customerService.remove(id);
   }
 
   // ─── Branches ──────────────────────────────────────────────────────────────
 
   @ApiCreatedResponse({ type: Branch })
-  @CustomerResource('branch')
-  @Post(':customerId/branches')
+  @CustomerResource("branch")
+  @Post(":customerId/branches")
   @HttpCode(HttpStatus.CREATED)
-  @ApiParam({ name: 'customerId', type: String, required: true })
+  @ApiParam({ name: "customerId", type: String, required: true })
   createBranch(
-    @Param('customerId') customerId: string,
+    @Param("customerId") customerId: string,
     @Body() createBranchDto: CreateBranchDto,
   ): Promise<Branch> {
     return this.branchService.create(customerId, createBranchDto);
   }
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Branch) })
-  @CustomerResource('branch')
-  @Get(':customerId/branches')
+  @CustomerResource("branch")
+  @Get(":customerId/branches")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'customerId', type: String, required: true })
+  @ApiParam({ name: "customerId", type: String, required: true })
   async findBranches(
-    @Param('customerId') customerId: string,
+    @Param("customerId") customerId: string,
     @Query() query: QueryBranchDto,
   ): Promise<InfinityPaginationResponseDto<Branch>> {
     const page = query?.page ?? 1;
@@ -224,55 +263,55 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: Branch })
-  @CustomerResource('branch')
-  @Get('branches/:id')
+  @CustomerResource("branch")
+  @Get("branches/:id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
-  findBranchById(@Param('id') id: string): Promise<NullableType<Branch>> {
+  @ApiParam({ name: "id", type: String, required: true })
+  findBranchById(@Param("id") id: string): Promise<NullableType<Branch>> {
     return this.branchService.findBranchById(id);
   }
 
   @ApiOkResponse({ type: Branch })
-  @CustomerResource('branch')
-  @Patch('branches/:id')
+  @CustomerResource("branch")
+  @Patch("branches/:id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
+  @ApiParam({ name: "id", type: String, required: true })
   updateBranch(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateBranchDto: UpdateBranchDto,
   ): Promise<Branch> {
     return this.branchService.update(id, updateBranchDto);
   }
 
-  @CustomerResource('branch')
-  @Delete('branches/:id')
+  @CustomerResource("branch")
+  @Delete("branches/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiParam({ name: 'id', type: String, required: true })
-  removeBranch(@Param('id') id: string): Promise<void> {
+  @ApiParam({ name: "id", type: String, required: true })
+  removeBranch(@Param("id") id: string): Promise<void> {
     return this.branchService.remove(id);
   }
 
   // ─── Staff ─────────────────────────────────────────────────────────────────
 
   @ApiCreatedResponse({ type: Staff })
-  @CustomerResource('staff')
-  @Post('branches/:branchId/staff')
+  @CustomerResource("staff")
+  @Post("branches/:branchId/staff")
   @HttpCode(HttpStatus.CREATED)
-  @ApiParam({ name: 'branchId', type: String, required: true })
+  @ApiParam({ name: "branchId", type: String, required: true })
   createStaff(
-    @Param('branchId') branchId: string,
+    @Param("branchId") branchId: string,
     @Body() createStaffDto: CreateStaffDto,
   ): Promise<Staff> {
     return this.staffService.create(branchId, createStaffDto);
   }
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Staff) })
-  @CustomerResource('staff')
-  @Get('branches/:branchId/staff')
+  @CustomerResource("staff")
+  @Get("branches/:branchId/staff")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'branchId', type: String, required: true })
+  @ApiParam({ name: "branchId", type: String, required: true })
   async findStaff(
-    @Param('branchId') branchId: string,
+    @Param("branchId") branchId: string,
     @Query() query: QueryStaffDto,
   ): Promise<InfinityPaginationResponseDto<Staff>> {
     const page = query?.page ?? 1;
@@ -295,31 +334,31 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: Staff })
-  @CustomerResource('staff')
-  @Get('staff/:id')
+  @CustomerResource("staff")
+  @Get("staff/:id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
-  findStaffById(@Param('id') id: string): Promise<NullableType<Staff>> {
+  @ApiParam({ name: "id", type: String, required: true })
+  findStaffById(@Param("id") id: string): Promise<NullableType<Staff>> {
     return this.staffService.findStaffById(id);
   }
 
   @ApiOkResponse({ type: Staff })
-  @CustomerResource('staff')
-  @Patch('staff/:id')
+  @CustomerResource("staff")
+  @Patch("staff/:id")
   @HttpCode(HttpStatus.OK)
-  @ApiParam({ name: 'id', type: String, required: true })
+  @ApiParam({ name: "id", type: String, required: true })
   updateStaff(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateStaffDto: UpdateStaffDto,
   ): Promise<Staff> {
     return this.staffService.update(id, updateStaffDto);
   }
 
-  @CustomerResource('staff')
-  @Delete('staff/:id')
+  @CustomerResource("staff")
+  @Delete("staff/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiParam({ name: 'id', type: String, required: true })
-  removeStaff(@Param('id') id: string): Promise<void> {
+  @ApiParam({ name: "id", type: String, required: true })
+  removeStaff(@Param("id") id: string): Promise<void> {
     return this.staffService.remove(id);
   }
 }

@@ -115,6 +115,16 @@ function PageInner() {
         ),
       },
       {
+        key: "customerName",
+        label: t("table.customer"),
+        sortable: false,
+        render: (item) => (
+          <span className="text-muted-foreground">
+            {item.customerName ?? item.customerId}
+          </span>
+        ),
+      },
+      {
         key: "addressLine",
         label: t("table.addressLine"),
         sortable: false,
@@ -229,77 +239,83 @@ function PageInner() {
           </div>
         </div>
 
-        {/* ── Customer picker ────────────────────────────────────────── */}
+        {/* ── Filter customer (opsional — kosong = semua customer) ───── */}
         <div className="mb-4 max-w-md space-y-1.5">
           <Label htmlFor="branch-customer-picker">
             {t("branch.selectCustomer")}
           </Label>
-          <SearchableSelect
-            id="branch-customer-picker"
-            ariaLabel={t("branch.selectCustomer")}
-            value={customer}
-            onSelect={handleCustomerChange}
-            fetchOptions={fetchCustomerOptions}
-            placeholder={t("branch.selectCustomerPlaceholder")}
-            loadingText={t("picker.loading")}
-            emptyText={t("picker.empty")}
-            errorText={t("picker.error")}
-          />
+          <div className="flex items-center gap-2">
+            <SearchableSelect
+              id="branch-customer-picker"
+              ariaLabel={t("branch.selectCustomer")}
+              value={customer}
+              onSelect={handleCustomerChange}
+              fetchOptions={fetchCustomerOptions}
+              placeholder={t("branch.filterAllCustomers")}
+              loadingText={t("picker.loading")}
+              emptyText={t("picker.empty")}
+              errorText={t("picker.error")}
+              className="flex-1"
+            />
+            {customer && (
+              <Button
+                variant="outline"
+                size="sm"
+                title={t("branch.clearCustomerFilter")}
+                onClick={() => handleCustomerChange(null)}
+              >
+                <TrashIcon className="size-3.5" />
+              </Button>
+            )}
+          </div>
         </div>
 
-        {/* ── Table (hanya bila customer terpilih) ───────────────────── */}
-        {customerId ? (
-          <SmallTable<Branch>
-            items={branches}
-            total={total}
-            searchValue={search}
-            onSearchChange={setSearch}
-            searchPlaceholder={t("branch.search")}
-            searchLabel={t("branch.searchLabel")}
-            page={page}
-            onPageChange={setPage}
-            perPage={limit}
-            sort={sort}
-            onSortChange={setSort}
-            columns={columns}
-            selectedId={selectedId}
-            onSelectId={select}
-            getItemId={(item) => item.id}
-            showDetail={showDetail}
-            detailItem={selectedBranch ?? null}
-            detailLoading={detailLoading}
-            tabs={[
-              { slug: "overview", label: t("detail.overview"), position: 0 },
-            ]}
-            customTabBody={{
-              overview: (item: Branch) => <BranchOverviewTab item={item} />,
-            }}
-            emptyText={t("branch.empty")}
-            isLoading={isLoading}
-            isFetching={isFetching}
-            loadingText={t("table.loading")}
-            error={error}
-            errorText={t("table.error")}
-            tabEmptyText={t("detail.empty")}
-            paginationOfLabel={t("table.of")}
-            previousPageLabel={t("actions.prev_page")}
-            nextPageLabel={t("actions.next_page")}
-            toolbar={toolbar}
-            renderHeader={renderHeader}
-            listHeader={
-              showDetail ? (
-                <Button variant="outline" size="sm" onClick={close}>
-                  {t("actions.collapse")}
-                </Button>
-              ) : undefined
-            }
-          />
-        ) : (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-            <GitBranchIcon className="mx-auto mb-3 size-8 text-muted-foreground/50" />
-            <p>{t("branch.selectCustomerFirst")}</p>
-          </div>
-        )}
+        {/* ── Table (selalu tampil; tanpa customer = list global) ────── */}
+        <SmallTable<Branch>
+          items={branches}
+          total={total}
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={t("branch.search")}
+          searchLabel={t("branch.searchLabel")}
+          page={page}
+          onPageChange={setPage}
+          perPage={limit}
+          sort={sort}
+          onSortChange={setSort}
+          columns={columns}
+          selectedId={selectedId}
+          onSelectId={select}
+          getItemId={(item) => item.id}
+          showDetail={showDetail}
+          detailItem={selectedBranch ?? null}
+          detailLoading={detailLoading}
+          tabs={[
+            { slug: "overview", label: t("detail.overview"), position: 0 },
+          ]}
+          customTabBody={{
+            overview: (item: Branch) => <BranchOverviewTab item={item} />,
+          }}
+          emptyText={t("branch.empty")}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          loadingText={t("table.loading")}
+          error={error}
+          errorText={t("table.error")}
+          tabEmptyText={t("detail.empty")}
+          paginationOfLabel={t("table.of")}
+          previousPageLabel={t("actions.prev_page")}
+          nextPageLabel={t("actions.next_page")}
+          toolbar={toolbar}
+          renderHeader={renderHeader}
+          listHeader={
+            showDetail ? (
+              <Button variant="outline" size="sm" onClick={close}>
+                {t("actions.collapse")}
+              </Button>
+            ) : undefined
+          }
+        />
       </div>
 
       {/* ── Create / Edit dialog ──────────────────────────────────────── */}

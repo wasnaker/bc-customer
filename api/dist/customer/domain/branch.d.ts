@@ -3,6 +3,8 @@ export declare class Branch {
     ulid: string | null;
     code: string | null;
     customerId: bigint | string;
+    /** Nama customer induk — terisi pada list global (join), opsional. */
+    customerName?: string | null;
     name: string;
     isHeadOffice: boolean;
     /**
@@ -13,7 +15,7 @@ export declare class Branch {
     cityId: number;
     postalCode: string | null;
     nitkuNumber: string | null;
-    vatType: 'npwp' | 'nitku';
+    vatType: "npwp" | "nitku";
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
