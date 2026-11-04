@@ -70,7 +70,9 @@
     "overview": "개요",
     "empty": "데이터가 없습니다.",
     "headOffice": "본사",
-    "headOfficeEmpty": "이 고객에게는 아직 본사가 없습니다."
+    "headOfficeEmpty": "이 고객에게는 아직 본사가 없습니다.",
+    "branches": "지점",
+    "branchesEmpty": "이 고객에게는 아직 지점이 없습니다."
   },
   "picker": {
     "loading": "불러오는 중…",

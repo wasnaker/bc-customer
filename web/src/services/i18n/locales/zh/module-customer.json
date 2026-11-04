@@ -70,7 +70,9 @@
     "overview": "概览",
     "empty": "暂无数据。",
     "headOffice": "总部",
-    "headOfficeEmpty": "该客户尚未设置总部。"
+    "headOfficeEmpty": "该客户尚未设置总部。",
+    "branches": "分公司",
+    "branchesEmpty": "该客户还没有分公司。"
   },
   "picker": {
     "loading": "加载中…",

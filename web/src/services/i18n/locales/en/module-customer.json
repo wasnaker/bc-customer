@@ -70,7 +70,9 @@
     "overview": "Overview",
     "empty": "No data.",
     "headOffice": "Head Office",
-    "headOfficeEmpty": "This customer has no head office yet."
+    "headOfficeEmpty": "This customer has no head office yet.",
+    "branches": "Branches",
+    "branchesEmpty": "No branches yet for this customer."
   },
   "picker": {
     "loading": "Loading…",

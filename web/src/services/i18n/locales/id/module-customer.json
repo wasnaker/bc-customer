@@ -70,7 +70,9 @@
     "overview": "Ringkasan",
     "empty": "Tidak ada data.",
     "headOffice": "Kantor Pusat",
-    "headOfficeEmpty": "Pelanggan ini belum memiliki kantor pusat."
+    "headOfficeEmpty": "Pelanggan ini belum memiliki kantor pusat.",
+    "branches": "Cabang",
+    "branchesEmpty": "Belum ada cabang untuk pelanggan ini."
   },
   "picker": {
     "loading": "Memuat…",

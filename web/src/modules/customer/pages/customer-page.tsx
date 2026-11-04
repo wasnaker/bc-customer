@@ -10,7 +10,10 @@ import {
 import { useMasterDetail } from "@/core/master-detail/use-master-detail";
 import { SmallTable, type SmallTableColumn } from "@/components/small-table";
 import { CustomerFormDialog } from "../components/customer-form-dialog";
-import { CustomerOverviewTab } from "../components/customer-detail-tab";
+import {
+  CustomerBranchesTab,
+  CustomerOverviewTab,
+} from "../components/customer-detail-tab";
 import { Button } from "@/components/ui/button";
 import PencilIcon from "lucide-react/dist/esm/icons/pencil";
 import TrashIcon from "lucide-react/dist/esm/icons/trash";
@@ -212,9 +215,11 @@ function PageInner() {
           detailLoading={detailLoading}
           tabs={[
             { slug: "overview", label: t("detail.overview"), position: 0 },
+            { slug: "branches", label: t("detail.branches"), position: 10 },
           ]}
           customTabBody={{
             overview: (item: Customer) => <CustomerOverviewTab item={item} />,
+            branches: (item: Customer) => <CustomerBranchesTab item={item} />,
           }}
           emptyText={t("customer.empty")}
           isLoading={isLoading}

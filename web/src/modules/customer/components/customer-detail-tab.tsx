@@ -1,7 +1,10 @@
 "use client";
 
 import { useTranslation } from "@/services/i18n/client";
-import { useHeadOffice } from "../hooks/use-branches";
+import {
+  useBranchesOptions,
+  useHeadOffice,
+} from "../hooks/use-branches";
 import type { Customer } from "../types/customer";
 
 function StatusBadge({
@@ -29,9 +32,64 @@ function StatusBadge({
 export { StatusBadge };
 
 /**
- * Ringkasan customer + kantor pusatnya. Head office diambil via
- * `filters[isHeadOffice]=true` (GET /:id tidak menyertakan relasi).
+ * Daftar cabang milik customer — paralel dengan tab Regency pada modul
+ * region. Data diambil server-side via endpoint list branch per customer.
  */
+export function CustomerBranchesTab({ item }: { item: Customer }) {
+  const { t } = useTranslation("module-customer");
+  const { data: branches, isLoading } = useBranchesOptions(
+    String(item.id),
+    50,
+  );
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2" aria-busy="true">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="h-8 w-full animate-pulse rounded bg-muted"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  const list = branches ?? [];
+
+  if (list.length === 0) {
+    return (
+      <p className="py-4 text-center text-sm text-muted-foreground">
+        {t("detail.branchesEmpty")}
+      </p>
+    );
+  }
+
+  return (
+    <ul className="space-y-1.5">
+      {list.map((branch) => (
+        <li
+          key={String(branch.id)}
+          className="flex items-center gap-2 text-sm"
+        >
+          {branch.isHeadOffice && (
+            <span className="inline-flex items-center rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
+              {t("detail.headOffice")}
+            </span>
+          )}
+          <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
+            {branch.code ?? "—"}
+          </span>
+          <span className="font-medium text-foreground">{branch.name}</span>
+          <span className="truncate text-muted-foreground">
+            {branch.addressLine}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function CustomerOverviewTab({ item }: { item: Customer }) {
   const { t } = useTranslation("module-customer");
   const { data: headOffice, isLoading: headOfficeLoading } = useHeadOffice(
