@@ -79,10 +79,19 @@ let StaffRelationalRepository = class StaffRelationalRepository {
         if (!entity) {
             return null;
         }
-        const updatedEntity = await this.staffRepository.save(this.staffRepository.create(staff_mapper_1.StaffMapper.toPersistence({
+        // TypeORM memperlakukan id berupa BigInt sebagai "tanpa id" pada
+        // save() (entitas dianggap baru -> INSERT). Gunakan update() + baca ulang.
+        const persistenceModel = staff_mapper_1.StaffMapper.toPersistence({
             ...staff_mapper_1.StaffMapper.toDomain(entity),
             ...payload,
-        })));
+        });
+        delete persistenceModel.id; // tidak boleh masuk klausa SET
+        delete persistenceModel.ulid; // immutable
+        delete persistenceModel.code; // diisi trigger AFTER INSERT
+        await this.staffRepository.update({ id: BigInt(id) }, persistenceModel);
+        const updatedEntity = await this.staffRepository.findOneByOrFail({
+            id: BigInt(id),
+        });
         return staff_mapper_1.StaffMapper.toDomain(updatedEntity);
     }
     async remove(id) {

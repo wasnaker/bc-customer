@@ -108,15 +108,20 @@ export class CustomerDocumentsRelationalRepository
       return null;
     }
 
-    const updatedEntity = await this.customerDocumentRepository.save(
-      this.customerDocumentRepository.create(
-        CustomerDocumentMapper.toPersistence({
-          ...CustomerDocumentMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+    // TypeORM memperlakukan id berupa BigInt sebagai "tanpa id" pada
+    // save() (entitas dianggap baru -> INSERT). Gunakan update() + baca ulang.
+    const persistenceModel = CustomerDocumentMapper.toPersistence({
+      ...CustomerDocumentMapper.toDomain(entity),
+      ...payload,
+    });
+    delete persistenceModel.id; // tidak boleh masuk klausa SET
+    delete persistenceModel.ulid; // immutable
+    delete persistenceModel.code; // diisi trigger AFTER INSERT
+    await this.customerDocumentRepository.update({ id: BigInt(id) }, persistenceModel);
 
+    const updatedEntity = await this.customerDocumentRepository.findOneByOrFail({
+      id: BigInt(id),
+    });
     return CustomerDocumentMapper.toDomain(updatedEntity);
   }
 

@@ -113,15 +113,20 @@ export class BranchesRelationalRepository implements BranchRepository {
       return null;
     }
 
-    const updatedEntity = await this.branchRepository.save(
-      this.branchRepository.create(
-        BranchMapper.toPersistence({
-          ...BranchMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+    // TypeORM memperlakukan id berupa BigInt sebagai "tanpa id" pada
+    // save() (entitas dianggap baru -> INSERT). Gunakan update() + baca ulang.
+    const persistenceModel = BranchMapper.toPersistence({
+      ...BranchMapper.toDomain(entity),
+      ...payload,
+    });
+    delete persistenceModel.id; // tidak boleh masuk klausa SET
+    delete persistenceModel.ulid; // immutable
+    delete persistenceModel.code; // diisi trigger AFTER INSERT
+    await this.branchRepository.update({ id: BigInt(id) }, persistenceModel);
 
+    const updatedEntity = await this.branchRepository.findOneByOrFail({
+      id: BigInt(id),
+    });
     return BranchMapper.toDomain(updatedEntity);
   }
 

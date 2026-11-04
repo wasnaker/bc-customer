@@ -103,15 +103,20 @@ export class StaffRelationalRepository implements StaffRepository {
       return null;
     }
 
-    const updatedEntity = await this.staffRepository.save(
-      this.staffRepository.create(
-        StaffMapper.toPersistence({
-          ...StaffMapper.toDomain(entity),
-          ...payload,
-        }),
-      ),
-    );
+    // TypeORM memperlakukan id berupa BigInt sebagai "tanpa id" pada
+    // save() (entitas dianggap baru -> INSERT). Gunakan update() + baca ulang.
+    const persistenceModel = StaffMapper.toPersistence({
+      ...StaffMapper.toDomain(entity),
+      ...payload,
+    });
+    delete persistenceModel.id; // tidak boleh masuk klausa SET
+    delete persistenceModel.ulid; // immutable
+    delete persistenceModel.code; // diisi trigger AFTER INSERT
+    await this.staffRepository.update({ id: BigInt(id) }, persistenceModel);
 
+    const updatedEntity = await this.staffRepository.findOneByOrFail({
+      id: BigInt(id),
+    });
     return StaffMapper.toDomain(updatedEntity);
   }
 

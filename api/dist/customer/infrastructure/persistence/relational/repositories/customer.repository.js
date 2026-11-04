@@ -84,10 +84,19 @@ let CustomersRelationalRepository = class CustomersRelationalRepository {
         if (!entity) {
             return null;
         }
-        const updatedEntity = await this.customerRepository.save(this.customerRepository.create(customer_mapper_1.CustomerMapper.toPersistence({
+        // TypeORM memperlakukan id berupa BigInt sebagai "tanpa id" pada
+        // save() (entitas dianggap baru -> INSERT). Gunakan update() + baca ulang.
+        const persistenceModel = customer_mapper_1.CustomerMapper.toPersistence({
             ...customer_mapper_1.CustomerMapper.toDomain(entity),
             ...payload,
-        })));
+        });
+        delete persistenceModel.id; // tidak boleh masuk klausa SET
+        delete persistenceModel.ulid; // immutable
+        delete persistenceModel.code; // diisi trigger AFTER INSERT
+        await this.customerRepository.update({ id: BigInt(id) }, persistenceModel);
+        const updatedEntity = await this.customerRepository.findOneByOrFail({
+            id: BigInt(id),
+        });
         return customer_mapper_1.CustomerMapper.toDomain(updatedEntity);
     }
     async remove(id) {
