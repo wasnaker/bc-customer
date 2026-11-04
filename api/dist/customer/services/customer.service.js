@@ -88,7 +88,13 @@ let CustomerService = class CustomerService {
         return this.customerRepository.countWithFilter(filterOptions);
     }
     async findCustomerById(id) {
-        return this.customerRepository.findById(id);
+        const customer = await this.customerRepository.findById(id);
+        if (!customer) {
+            return null;
+        }
+        customer.headOffice =
+            (await this.branchRepository.findHeadOfficeByCustomerId(customer.id)) ?? undefined;
+        return customer;
     }
     async findHeadOffice(customerId) {
         return this.branchRepository.findHeadOfficeByCustomerId(customerId);

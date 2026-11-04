@@ -116,7 +116,15 @@ export class CustomerService {
   }
 
   async findCustomerById(id: Customer['id']): Promise<NullableType<Customer>> {
-    return this.customerRepository.findById(id);
+    const customer = await this.customerRepository.findById(id);
+    if (!customer) {
+      return null;
+    }
+    customer.headOffice =
+      (await this.branchRepository.findHeadOfficeByCustomerId(
+        customer.id,
+      )) ?? undefined;
+    return customer;
   }
 
   async findHeadOffice(
