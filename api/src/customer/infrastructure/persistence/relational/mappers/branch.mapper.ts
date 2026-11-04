@@ -17,7 +17,9 @@ export class BranchMapper {
     // Email admin cabang: staff ter-link user (userId terisi) pertama yang
     // punya email — fallback ke staff pertama yang punya email. Relasi
     // staffs hanya di-load pada list global.
-    const staffs = (raw.staff ?? []).slice().sort((a, b) => a.id - b.id);
+    const staffs = (raw.staff ?? [])
+      .slice()
+      .sort((a, b) => Number(a.id - b.id));
     const linkedStaff =
       staffs.find((staff) => staff.userId != null && staff.email) ??
       staffs.find((staff) => staff.email);
