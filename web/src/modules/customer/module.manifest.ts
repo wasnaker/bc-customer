@@ -1,7 +1,5 @@
 import { defineModuleManifest } from "@/core/modules/types";
 import Building2 from "lucide-react/dist/esm/icons/building-2";
-import GitBranch from "lucide-react/dist/esm/icons/git-branch";
-import Users from "lucide-react/dist/esm/icons/users";
 import { CustomerPage } from "./pages/customer-page";
 import { BranchPage } from "./pages/branch-page";
 import { StaffPage } from "./pages/staff-page";
@@ -16,16 +14,19 @@ export default defineModuleManifest({
     {
       path: "/admin/customer",
       component: CustomerPage,
+      title: { namespace: "module-customer", key: "customer.title" },
       permission: "read:customer",
     },
     {
       path: "/admin/customer/branch",
       component: BranchPage,
+      title: { namespace: "module-customer", key: "branch.title" },
       permission: "read:branch",
     },
     {
       path: "/admin/customer/staff",
       component: StaffPage,
+      title: { namespace: "module-customer", key: "staff.title" },
       permission: "read:staff",
     },
   ],
