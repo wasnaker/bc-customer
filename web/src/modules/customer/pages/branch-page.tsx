@@ -125,13 +125,11 @@ function PageInner() {
         ),
       },
       {
-        key: "adminEmail",
+        key: "adminName",
         label: t("table.admin"),
         sortable: false,
         render: (item) => (
-          <span className="font-mono text-xs text-muted-foreground">
-            {item.adminEmail ?? "—"}
-          </span>
+          <span className="text-muted-foreground">{item.adminName ?? "—"}</span>
         ),
       },
       {

@@ -18,14 +18,11 @@ export class Branch {
   customerName?: string | null;
 
   /**
-   * Email akun user ter-link melalui staff pertama cabang — terisi pada
-   * list global (join staffs), opsional.
+   * Nama staff ter-link akun user (admin cabang) — terisi pada list global
+   * (join staffs), opsional.
    */
-  @ApiPropertyOptional({
-    example: "admin.cabang01@example.com",
-    nullable: true,
-  })
-  adminEmail?: string | null;
+  @ApiPropertyOptional({ example: "Ahmad Fauzi Lubis", nullable: true })
+  adminName?: string | null;
 
   @ApiProperty({ example: "Kantor Pusat Jakarta" })
   name: string;

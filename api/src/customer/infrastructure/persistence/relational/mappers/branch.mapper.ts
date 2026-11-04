@@ -21,9 +21,8 @@ export class BranchMapper {
       .slice()
       .sort((a, b) => Number(a.id - b.id));
     const linkedStaff =
-      staffs.find((staff) => staff.userId != null && staff.email) ??
-      staffs.find((staff) => staff.email);
-    domainEntity.adminEmail = linkedStaff?.email ?? null;
+      staffs.find((staff) => staff.userId != null) ?? staffs[0];
+    domainEntity.adminName = linkedStaff?.name ?? null;
     domainEntity.name = raw.name;
     domainEntity.isHeadOffice = raw.isHeadOffice;
     domainEntity.addressLine = raw.addressLine;
