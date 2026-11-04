@@ -78,8 +78,15 @@ export class CustomerService {
         } as Branch)),
       );
 
-      const customer = CustomerMapper.toDomain(customerEntity);
-      customer.headOffice = BranchMapper.toDomain(headOfficeEntity);
+      // `code` diisi trigger AFTER INSERT — baca ulang baris agar nilainya
+      // terbawa dalam respons (save() hanya mengembalikan nilai yang di-insert).
+      const [savedCustomerEntity, savedHeadOfficeEntity] = await Promise.all([
+        manager.findOneByOrFail(CustomerEntity, { id: customerEntity.id }),
+        manager.findOneByOrFail(BranchEntity, { id: headOfficeEntity.id }),
+      ]);
+
+      const customer = CustomerMapper.toDomain(savedCustomerEntity);
+      customer.headOffice = BranchMapper.toDomain(savedHeadOfficeEntity);
       return customer;
     });
 

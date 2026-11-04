@@ -65,8 +65,14 @@ let CustomerService = class CustomerService {
                 vatType: createCustomerDto.headOffice.vatType ?? 'npwp',
                 isActive: true,
             })));
-            const customer = customer_mapper_1.CustomerMapper.toDomain(customerEntity);
-            customer.headOffice = branch_mapper_1.BranchMapper.toDomain(headOfficeEntity);
+            // `code` diisi trigger AFTER INSERT — baca ulang baris agar nilainya
+            // terbawa dalam respons (save() hanya mengembalikan nilai yang di-insert).
+            const [savedCustomerEntity, savedHeadOfficeEntity] = await Promise.all([
+                manager.findOneByOrFail(customer_entity_1.CustomerEntity, { id: customerEntity.id }),
+                manager.findOneByOrFail(branch_entity_1.BranchEntity, { id: headOfficeEntity.id }),
+            ]);
+            const customer = customer_mapper_1.CustomerMapper.toDomain(savedCustomerEntity);
+            customer.headOffice = branch_mapper_1.BranchMapper.toDomain(savedHeadOfficeEntity);
             return customer;
         });
         return created;

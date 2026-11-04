@@ -1,3 +1,4 @@
+import { QueryFailedError } from 'typeorm';
 import {
   HttpStatus,
   Injectable,
@@ -32,16 +33,32 @@ export class CustomerDocumentService {
       });
     }
 
-    return this.customerDocumentRepository.create({
-      ownerType: createCustomerDocumentDto.ownerType,
-      ownerId: BigInt(createCustomerDocumentDto.ownerId),
-      type: createCustomerDocumentDto.type,
-      number: createCustomerDocumentDto.number ?? null,
-      fileId: createCustomerDocumentDto.fileId,
-      issuedAt: createCustomerDocumentDto.issuedAt ?? null,
-      expiresAt: createCustomerDocumentDto.expiresAt ?? null,
-      isActive: createCustomerDocumentDto.isActive ?? true,
-    });
+    try {
+      return await this.customerDocumentRepository.create({
+        ownerType: createCustomerDocumentDto.ownerType,
+        ownerId: BigInt(createCustomerDocumentDto.ownerId),
+        type: createCustomerDocumentDto.type,
+        number: createCustomerDocumentDto.number ?? null,
+        fileId: createCustomerDocumentDto.fileId,
+        issuedAt: createCustomerDocumentDto.issuedAt ?? null,
+        expiresAt: createCustomerDocumentDto.expiresAt ?? null,
+        isActive: createCustomerDocumentDto.isActive ?? true,
+      });
+    } catch (error) {
+      // FK ke tabel `file` milik host — petakan pelanggaran menjadi 422.
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError as { code?: string }).code === '23503'
+      ) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: {
+            fileId: 'fileNotFound',
+          },
+        });
+      }
+      throw error;
+    }
   }
 
   async findManyByOwner({

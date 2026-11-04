@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CustomerDocumentService = void 0;
+const typeorm_1 = require("typeorm");
 const common_1 = require("@nestjs/common");
 const customer_document_repository_1 = require("../infrastructure/persistence/customer-document.repository");
 let CustomerDocumentService = class CustomerDocumentService {
@@ -25,16 +26,31 @@ let CustomerDocumentService = class CustomerDocumentService {
                 },
             });
         }
-        return this.customerDocumentRepository.create({
-            ownerType: createCustomerDocumentDto.ownerType,
-            ownerId: BigInt(createCustomerDocumentDto.ownerId),
-            type: createCustomerDocumentDto.type,
-            number: createCustomerDocumentDto.number ?? null,
-            fileId: createCustomerDocumentDto.fileId,
-            issuedAt: createCustomerDocumentDto.issuedAt ?? null,
-            expiresAt: createCustomerDocumentDto.expiresAt ?? null,
-            isActive: createCustomerDocumentDto.isActive ?? true,
-        });
+        try {
+            return await this.customerDocumentRepository.create({
+                ownerType: createCustomerDocumentDto.ownerType,
+                ownerId: BigInt(createCustomerDocumentDto.ownerId),
+                type: createCustomerDocumentDto.type,
+                number: createCustomerDocumentDto.number ?? null,
+                fileId: createCustomerDocumentDto.fileId,
+                issuedAt: createCustomerDocumentDto.issuedAt ?? null,
+                expiresAt: createCustomerDocumentDto.expiresAt ?? null,
+                isActive: createCustomerDocumentDto.isActive ?? true,
+            });
+        }
+        catch (error) {
+            // FK ke tabel `file` milik host — petakan pelanggaran menjadi 422.
+            if (error instanceof typeorm_1.QueryFailedError &&
+                error.driverError.code === '23503') {
+                throw new common_1.UnprocessableEntityException({
+                    status: common_1.HttpStatus.UNPROCESSABLE_ENTITY,
+                    errors: {
+                        fileId: 'fileNotFound',
+                    },
+                });
+            }
+            throw error;
+        }
     }
     async findManyByOwner({ ownerType, ownerId, filterOptions, sortOptions, paginationOptions, }) {
         return this.customerDocumentRepository.findManyByOwner({
