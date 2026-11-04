@@ -2,16 +2,16 @@ import {
   HttpStatus,
   Injectable,
   UnprocessableEntityException,
-} from '@nestjs/common';
-import { CreateStaffDto } from '../dto/create-staff.dto';
-import { UpdateStaffDto } from '../dto/update-staff.dto';
-import { FilterStaffDto, SortStaffDto } from '../dto/query-staff.dto';
-import { Staff } from '../domain/staff';
-import { BranchRepository } from '../infrastructure/persistence/branch.repository';
-import { StaffRepository } from '../infrastructure/persistence/staff.repository';
-import { NullableType } from '../../utils/types/nullable.type';
-import { IPaginationOptions } from '../../utils/types/pagination-options';
-import { RegionValidationService } from './region-validation.service';
+} from "@nestjs/common";
+import { CreateStaffDto } from "../dto/create-staff.dto";
+import { UpdateStaffDto } from "../dto/update-staff.dto";
+import { FilterStaffDto, SortStaffDto } from "../dto/query-staff.dto";
+import { Staff } from "../domain/staff";
+import { BranchRepository } from "../infrastructure/persistence/branch.repository";
+import { StaffRepository } from "../infrastructure/persistence/staff.repository";
+import { NullableType } from "../../utils/types/nullable.type";
+import { IPaginationOptions } from "../../utils/types/pagination-options";
+import { RegionValidationService } from "./region-validation.service";
 
 @Injectable()
 export class StaffService {
@@ -21,13 +21,16 @@ export class StaffService {
     private readonly regionValidation: RegionValidationService,
   ) {}
 
-  async create(branchId: Staff['branchId'], createStaffDto: CreateStaffDto): Promise<Staff> {
+  async create(
+    branchId: Staff["branchId"],
+    createStaffDto: CreateStaffDto,
+  ): Promise<Staff> {
     const branch = await this.branchRepository.findById(branchId);
     if (!branch) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          branch: 'branchNotExists',
+          branch: "branchNotExists",
         },
       });
     }
@@ -70,7 +73,7 @@ export class StaffService {
     sortOptions,
     paginationOptions,
   }: {
-    branchId: Staff['branchId'];
+    branchId: Staff["branchId"];
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -80,7 +83,7 @@ export class StaffService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          branch: 'branchNotExists',
+          branch: "branchNotExists",
         },
       });
     }
@@ -94,23 +97,74 @@ export class StaffService {
   }
 
   async countByBranchId(
-    branchId: Staff['branchId'],
+    branchId: Staff["branchId"],
     filterOptions?: FilterStaffDto | null,
   ): Promise<number> {
     return this.staffRepository.countByBranchId(branchId, filterOptions);
   }
 
-  async findStaffById(id: Staff['id']): Promise<NullableType<Staff>> {
+  /**
+   * List staff global (lintas branch) untuk tabel Staff mandiri.
+   * `branchId` bersifat filter opsional — divalidasi bila diisi.
+   */
+  async findMany({
+    branchId,
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+  }: {
+    branchId?: Staff["branchId"] | null;
+    filterOptions?: FilterStaffDto | null;
+    sortOptions?: SortStaffDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<Staff[]> {
+    if (branchId != null) {
+      await this.assertBranchExists(branchId);
+    }
+    return this.staffRepository.findMany({
+      branchId,
+      filterOptions,
+      sortOptions,
+      paginationOptions,
+    });
+  }
+
+  async countMany(
+    branchId?: Staff["branchId"] | null,
+    filterOptions?: FilterStaffDto | null,
+  ): Promise<number> {
+    if (branchId != null) {
+      await this.assertBranchExists(branchId);
+    }
+    return this.staffRepository.countMany(branchId, filterOptions);
+  }
+
+  private async assertBranchExists(branchId: Staff["branchId"]): Promise<void> {
+    const branch = await this.branchRepository.findById(branchId);
+    if (!branch) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          branch: "branchNotExists",
+        },
+      });
+    }
+  }
+
+  async findStaffById(id: Staff["id"]): Promise<NullableType<Staff>> {
     return this.staffRepository.findById(id);
   }
 
-  async update(id: Staff['id'], updateStaffDto: UpdateStaffDto): Promise<Staff> {
+  async update(
+    id: Staff["id"],
+    updateStaffDto: UpdateStaffDto,
+  ): Promise<Staff> {
     const staff = await this.staffRepository.findById(id);
     if (!staff) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          staff: 'staffNotExists',
+          staff: "staffNotExists",
         },
       });
     }
@@ -141,20 +195,20 @@ export class StaffService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          staff: 'staffNotExists',
+          staff: "staffNotExists",
         },
       });
     }
     return updated;
   }
 
-  async remove(id: Staff['id']): Promise<void> {
+  async remove(id: Staff["id"]): Promise<void> {
     const staff = await this.staffRepository.findById(id);
     if (!staff) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          staff: 'staffNotExists',
+          staff: "staffNotExists",
         },
       });
     }
@@ -172,7 +226,7 @@ export class StaffService {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
         errors: {
-          userId: 'staffUserAlreadyLinked',
+          userId: "staffUserAlreadyLinked",
         },
       });
     }

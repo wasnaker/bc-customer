@@ -9,7 +9,8 @@ import type { CustomerPagination, Staff } from "../types/customer";
 // ── Staff (nested di bawah branch) ──────────────────────────────────────────
 
 export type StaffListRequest = {
-  branchId: Staff["branchId"];
+  /** Opsional — bila kosong, list global (semua staff lintas branch). */
+  branchId?: Staff["branchId"] | null;
   page: number;
   limit: number;
   /** Filter API: `name` (ILike) & `isActive`. Search dipetakan ke `name`. */
@@ -23,9 +24,11 @@ export function useGetStaffService() {
   const fetch = useFetch();
   return useCallback(
     (data: StaffListRequest, requestConfig?: RequestConfigType) => {
-      const url = new URL(
-        `${API_URL}/v1/customer/branches/${data.branchId}/staff`,
-      );
+      // Global list endpoint; branchId opsional sebagai filter server-side.
+      const url = new URL(`${API_URL}/v1/customer/staff`);
+      if (data.branchId != null) {
+        url.searchParams.append("branchId", String(data.branchId));
+      }
       url.searchParams.append("page", String(data.page));
       url.searchParams.append("limit", String(data.limit));
       if (data.filters) {

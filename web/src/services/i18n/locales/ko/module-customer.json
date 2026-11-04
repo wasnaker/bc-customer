@@ -43,6 +43,9 @@
     "selectCustomer": "고객",
     "selectCustomerPlaceholder": "고객 선택…",
     "selectCustomerFirst": "고객과 지점을 선택하면 직원이 표시됩니다.",
+    "allBranches": "모든 지점",
+    "clearCustomerFilter": "고객 필터 지우기",
+    "filterAllCustomers": "모든 고객",
     "selectBranch": "지점",
     "selectBranchPlaceholder": "지점 선택…",
     "selectBranchNeedCustomer": "먼저 고객을 선택하세요",
@@ -68,7 +71,8 @@
     "loading": "불러오는 중…",
     "of": "/",
     "error": "데이터를 불러오지 못했습니다. 다시 시도해 주세요.",
-    "customer": "고객"
+    "customer": "고객",
+    "branch": "지점"
   },
   "detail": {
     "overview": "개요",

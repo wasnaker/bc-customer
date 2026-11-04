@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 
-import { FindOptionsWhere, ILike, Repository } from 'typeorm';
-import { StaffEntity } from '../entities/staff.entity';
-import { NullableType } from '../../../../../utils/types/nullable.type';
-import { FilterStaffDto, SortStaffDto } from '../../../../dto/query-staff.dto';
-import { Staff } from '../../../../domain/staff';
-import { StaffRepository } from '../../staff.repository';
-import { StaffMapper } from '../mappers/staff.mapper';
-import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { FindOptionsWhere, ILike, Repository } from "typeorm";
+import { StaffEntity } from "../entities/staff.entity";
+import { NullableType } from "../../../../../utils/types/nullable.type";
+import { FilterStaffDto, SortStaffDto } from "../../../../dto/query-staff.dto";
+import { Staff } from "../../../../domain/staff";
+import { StaffRepository } from "../../staff.repository";
+import { StaffMapper } from "../mappers/staff.mapper";
+import { IPaginationOptions } from "../../../../../utils/types/pagination-options";
 
 @Injectable()
 export class StaffRelationalRepository implements StaffRepository {
@@ -18,7 +18,7 @@ export class StaffRelationalRepository implements StaffRepository {
   ) {}
 
   async create(
-    data: Omit<Staff, 'id' | 'createdAt' | 'updatedAt' | 'ulid'>,
+    data: Omit<Staff, "id" | "createdAt" | "updatedAt" | "ulid">,
   ): Promise<Staff> {
     const persistenceModel = StaffMapper.toPersistence(data as Staff);
     const newEntity = await this.staffRepository.save(
@@ -33,7 +33,7 @@ export class StaffRelationalRepository implements StaffRepository {
     sortOptions,
     paginationOptions,
   }: {
-    branchId: Staff['branchId'];
+    branchId: Staff["branchId"];
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -57,14 +57,72 @@ export class StaffRelationalRepository implements StaffRepository {
           ...accumulator,
           [sort.orderBy]: sort.order,
         }),
-        { name: 'ASC' },
+        { name: "ASC" },
       ),
     });
 
     return entities.map((staff) => StaffMapper.toDomain(staff));
   }
 
-  async findById(id: Staff['id']): Promise<NullableType<Staff>> {
+  async findMany({
+    branchId,
+    filterOptions,
+    sortOptions,
+    paginationOptions,
+  }: {
+    branchId?: Staff["branchId"] | null;
+    filterOptions?: FilterStaffDto | null;
+    sortOptions?: SortStaffDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<Staff[]> {
+    const where: FindOptionsWhere<StaffEntity> = {};
+    if (branchId != null) {
+      where.branchId = BigInt(branchId);
+    }
+    if (filterOptions?.name) {
+      where.name = ILike(`%${filterOptions.name}%`);
+    }
+    if (filterOptions?.position) {
+      where.position = ILike(`%${filterOptions.position}%`);
+    }
+
+    const entities = await this.staffRepository.find({
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+      where,
+      // Relasi branch+customer hanya untuk list global — kolom nama
+      // cabang/pelanggan dibutuhkan tabel Staff mandiri.
+      relations: branchId == null ? { branch: { customer: true } } : undefined,
+      order: sortOptions?.reduce(
+        (accumulator, sort) => ({
+          ...accumulator,
+          [sort.orderBy]: sort.order,
+        }),
+        { name: "ASC" },
+      ),
+    });
+
+    return entities.map((staff) => StaffMapper.toDomain(staff));
+  }
+
+  async countMany(
+    branchId?: Staff["branchId"] | null,
+    filterOptions?: FilterStaffDto | null,
+  ): Promise<number> {
+    const where: FindOptionsWhere<StaffEntity> = {};
+    if (branchId != null) {
+      where.branchId = BigInt(branchId);
+    }
+    if (filterOptions?.name) {
+      where.name = ILike(`%${filterOptions.name}%`);
+    }
+    if (filterOptions?.position) {
+      where.position = ILike(`%${filterOptions.position}%`);
+    }
+    return this.staffRepository.count({ where });
+  }
+
+  async findById(id: Staff["id"]): Promise<NullableType<Staff>> {
     const entity = await this.staffRepository.findOne({
       where: { id: BigInt(id) },
     });
@@ -79,7 +137,7 @@ export class StaffRelationalRepository implements StaffRepository {
   }
 
   async countByBranchId(
-    branchId: Staff['branchId'],
+    branchId: Staff["branchId"],
     filterOptions?: FilterStaffDto | null,
   ): Promise<number> {
     const where: FindOptionsWhere<StaffEntity> = {
@@ -94,7 +152,10 @@ export class StaffRelationalRepository implements StaffRepository {
     return this.staffRepository.count({ where });
   }
 
-  async update(id: Staff['id'], payload: Partial<Staff>): Promise<Staff | null> {
+  async update(
+    id: Staff["id"],
+    payload: Partial<Staff>,
+  ): Promise<Staff | null> {
     const entity = await this.staffRepository.findOne({
       where: { id: BigInt(id) },
     });
@@ -119,7 +180,7 @@ export class StaffRelationalRepository implements StaffRepository {
     return StaffMapper.toDomain(updatedEntity);
   }
 
-  async remove(id: Staff['id']): Promise<void> {
+  async remove(id: Staff["id"]): Promise<void> {
     await this.staffRepository.delete({ id: BigInt(id) });
   }
 }

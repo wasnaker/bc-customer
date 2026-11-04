@@ -43,6 +43,9 @@
     "selectCustomer": "Pelanggan",
     "selectCustomerPlaceholder": "Pilih pelanggan…",
     "selectCustomerFirst": "Pilih pelanggan dan cabang untuk melihat stafnya.",
+    "allBranches": "Semua cabang",
+    "clearCustomerFilter": "Hapus filter pelanggan",
+    "filterAllCustomers": "Semua pelanggan",
     "selectBranch": "Cabang",
     "selectBranchPlaceholder": "Pilih cabang…",
     "selectBranchNeedCustomer": "Pilih pelanggan terlebih dahulu",
@@ -68,7 +71,8 @@
     "loading": "Memuat…",
     "of": "dari",
     "error": "Gagal memuat data. Silakan coba lagi.",
-    "customer": "Pelanggan"
+    "customer": "Pelanggan",
+    "branch": "Cabang"
   },
   "detail": {
     "overview": "Ringkasan",

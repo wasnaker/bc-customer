@@ -1,15 +1,19 @@
-import { Staff } from '../../../../domain/staff';
-import { StaffEntity } from '../entities/staff.entity';
+import { Staff } from "../../../../domain/staff";
+import { StaffEntity } from "../entities/staff.entity";
 
 export class StaffMapper {
   static toDomain(raw: StaffEntity): Staff {
     const domainEntity = new Staff();
-    domainEntity.id = raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
+    domainEntity.id =
+      raw.id === null || raw.id === undefined ? raw.id : String(raw.id);
     domainEntity.ulid = raw.ulid;
     domainEntity.branchId =
       raw.branchId === null || raw.branchId === undefined
         ? raw.branchId
         : String(raw.branchId);
+    // Nama branch/customer hanya tersedia bila relasi di-load (list global).
+    domainEntity.branchName = raw.branch?.name ?? null;
+    domainEntity.customerName = raw.branch?.customer?.name ?? null;
     domainEntity.name = raw.name;
     domainEntity.userId = raw.userId;
     domainEntity.position = raw.position;

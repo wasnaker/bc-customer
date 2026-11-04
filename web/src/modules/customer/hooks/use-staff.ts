@@ -32,9 +32,8 @@ export function useStaffServerSide(branchId: string | null) {
     searchDebounce: 300,
     defaultSort: { field: "name", order: "ASC" },
     fetchFn: async ({ page, limit, search, sort, signal }) => {
-      if (branchId == null) {
-        return { data: [], total: 0 };
-      }
+      // Tanpa branch terpilih → list GLOBAL (semua staff); dengan branch
+      // → difilter server-side via query param branchId.
 
       // Search → `filters[name]` (ILike); search dikombinasikan dengan filter lain.
       const filters: Record<string, string> = {};
@@ -42,7 +41,7 @@ export function useStaffServerSide(branchId: string | null) {
 
       const res = await service(
         {
-          branchId,
+          branchId: branchId ?? undefined,
           page,
           limit,
           filters: Object.keys(filters).length ? filters : undefined,

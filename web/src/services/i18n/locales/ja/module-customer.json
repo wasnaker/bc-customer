@@ -43,6 +43,9 @@
     "selectCustomer": "顧客",
     "selectCustomerPlaceholder": "顧客を選択…",
     "selectCustomerFirst": "顧客と支店を選択するとスタッフが表示されます。",
+    "allBranches": "すべての支店",
+    "clearCustomerFilter": "顧客フィルターを解除",
+    "filterAllCustomers": "すべての顧客",
     "selectBranch": "支店",
     "selectBranchPlaceholder": "支店を選択…",
     "selectBranchNeedCustomer": "先に顧客を選択してください",
@@ -68,7 +71,8 @@
     "loading": "読み込み中…",
     "of": "/",
     "error": "データを読み込めませんでした。もう一度お試しください。",
-    "customer": "顧客"
+    "customer": "顧客",
+    "branch": "支店"
   },
   "detail": {
     "overview": "概要",

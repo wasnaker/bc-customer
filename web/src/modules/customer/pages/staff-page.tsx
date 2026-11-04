@@ -89,7 +89,7 @@ function PageInner() {
   // Ganti customer/branch → reset state tabel (page/search milik useTable
   // tidak otomatis reset saat queryKey parent berubah).
   function handleBranchChange(next: string) {
-    setBranchId(next);
+    setBranchId(next === "__all__" ? "" : next);
     setSearch("");
     setPage(1);
   }
@@ -111,11 +111,22 @@ function PageInner() {
         ),
       },
       {
-        key: "phone",
-        label: t("table.phone"),
+        key: "branchName",
+        label: t("table.branch"),
+        sortable: false,
         render: (item) => (
-          <span className="font-mono text-xs text-muted-foreground">
-            {item.phone ?? "—"}
+          <span className="line-clamp-1 text-muted-foreground">
+            {item.branchName ?? item.branchId}
+          </span>
+        ),
+      },
+      {
+        key: "customerName",
+        label: t("table.customer"),
+        sortable: false,
+        render: (item) => (
+          <span className="text-muted-foreground">
+            {item.customerName ?? "—"}
           </span>
         ),
       },
@@ -225,30 +236,43 @@ function PageInner() {
           </div>
         </div>
 
-        {/* ── Cascade selectors: customer → branch ───────────────────── */}
+        {/* ── Filter customer (opsional) + cabang ────────────────────── */}
         <div className="mb-4 grid grid-cols-1 gap-3 sm:max-w-2xl sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="staff-customer-picker">
               {t("staff.selectCustomer")}
             </Label>
-            <SearchableSelect
-              id="staff-customer-picker"
-              ariaLabel={t("staff.selectCustomer")}
-              value={customer}
-              onSelect={handleCustomerChange}
-              fetchOptions={fetchCustomerOptions}
-              placeholder={t("staff.selectCustomerPlaceholder")}
-              loadingText={t("picker.loading")}
-              emptyText={t("picker.empty")}
-              errorText={t("picker.error")}
-            />
+            <div className="flex items-center gap-2">
+              <SearchableSelect
+                id="staff-customer-picker"
+                ariaLabel={t("staff.selectCustomer")}
+                value={customer}
+                onSelect={handleCustomerChange}
+                fetchOptions={fetchCustomerOptions}
+                placeholder={t("staff.filterAllCustomers")}
+                loadingText={t("picker.loading")}
+                emptyText={t("picker.empty")}
+                errorText={t("picker.error")}
+                className="flex-1"
+              />
+              {customer && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  title={t("staff.clearCustomerFilter")}
+                  onClick={() => handleCustomerChange(null)}
+                >
+                  <TrashIcon className="size-3.5" />
+                </Button>
+              )}
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="staff-branch-select">
               {t("staff.selectBranch")}
             </Label>
             <Select
-              value={branchId || undefined}
+              value={branchId || "__all__"}
               disabled={!customerId}
               onValueChange={handleBranchChange}
             >
@@ -262,6 +286,10 @@ function PageInner() {
                 />
               </SelectTrigger>
               <SelectContent>
+                {/* Nilai "Semua cabang" — list global tanpa filter branch. */}
+                <SelectItem value="__all__">
+                  {t("staff.allBranches")}
+                </SelectItem>
                 {(branchOptions ?? []).map((branch) => (
                   <SelectItem key={String(branch.id)} value={String(branch.id)}>
                     {branch.name}
@@ -275,63 +303,52 @@ function PageInner() {
           </div>
         </div>
 
-        {/* ── Table (hanya bila branch terpilih) ─────────────────────── */}
-        {branchReady ? (
-          <SmallTable<Staff>
-            items={staff}
-            total={total}
-            searchValue={search}
-            onSearchChange={setSearch}
-            searchPlaceholder={t("staff.search")}
-            searchLabel={t("staff.searchLabel")}
-            page={page}
-            onPageChange={setPage}
-            perPage={limit}
-            sort={sort}
-            onSortChange={setSort}
-            columns={columns}
-            selectedId={selectedId}
-            onSelectId={select}
-            getItemId={(item) => item.id}
-            showDetail={showDetail}
-            detailItem={selectedStaff ?? null}
-            detailLoading={detailLoading}
-            tabs={[
-              { slug: "overview", label: t("detail.overview"), position: 0 },
-            ]}
-            customTabBody={{
-              overview: (item: Staff) => <StaffOverviewTab item={item} />,
-            }}
-            emptyText={t("staff.empty")}
-            isLoading={isLoading}
-            isFetching={isFetching}
-            loadingText={t("table.loading")}
-            error={error}
-            errorText={t("table.error")}
-            tabEmptyText={t("detail.empty")}
-            paginationOfLabel={t("table.of")}
-            previousPageLabel={t("actions.prev_page")}
-            nextPageLabel={t("actions.next_page")}
-            toolbar={toolbar}
-            renderHeader={renderHeader}
-            listHeader={
-              showDetail ? (
-                <Button variant="outline" size="sm" onClick={close}>
-                  {t("actions.collapse")}
-                </Button>
-              ) : undefined
-            }
-          />
-        ) : (
-          <div className="rounded-lg border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-            <UsersIcon className="mx-auto mb-3 size-8 text-muted-foreground/50" />
-            <p>
-              {customerId
-                ? t("staff.selectBranchFirst")
-                : t("staff.selectCustomerFirst")}
-            </p>
-          </div>
-        )}
+        {/* ── Table (selalu tampil; tanpa branch = list global) ──────── */}
+        <SmallTable<Staff>
+          items={staff}
+          total={total}
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder={t("staff.search")}
+          searchLabel={t("staff.searchLabel")}
+          page={page}
+          onPageChange={setPage}
+          perPage={limit}
+          sort={sort}
+          onSortChange={setSort}
+          columns={columns}
+          selectedId={selectedId}
+          onSelectId={select}
+          getItemId={(item) => item.id}
+          showDetail={showDetail}
+          detailItem={selectedStaff ?? null}
+          detailLoading={detailLoading}
+          tabs={[
+            { slug: "overview", label: t("detail.overview"), position: 0 },
+          ]}
+          customTabBody={{
+            overview: (item: Staff) => <StaffOverviewTab item={item} />,
+          }}
+          emptyText={t("staff.empty")}
+          isLoading={isLoading}
+          isFetching={isFetching}
+          loadingText={t("table.loading")}
+          error={error}
+          errorText={t("table.error")}
+          tabEmptyText={t("detail.empty")}
+          paginationOfLabel={t("table.of")}
+          previousPageLabel={t("actions.prev_page")}
+          nextPageLabel={t("actions.next_page")}
+          toolbar={toolbar}
+          renderHeader={renderHeader}
+          listHeader={
+            showDetail ? (
+              <Button variant="outline" size="sm" onClick={close}>
+                {t("actions.collapse")}
+              </Button>
+            ) : undefined
+          }
+        />
       </div>
 
       {/* ── Create / Edit dialog ──────────────────────────────────────── */}

@@ -157,6 +157,30 @@ export class CustomerController {
     return infinityPagination(data, { page, limit }, total);
   }
 
+  @ApiOkResponse({ type: InfinityPaginationResponse(Staff) })
+  @CustomerResource("staff")
+  @Get("staff")
+  @HttpCode(HttpStatus.OK)
+  async findAllStaff(
+    @Query() query: QueryStaffDto,
+  ): Promise<InfinityPaginationResponseDto<Staff>> {
+    const page = query?.page ?? 1;
+    const limit = Math.min(query?.limit ?? 10, 50);
+
+    const filterOptions: FilterStaffDto | null = query.filters ?? null;
+    const branchId = query.branchId?.trim() || null;
+
+    const data = await this.staffService.findMany({
+      branchId,
+      filterOptions,
+      sortOptions: query.sort ?? null,
+      paginationOptions: { page, limit },
+    });
+    const total = await this.staffService.countMany(branchId, filterOptions);
+
+    return infinityPagination(data, { page, limit }, total);
+  }
+
   // ─── Customers ─────────────────────────────────────────────────────────────
 
   @ApiCreatedResponse({ type: Customer })

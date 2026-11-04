@@ -43,6 +43,9 @@
     "selectCustomer": "客户",
     "selectCustomerPlaceholder": "选择客户…",
     "selectCustomerFirst": "请选择客户和分支以查看其员工。",
+    "allBranches": "所有分支",
+    "clearCustomerFilter": "清除客户筛选",
+    "filterAllCustomers": "所有客户",
     "selectBranch": "分支",
     "selectBranchPlaceholder": "选择分支…",
     "selectBranchNeedCustomer": "请先选择客户",
@@ -68,7 +71,8 @@
     "loading": "加载中…",
     "of": "/",
     "error": "数据加载失败，请重试。",
-    "customer": "客户"
+    "customer": "客户",
+    "branch": "分支"
   },
   "detail": {
     "overview": "概览",

@@ -43,6 +43,9 @@
     "selectCustomer": "Customer",
     "selectCustomerPlaceholder": "Select a customer…",
     "selectCustomerFirst": "Select a customer and a branch to see its staff.",
+    "allBranches": "All branches",
+    "clearCustomerFilter": "Clear customer filter",
+    "filterAllCustomers": "All customers",
     "selectBranch": "Branch",
     "selectBranchPlaceholder": "Select a branch…",
     "selectBranchNeedCustomer": "Select a customer first",
@@ -68,7 +71,8 @@
     "loading": "Loading…",
     "of": "of",
     "error": "Unable to load data. Please try again.",
-    "customer": "Customer"
+    "customer": "Customer",
+    "branch": "Branch"
   },
   "detail": {
     "overview": "Overview",
