@@ -25,7 +25,12 @@ let CustomersRelationalRepository = class CustomersRelationalRepository {
     async create(data) {
         const persistenceModel = customer_mapper_1.CustomerMapper.toPersistence(data);
         const newEntity = await this.customerRepository.save(this.customerRepository.create(persistenceModel));
-        return customer_mapper_1.CustomerMapper.toDomain(newEntity);
+        // Kolom `code` diisi oleh trigger AFTER INSERT di database, sehingga tidak
+        // terbawa oleh nilai kembalian save(). Baca ulang baris untuk memuatnya.
+        const savedEntity = await this.customerRepository.findOneByOrFail({
+            id: newEntity.id,
+        });
+        return customer_mapper_1.CustomerMapper.toDomain(savedEntity);
     }
     async findManyWithPagination({ filterOptions, sortOptions, paginationOptions, }) {
         const where = {};

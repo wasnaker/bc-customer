@@ -24,7 +24,12 @@ export class CustomersRelationalRepository implements CustomerRepository {
     const newEntity = await this.customerRepository.save(
       this.customerRepository.create(persistenceModel),
     );
-    return CustomerMapper.toDomain(newEntity);
+    // Kolom `code` diisi oleh trigger AFTER INSERT di database, sehingga tidak
+    // terbawa oleh nilai kembalian save(). Baca ulang baris untuk memuatnya.
+    const savedEntity = await this.customerRepository.findOneByOrFail({
+      id: newEntity.id,
+    });
+    return CustomerMapper.toDomain(savedEntity);
   }
 
   async findManyWithPagination({

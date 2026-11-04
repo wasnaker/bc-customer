@@ -24,7 +24,12 @@ export class BranchesRelationalRepository implements BranchRepository {
     const newEntity = await this.branchRepository.save(
       this.branchRepository.create(persistenceModel),
     );
-    return BranchMapper.toDomain(newEntity);
+    // Kolom `code` diisi oleh trigger AFTER INSERT di database, sehingga tidak
+    // terbawa oleh nilai kembalian save(). Baca ulang baris untuk memuatnya.
+    const savedEntity = await this.branchRepository.findOneByOrFail({
+      id: newEntity.id,
+    });
+    return BranchMapper.toDomain(savedEntity);
   }
 
   async findManyByCustomerId({

@@ -25,7 +25,12 @@ let BranchesRelationalRepository = class BranchesRelationalRepository {
     async create(data) {
         const persistenceModel = branch_mapper_1.BranchMapper.toPersistence(data);
         const newEntity = await this.branchRepository.save(this.branchRepository.create(persistenceModel));
-        return branch_mapper_1.BranchMapper.toDomain(newEntity);
+        // Kolom `code` diisi oleh trigger AFTER INSERT di database, sehingga tidak
+        // terbawa oleh nilai kembalian save(). Baca ulang baris untuk memuatnya.
+        const savedEntity = await this.branchRepository.findOneByOrFail({
+            id: newEntity.id,
+        });
+        return branch_mapper_1.BranchMapper.toDomain(savedEntity);
     }
     async findManyByCustomerId({ customerId, filterOptions, sortOptions, paginationOptions, }) {
         const where = {
