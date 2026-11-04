@@ -1,32 +1,36 @@
-import { DynamicModule, Module, Provider } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DynamicModule, Module, Provider } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { CustomerEntity } from './infrastructure/persistence/relational/entities/customer.entity';
-import { BranchEntity } from './infrastructure/persistence/relational/entities/branch.entity';
-import { StaffEntity } from './infrastructure/persistence/relational/entities/staff.entity';
-import { CustomerDocumentEntity } from './infrastructure/persistence/relational/entities/customer-document.entity';
-import { CustomerService } from './services/customer.service';
-import { BranchService } from './services/branch.service';
-import { StaffService } from './services/staff.service';
-import { CustomerDocumentService } from './services/customer-document.service';
-import { RegionValidationService } from './services/region-validation.service';
-import { CustomerController } from './controllers/customer.controller';
-import { CustomerRepository } from './infrastructure/persistence/customer.repository';
-import { BranchRepository } from './infrastructure/persistence/branch.repository';
-import { StaffRepository } from './infrastructure/persistence/staff.repository';
-import { CustomerDocumentRepository } from './infrastructure/persistence/customer-document.repository';
-import { CustomersRelationalRepository } from './infrastructure/persistence/relational/repositories/customer.repository';
-import { BranchesRelationalRepository } from './infrastructure/persistence/relational/repositories/branch.repository';
-import { StaffRelationalRepository } from './infrastructure/persistence/relational/repositories/staff.repository';
-import { CustomerDocumentsRelationalRepository } from './infrastructure/persistence/relational/repositories/customer-document.repository';
-import { CustomerAccessGuard } from './security/customer-access.guard';
+import { CustomerEntity } from "./infrastructure/persistence/relational/entities/customer.entity";
+import { BranchEntity } from "./infrastructure/persistence/relational/entities/branch.entity";
+import { StaffEntity } from "./infrastructure/persistence/relational/entities/staff.entity";
+import { CustomerDocumentEntity } from "./infrastructure/persistence/relational/entities/customer-document.entity";
+import { CustomerService } from "./services/customer.service";
+import { BranchService } from "./services/branch.service";
+import { StaffService } from "./services/staff.service";
+import { CustomerDocumentService } from "./services/customer-document.service";
+import { RegionValidationService } from "./services/region-validation.service";
+import { CustomerController } from "./controllers/customer.controller";
+import { CustomerRepository } from "./infrastructure/persistence/customer.repository";
+import { BranchRepository } from "./infrastructure/persistence/branch.repository";
+import { StaffRepository } from "./infrastructure/persistence/staff.repository";
+import { CustomerDocumentRepository } from "./infrastructure/persistence/customer-document.repository";
+import { CustomersRelationalRepository } from "./infrastructure/persistence/relational/repositories/customer.repository";
+import { BranchesRelationalRepository } from "./infrastructure/persistence/relational/repositories/branch.repository";
+import { StaffRelationalRepository } from "./infrastructure/persistence/relational/repositories/staff.repository";
+import { CustomerDocumentsRelationalRepository } from "./infrastructure/persistence/relational/repositories/customer-document.repository";
+import { CustomerAccessGuard } from "./security/customer-access.guard";
+import { CustomerDemoDataSeedService } from "./database/seeds/demo-data/customer-demo-data.seed.service";
 import {
   CUSTOMER_MODULE_OPTIONS,
   CustomerModuleAsyncOptions,
-} from './customer.options';
+} from "./customer.options";
 
-export { CUSTOMER_MODULE_OPTIONS } from './customer.options';
-export type { CustomerModuleOptions, CustomerModuleAsyncOptions } from './customer.options';
+export { CUSTOMER_MODULE_OPTIONS } from "./customer.options";
+export type {
+  CustomerModuleOptions,
+  CustomerModuleAsyncOptions,
+} from "./customer.options";
 
 /**
  * Phase 4 (API layer) module: controllers, services and repositories on top
@@ -50,6 +54,7 @@ export type { CustomerModuleOptions, CustomerModuleAsyncOptions } from './custom
     CustomerDocumentService,
     RegionValidationService,
     CustomerAccessGuard,
+    CustomerDemoDataSeedService,
     { provide: CustomerRepository, useClass: CustomersRelationalRepository },
     { provide: BranchRepository, useClass: BranchesRelationalRepository },
     { provide: StaffRepository, useClass: StaffRelationalRepository },
@@ -65,6 +70,7 @@ export type { CustomerModuleOptions, CustomerModuleAsyncOptions } from './custom
     StaffService,
     CustomerDocumentService,
     CustomerAccessGuard,
+    CustomerDemoDataSeedService,
   ],
 })
 export class CustomerModule {
