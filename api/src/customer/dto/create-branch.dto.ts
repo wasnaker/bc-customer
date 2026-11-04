@@ -12,7 +12,12 @@ import {
 } from 'class-validator';
 
 export class CreateBranchDto {
-  @ApiProperty({ example: 'Cabang Bandung', maxLength: 190 })
+  @ApiProperty({
+    example: 'Cabang Bandung PT Baja Prima Konstruksi',
+    description:
+      'Sertakan nama customer agar jelas cabang milik perusahaan mana.',
+    maxLength: 190,
+  })
   @IsNotEmpty()
   @IsString()
   @MaxLength(190)
