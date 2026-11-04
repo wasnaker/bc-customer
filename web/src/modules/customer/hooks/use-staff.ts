@@ -25,10 +25,15 @@ function assertOk(status: number, data: unknown): void {
 
 // ── List per branch (server-side, dipakai SmallTable + useTable) ────────────
 
-export function useStaffServerSide(branchId: string | null) {
+export function useStaffServerSide(
+  branchId: string | null,
+  customerId: string | null = null,
+) {
   const service = useGetStaffService();
+  // customerId ikut di queryKey: ganti customer memicu refetch meski
+  // branchId tetap kosong (branchId = filter server-side, bukan bagian key).
   return useTable<Staff>({
-    queryKey: ["customer", "staff", branchId ?? "none"],
+    queryKey: ["customer", "staff", branchId ?? "all", customerId ?? "all"],
     searchDebounce: 300,
     defaultSort: { field: "name", order: "ASC" },
     fetchFn: async ({ page, limit, search, sort, signal }) => {

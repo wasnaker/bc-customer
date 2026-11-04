@@ -84,7 +84,7 @@ function PageInner() {
     setSearch,
     sort,
     setSort,
-  } = useStaffServerSide(branchId || null);
+  } = useStaffServerSide(branchId || null, customerId);
 
   // Ganti customer/branch → reset state tabel (page/search milik useTable
   // tidak otomatis reset saat queryKey parent berubah).
