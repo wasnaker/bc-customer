@@ -14,12 +14,13 @@ export class BranchMapper {
         : String(raw.customerId);
     // Nama customer hanya tersedia bila relasi di-load (list global).
     domainEntity.customerName = raw.customer?.name ?? null;
-    // Email admin cabang: staff pertama (urut id) yang punya email akun
-    // ter-link. Relasi staffs hanya di-load pada list global.
-    const linkedStaff = (raw.staff ?? [])
-      .slice()
-      .sort((a, b) => Number(BigInt(a.id) - BigInt(b.id)))
-      .find((staff) => staff.email);
+    // Email admin cabang: staff ter-link user (userId terisi) pertama yang
+    // punya email — fallback ke staff pertama yang punya email. Relasi
+    // staffs hanya di-load pada list global.
+    const staffs = (raw.staff ?? []).slice().sort((a, b) => a.id - b.id);
+    const linkedStaff =
+      staffs.find((staff) => staff.userId != null && staff.email) ??
+      staffs.find((staff) => staff.email);
     domainEntity.adminEmail = linkedStaff?.email ?? null;
     domainEntity.name = raw.name;
     domainEntity.isHeadOffice = raw.isHeadOffice;
