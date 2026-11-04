@@ -34,7 +34,7 @@ export function useGetRegionProvincesService() {
       const url = new URL(`${API_URL}/v1/region/provinces`);
       url.searchParams.append("page", "1");
       // Provinsi Indonesia < 40 — satu halaman cukup.
-      url.searchParams.append("limit", "100");
+      url.searchParams.append("limit", "50");
       return fetch(url, { method: "GET", ...requestConfig }).then(
         wrapperFetchJsonResponse<RegionRefListResponse<RegionProvinceRef>>,
       );
@@ -52,8 +52,8 @@ export function useGetRegionRegenciesService() {
     ) => {
       const url = new URL(`${API_URL}/v1/region/regencies`);
       url.searchParams.append("page", "1");
-      // Kabupaten/kota terbanyak per provinsi < 100 — satu halaman cukup.
-      url.searchParams.append("limit", String(data.limit ?? 100));
+      // Kabupaten/kota terbanyak per provinsi < 50 — satu halaman cukup.
+      url.searchParams.append("limit", String(data.limit ?? 50));
       url.searchParams.append(
         "filters",
         JSON.stringify({ provinceId: String(data.provinceId) }),
