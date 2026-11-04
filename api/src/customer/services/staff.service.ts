@@ -8,6 +8,7 @@ import { UpdateStaffDto } from "../dto/update-staff.dto";
 import { FilterStaffDto, SortStaffDto } from "../dto/query-staff.dto";
 import { Staff } from "../domain/staff";
 import { BranchRepository } from "../infrastructure/persistence/branch.repository";
+import { CustomerRepository } from "../infrastructure/persistence/customer.repository";
 import { StaffRepository } from "../infrastructure/persistence/staff.repository";
 import { NullableType } from "../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../utils/types/pagination-options";
@@ -18,6 +19,7 @@ export class StaffService {
   constructor(
     private readonly staffRepository: StaffRepository,
     private readonly branchRepository: BranchRepository,
+    private readonly customerRepository: CustomerRepository,
     private readonly regionValidation: RegionValidationService,
   ) {}
 
@@ -109,20 +111,25 @@ export class StaffService {
    */
   async findMany({
     branchId,
+    customerId,
     filterOptions,
     sortOptions,
     paginationOptions,
   }: {
     branchId?: Staff["branchId"] | null;
+    customerId?: Staff["branchId"] | null;
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
   }): Promise<Staff[]> {
     if (branchId != null) {
       await this.assertBranchExists(branchId);
+    } else if (customerId != null) {
+      await this.assertCustomerExists(customerId);
     }
     return this.staffRepository.findMany({
       branchId,
+      customerId,
       filterOptions,
       sortOptions,
       paginationOptions,
@@ -132,11 +139,28 @@ export class StaffService {
   async countMany(
     branchId?: Staff["branchId"] | null,
     filterOptions?: FilterStaffDto | null,
+    customerId?: Staff["branchId"] | null,
   ): Promise<number> {
     if (branchId != null) {
       await this.assertBranchExists(branchId);
+    } else if (customerId != null) {
+      await this.assertCustomerExists(customerId);
     }
-    return this.staffRepository.countMany(branchId, filterOptions);
+    return this.staffRepository.countMany(branchId, filterOptions, customerId);
+  }
+
+  private async assertCustomerExists(
+    customerId: Staff["branchId"],
+  ): Promise<void> {
+    const customer = await this.customerRepository.findById(customerId);
+    if (!customer) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          customer: "customerNotExists",
+        },
+      });
+    }
   }
 
   private async assertBranchExists(branchId: Staff["branchId"]): Promise<void> {

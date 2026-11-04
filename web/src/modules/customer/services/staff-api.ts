@@ -11,6 +11,8 @@ import type { CustomerPagination, Staff } from "../types/customer";
 export type StaffListRequest = {
   /** Opsional — bila kosong, list global (semua staff lintas branch). */
   branchId?: Staff["branchId"] | null;
+  /** Opsional — filter via branch.customerId (customer dipilih, cabang belum). */
+  customerId?: Staff["branchId"] | null;
   page: number;
   limit: number;
   /** Filter API: `name` (ILike) & `isActive`. Search dipetakan ke `name`. */
@@ -28,6 +30,9 @@ export function useGetStaffService() {
       const url = new URL(`${API_URL}/v1/customer/staff`);
       if (data.branchId != null) {
         url.searchParams.append("branchId", String(data.branchId));
+      }
+      if (data.customerId != null) {
+        url.searchParams.append("customerId", String(data.customerId));
       }
       url.searchParams.append("page", String(data.page));
       url.searchParams.append("limit", String(data.limit));

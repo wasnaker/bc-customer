@@ -47,6 +47,7 @@ export function useStaffServerSide(
       const res = await service(
         {
           branchId: branchId ?? undefined,
+          customerId: customerId ?? undefined,
           page,
           limit,
           filters: Object.keys(filters).length ? filters : undefined,

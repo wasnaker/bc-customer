@@ -28,11 +28,14 @@ export abstract class StaffRepository {
    */
   abstract findMany({
     branchId,
+    customerId,
     filterOptions,
     sortOptions,
     paginationOptions,
   }: {
     branchId?: Staff["branchId"] | null;
+    /** Filter via branch.customerId — mode "customer dipilih, cabang belum". */
+    customerId?: Staff["branchId"] | null;
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -41,6 +44,7 @@ export abstract class StaffRepository {
   abstract countMany(
     branchId?: Staff["branchId"] | null,
     filterOptions?: FilterStaffDto | null,
+    customerId?: Staff["branchId"] | null,
   ): Promise<number>;
 
   abstract findById(id: Staff["id"]): Promise<NullableType<Staff>>;

@@ -169,14 +169,20 @@ export class CustomerController {
 
     const filterOptions: FilterStaffDto | null = query.filters ?? null;
     const branchId = query.branchId?.trim() || null;
+    const customerId = query.customerId?.trim() || null;
 
     const data = await this.staffService.findMany({
       branchId,
+      customerId,
       filterOptions,
       sortOptions: query.sort ?? null,
       paginationOptions: { page, limit },
     });
-    const total = await this.staffService.countMany(branchId, filterOptions);
+    const total = await this.staffService.countMany(
+      branchId,
+      filterOptions,
+      customerId,
+    );
 
     return infinityPagination(data, { page, limit }, total);
   }

@@ -66,11 +66,13 @@ export class StaffRelationalRepository implements StaffRepository {
 
   async findMany({
     branchId,
+    customerId,
     filterOptions,
     sortOptions,
     paginationOptions,
   }: {
     branchId?: Staff["branchId"] | null;
+    customerId?: Staff["branchId"] | null;
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -78,6 +80,9 @@ export class StaffRelationalRepository implements StaffRepository {
     const where: FindOptionsWhere<StaffEntity> = {};
     if (branchId != null) {
       where.branchId = BigInt(branchId);
+    } else if (customerId != null) {
+      // Filter nested via relasi branch → customer.
+      where.branch = { customerId: BigInt(customerId) };
     }
     if (filterOptions?.name) {
       where.name = ILike(`%${filterOptions.name}%`);
@@ -108,10 +113,13 @@ export class StaffRelationalRepository implements StaffRepository {
   async countMany(
     branchId?: Staff["branchId"] | null,
     filterOptions?: FilterStaffDto | null,
+    customerId?: Staff["branchId"] | null,
   ): Promise<number> {
     const where: FindOptionsWhere<StaffEntity> = {};
     if (branchId != null) {
       where.branchId = BigInt(branchId);
+    } else if (customerId != null) {
+      where.branch = { customerId: BigInt(customerId) };
     }
     if (filterOptions?.name) {
       where.name = ILike(`%${filterOptions.name}%`);

@@ -37,6 +37,15 @@ export class QueryStaffDto {
   @IsString()
   branchId?: string;
 
+  /**
+   * Filter opsional milik customer (via branch) — untuk mode "customer
+   * dipilih, cabang belum". Diabaikan pada route nested.
+   */
+  @ApiPropertyOptional({ example: "11", description: "Bigint PK as string" })
+  @IsOptional()
+  @IsString()
+  customerId?: string;
+
   @ApiPropertyOptional()
   @Transform(({ value }) =>
     value === undefined || value === "" ? 1 : Number(value),
