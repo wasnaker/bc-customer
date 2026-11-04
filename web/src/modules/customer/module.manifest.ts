@@ -1,22 +1,35 @@
 import { defineModuleManifest } from "@/core/modules/types";
 import Building2 from "lucide-react/dist/esm/icons/building-2";
-import GitBranch from "lucide-react/dist/esm/icons/git-branch";
-import Users from "lucide-react/dist/esm/icons/users";
+import { CustomerPage } from "./pages/customer-page";
+import { BranchPage } from "./pages/branch-page";
+import { StaffPage } from "./pages/staff-page";
 
 /**
- * Manifest modul Customer.
- *
- * Menu: 1 induk "Customer" collapsible dengan 3 anak — /admin/customer,
- * /admin/customer/branch, /admin/customer/staff. Parent tanpa permission
- * eksplisit → tampil bila minimal satu anak lolos filter permission user.
- * String UI memakai namespace "module-customer" (lihat
- * src/services/i18n/locales/<lang>/module-customer.json).
- *
- * dashboardWidgets sengaja kosong — widget lama memakai endpoint yang sudah
- * tidak ada.
+ * Customer owns its admin pages and navigation. The host only resolves the
+ * declared canonical paths and applies its shared admin authentication.
  */
 export default defineModuleManifest({
   alias: "customer",
+  pages: [
+    {
+      path: "/admin/customer",
+      component: CustomerPage,
+      title: { namespace: "module-customer", key: "customer.title" },
+      permission: "read:customer",
+    },
+    {
+      path: "/admin/customer/branch",
+      component: BranchPage,
+      title: { namespace: "module-customer", key: "branch.title" },
+      permission: "read:branch",
+    },
+    {
+      path: "/admin/customer/staff",
+      component: StaffPage,
+      title: { namespace: "module-customer", key: "staff.title" },
+      permission: "read:staff",
+    },
+  ],
   menu: [
     {
       slug: "customer",
