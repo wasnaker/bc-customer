@@ -113,10 +113,9 @@ export class CustomerDocumentsRelationalRepository
     const persistenceModel = CustomerDocumentMapper.toPersistence({
       ...CustomerDocumentMapper.toDomain(entity),
       ...payload,
-    });
+    }) as Partial<CustomerDocumentEntity>;
     delete persistenceModel.id; // tidak boleh masuk klausa SET
     delete persistenceModel.ulid; // immutable
-    delete persistenceModel.code; // diisi trigger AFTER INSERT
     await this.customerDocumentRepository.update({ id: BigInt(id) }, persistenceModel);
 
     const updatedEntity = await this.customerDocumentRepository.findOneByOrFail({

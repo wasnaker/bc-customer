@@ -114,7 +114,7 @@ export class CustomersRelationalRepository implements CustomerRepository {
     const persistenceModel = CustomerMapper.toPersistence({
       ...CustomerMapper.toDomain(entity),
       ...payload,
-    });
+    }) as Partial<CustomerEntity>;
     delete persistenceModel.id; // tidak boleh masuk klausa SET
     delete persistenceModel.ulid; // immutable
     delete persistenceModel.code; // diisi trigger AFTER INSERT

@@ -118,7 +118,7 @@ export class BranchesRelationalRepository implements BranchRepository {
     const persistenceModel = BranchMapper.toPersistence({
       ...BranchMapper.toDomain(entity),
       ...payload,
-    });
+    }) as Partial<BranchEntity>;
     delete persistenceModel.id; // tidak boleh masuk klausa SET
     delete persistenceModel.ulid; // immutable
     delete persistenceModel.code; // diisi trigger AFTER INSERT

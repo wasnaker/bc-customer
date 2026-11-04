@@ -87,7 +87,6 @@ let StaffRelationalRepository = class StaffRelationalRepository {
         });
         delete persistenceModel.id; // tidak boleh masuk klausa SET
         delete persistenceModel.ulid; // immutable
-        delete persistenceModel.code; // diisi trigger AFTER INSERT
         await this.staffRepository.update({ id: BigInt(id) }, persistenceModel);
         const updatedEntity = await this.staffRepository.findOneByOrFail({
             id: BigInt(id),
