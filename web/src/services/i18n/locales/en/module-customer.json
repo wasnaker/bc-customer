@@ -1,5 +1,6 @@
 {
   "menu": {
+    "parent": "Customer",
     "customer": "Customers",
     "branch": "Customer Branches",
     "staff": "Customer Staff"

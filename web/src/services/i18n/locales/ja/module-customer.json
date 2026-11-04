@@ -1,5 +1,6 @@
 {
   "menu": {
+    "parent": "顧客管理",
     "customer": "顧客",
     "branch": "顧客支店",
     "staff": "顧客スタッフ"
