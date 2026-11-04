@@ -17,6 +17,16 @@ export class Branch {
   @ApiPropertyOptional({ example: "PT Sentosa Mitra Logistik" })
   customerName?: string | null;
 
+  /**
+   * Email akun user ter-link melalui staff pertama cabang — terisi pada
+   * list global (join staffs), opsional.
+   */
+  @ApiPropertyOptional({
+    example: "admin.cabang01@example.com",
+    nullable: true,
+  })
+  adminEmail?: string | null;
+
   @ApiProperty({ example: "Kantor Pusat Jakarta" })
   name: string;
 

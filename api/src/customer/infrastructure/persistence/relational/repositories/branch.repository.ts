@@ -98,9 +98,10 @@ export class BranchesRelationalRepository implements BranchRepository {
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
       where,
-      // Relasi customer hanya untuk list global — kolom nama customer
-      // dibutuhkan tabel Branch mandiri (baris lintas customer).
-      relations: customerId == null ? { customer: true } : undefined,
+      // Relasi customer+staff hanya untuk list global — nama customer dan
+      // email admin (via staff) dibutuhkan tabel Branch mandiri.
+      relations:
+        customerId == null ? { customer: true, staff: true } : undefined,
       order: sortOptions?.reduce(
         (accumulator, sort) => ({
           ...accumulator,

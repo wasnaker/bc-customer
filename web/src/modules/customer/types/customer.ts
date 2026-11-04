@@ -31,6 +31,8 @@ export interface Branch {
   customerId: string;
   /** Nama customer induk — terisi pada list global, null bila tidak di-join. */
   customerName?: string | null;
+  /** Email akun user ter-link via staff pertama cabang (list global). */
+  adminEmail?: string | null;
   name: string;
   isHeadOffice: boolean;
   addressLine: string;

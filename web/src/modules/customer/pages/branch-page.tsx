@@ -125,6 +125,16 @@ function PageInner() {
         ),
       },
       {
+        key: "adminEmail",
+        label: t("table.admin"),
+        sortable: false,
+        render: (item) => (
+          <span className="font-mono text-xs text-muted-foreground">
+            {item.adminEmail ?? "—"}
+          </span>
+        ),
+      },
+      {
         key: "addressLine",
         label: t("table.addressLine"),
         sortable: false,

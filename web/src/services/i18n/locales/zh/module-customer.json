@@ -72,6 +72,7 @@
     "of": "/",
     "error": "数据加载失败，请重试。",
     "customer": "客户",
+    "admin": "管理员",
     "branch": "分支"
   },
   "detail": {

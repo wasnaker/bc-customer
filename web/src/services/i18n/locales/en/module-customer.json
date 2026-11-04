@@ -72,6 +72,7 @@
     "of": "of",
     "error": "Unable to load data. Please try again.",
     "customer": "Customer",
+    "admin": "Admin",
     "branch": "Branch"
   },
   "detail": {
