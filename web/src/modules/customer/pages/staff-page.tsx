@@ -212,6 +212,9 @@ function PageInner() {
     );
   }
 
+  // Saat edit dari daftar global/semua cabang, ambil branchId dari staff.
+  // Create tetap mensyaratkan cabang yang dipilih pada filter.
+  const formBranchId = editItem?.branchId ?? branchId;
   const branchReady = Boolean(branchId);
 
   return (
@@ -352,11 +355,11 @@ function PageInner() {
       </div>
 
       {/* ── Create / Edit dialog ──────────────────────────────────────── */}
-      {formOpen && branchId ? (
+      {formOpen && formBranchId ? (
         <StaffFormDialog
           open={formOpen}
           onOpenChange={setFormOpen}
-          branchId={branchId}
+          branchId={formBranchId}
           editItem={editItem}
           onSuccess={(savedId) => afterSave(savedId)}
         />
