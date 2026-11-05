@@ -3,11 +3,20 @@ export interface ModulePermissionDefinition {
   description: string;
 }
 
+export interface ModuleRoleDefinition {
+  key: string;
+  name: string;
+  description: string;
+  scope: 'global' | 'customer' | 'branch';
+  permissions: readonly string[];
+}
+
 export interface BackendModuleManifest {
   id: string;
   version: string;
   capabilities: readonly ('api' | 'web')[];
   permissions: readonly ModulePermissionDefinition[];
+  roles?: readonly ModuleRoleDefinition[];
   /** Hard dependencies on other modules (by manifest id). */
   requires?: readonly string[];
 }
@@ -31,6 +40,36 @@ export const moduleManifest: BackendModuleManifest = {
     { name: 'create:staff', description: 'Allows adding staff to branches' },
     { name: 'update:staff', description: 'Allows updating branch staff' },
     { name: 'delete:staff', description: 'Allows removing staff from branches' },
+  ],
+  roles: [
+    {
+      key: 'customer-admin',
+      name: 'Customer Admin',
+      description: 'Administrator at the customer company / head-office scope.',
+      scope: 'customer',
+      permissions: [
+        'read:customer', 'create:customer', 'update:customer', 'delete:customer',
+        'read:branch', 'create:branch', 'update:branch', 'delete:branch',
+        'read:staff', 'create:staff', 'update:staff', 'delete:staff',
+      ],
+    },
+    {
+      key: 'branch-admin',
+      name: 'Branch Admin',
+      description: 'Administrator limited to one assigned branch.',
+      scope: 'branch',
+      permissions: [
+        'read:customer', 'read:branch', 'read:staff',
+        'create:staff', 'update:staff', 'delete:staff',
+      ],
+    },
+    {
+      key: 'customer',
+      name: 'Customer',
+      description: 'Standard customer staff account limited to its registered branch.',
+      scope: 'branch',
+      permissions: ['read:customer', 'read:branch', 'read:staff'],
+    },
   ],
 };
 
