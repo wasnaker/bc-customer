@@ -44,6 +44,7 @@ export class CustomerDemoDataSeedService {
         FROM "staff" staff
         INNER JOIN "branch" branch ON branch."id" = staff."branchId"
         WHERE staff."userId" IS NOT NULL
+          AND staff."id" BETWEEN 3 AND 46
 
         UNION ALL
 
@@ -56,6 +57,7 @@ export class CustomerDemoDataSeedService {
         FROM "staff" staff
         INNER JOIN "branch" branch ON branch."id" = staff."branchId"
         WHERE staff."userId" IS NOT NULL
+          AND staff."id" BETWEEN 3 AND 46
 
         UNION ALL
 
@@ -68,6 +70,7 @@ export class CustomerDemoDataSeedService {
         FROM "staff" staff
         INNER JOIN "branch" branch ON branch."id" = staff."branchId"
         WHERE staff."userId" IS NOT NULL
+          AND staff."id" BETWEEN 3 AND 46
           AND branch."isHeadOffice" = TRUE
 
         ON CONFLICT ("moduleId", "roleKey", "userId", "scopeType", "scopeId")
