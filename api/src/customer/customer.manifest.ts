@@ -54,8 +54,8 @@ export const moduleManifest: BackendModuleManifest = {
       ],
     },
     {
-      key: 'branch-admin',
-      name: 'Branch Admin',
+      key: 'customer-branch-admin',
+      name: 'Customer Branch Admin',
       description: 'Administrator limited to one assigned branch.',
       scope: 'branch',
       permissions: [
