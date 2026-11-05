@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { DataSource } from "typeorm";
 
 import { CUSTOMER_DEMO_DATA_SQL } from "./customer-demo-data.sql";
@@ -20,19 +20,23 @@ import { CUSTOMER_DEMO_DATA_SQL } from "./customer-demo-data.sql";
  */
 @Injectable()
 export class CustomerDemoDataSeedService {
+  private readonly logger = new Logger(CustomerDemoDataSeedService.name);
+
   constructor(
     @Inject(DataSource)
     private readonly dataSource: DataSource,
   ) {}
 
   async run(): Promise<void> {
+    this.logger.log("Running customer demo data seed...");
     await this.dataSource.transaction(async (manager) => {
       await manager.query(CUSTOMER_DEMO_DATA_SQL);
+      this.logger.log("Demo SQL executed, assigning roles...");
 
       // Initial demo appointments. Additional staff are not included in this
       // fixed demo seed and must receive admin roles only through an explicit
       // assignment action.
-      await manager.query(`
+      const result = await manager.query(`
         INSERT INTO "module_role_assignment"
           ("userId", "moduleId", "roleKey", "scopeType", "scopeId")
         SELECT
@@ -76,6 +80,7 @@ export class CustomerDemoDataSeedService {
         ON CONFLICT ("moduleId", "roleKey", "userId", "scopeType", "scopeId")
         DO NOTHING
       `);
+      this.logger.log("Role assignments complete.");
     });
   }
 }
