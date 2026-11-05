@@ -10,7 +10,7 @@ import { CUSTOMER_DEMO_DATA_SQL } from "./customer-demo-data.sql";
  *
  * The current demo dataset has one appointed staff account per branch:
  * - every demo staff account receives Customer at its branch scope;
- * - every current branch staff account also receives Branch Admin;
+ * - every current branch staff account also receives Customer Branch Admin;
  * - the current head-office staff account also receives Customer Admin
  *   at its customer scope.
  *
@@ -36,6 +36,13 @@ export class CustomerDemoDataSeedService {
       // Initial demo appointments. Additional staff are not included in this
       // fixed demo seed and must receive admin roles only through an explicit
       // assignment action.
+      // Keep existing scoped assignments compatible with the renamed manifest key.
+      await manager.query(`
+        UPDATE "module_role_assignment"
+        SET "roleKey" = 'customer-branch-admin'
+        WHERE "moduleId" = 'customer' AND "roleKey" = 'branch-admin'
+      `);
+
       const result = await manager.query(`
         INSERT INTO "module_role_assignment"
           ("userId", "moduleId", "roleKey", "scopeType", "scopeId")
@@ -55,7 +62,7 @@ export class CustomerDemoDataSeedService {
         SELECT
           staff."userId",
           'customer',
-          'branch-admin',
+          'customer-branch-admin',
           'branch',
           staff."branchId"::varchar
         FROM "staff" staff
