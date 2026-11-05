@@ -117,7 +117,7 @@
       "province": "州",
       "city": "市・県",
       "postalCode": "郵便番号",
-      "vatNumber": "NITKU番号",
+      "vatNumber": "VAT番号",
       "vatType": "税種別",
       "position": "役職",
       "phone": "電話",
