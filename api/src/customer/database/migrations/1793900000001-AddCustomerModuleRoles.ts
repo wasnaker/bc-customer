@@ -15,8 +15,7 @@ export class AddCustomerModuleRoles1793900000001 implements MigrationInterface {
       ON CONFLICT ("id") DO UPDATE SET "name" = EXCLUDED."name"
     `);
     
-    // Sync sequence if necessary (Postgres specific)
-    await queryRunner.query(`SELECT setval('role_id_seq', (SELECT MAX(id) FROM "role"))`);
+    // Role table has no sequence (manually seeded), skip setval
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
