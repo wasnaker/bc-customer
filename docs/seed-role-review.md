@@ -1,56 +1,41 @@
-# Review Temuan Seed & Role `bc-customer`
+# Review Seeder dan Role `bc-customer`
 
-Dokumen ini merangkum status basis data dan usulan perubahan untuk role user demo pada modul `bc-customer`.
+Dokumen ini mengikuti rancangan role modul Customer yang disepakati. Role modul **bukan** role inti dan tidak boleh ditambahkan ke tabel `role`.
 
-## Status Saat Ini (Snapshot 2026-11-05)
+## Model role
 
-1.  **Tabel `role`**: Hanya ada 2 role sistem core: `1 (Admin)` dan `2 (User)`.
-2.  **User Demo**: Terdapat 44 user demo (id 3–46) yang dibuat oleh seeder `bc-customer`. Saat ini **seluruhnya memiliki `roleId = 1` (Admin)**.
-3.  **Struktur Staff**:
-    *   Total staff: 46 orang.
-    *   Semua staff terhubung ke `user` lewat `userId`.
-    *   Staff tersebar di 11 Kantor Pusat (Head Office) dan 33 Cabang.
-4.  **Manifest Modul**: Commit terbaru (`cf5304d`) sudah mendeklarasikan 3 role baru di level kode (namun belum ada di DB):
-    *   `customer-admin`: Akses penuh level customer (HO).
-    *   `branch-admin`: Akses terbatas level cabang (Staff CRUD).
-    *   `customer`: Akses baca saja di level cabang.
+Tabel `role` tetap hanya menyimpan role inti host:
+- `admin` — administrator platform.
+- `user` — akun pengguna biasa.
 
-## Analisis Peran (Staff vs Kantor)
+Modul Customer mendeklarasikan tepat tiga role melalui manifest:
 
-Berdasarkan data `branch` dan `staff` saat ini:
+| Key | Scope assignment | Fungsi |
+|---|---|---|
+| `customer-admin` | `customer` | Satu pengelola pada lingkup perusahaan/customer; mengelola customer, cabang, dan staff serta menunjuk Branch Admin. |
+| `branch-admin` | `branch` | Satu pengelola untuk satu cabang; mengelola staff pada cabangnya. |
+| `customer` | `branch` | Akun staff biasa; akses baca sesuai permission manifest pada cabangnya. |
 
-| Tipe Lokasi | Jumlah Lokasi | Jumlah Staff Terkait | User ID |
-| :--- | :--- | :--- | :--- |
-| **Kantor Pusat (HO)** | 11 | 13 staff | 3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43 |
-| **Cabang (Branch)** | 33 | 33 staff | Sisanya (4-46, kecuali di atas) |
+Assignment disimpan di tabel host `module_role_assignment` menggunakan `moduleId = 'customer'`, `roleKey`, `scopeType`, dan `scopeId`. Scope tidak digantikan dengan role ID baru.
 
-*Catatan: Kantor Pusat PT Niaga Sentosa Raya (id 34) memiliki staff Mega Utami (id 35).*
+## Aturan penugasan
 
-## Rencana Perubahan Seeder
+1. Akun staff yang ditautkan ke suatu branch memperoleh role modul `customer` pada branch tersebut secara default.
+2. Staff yang ditunjuk sebagai Customer Admin memperoleh assignment `customer-admin` pada customer terkait.
+3. Staff yang ditunjuk sebagai Branch Admin memperoleh assignment `branch-admin` pada branch terkait.
+4. Customer Admin dan Branch Admin **bukan** anggota role `customer` untuk branch yang sama. Penunjukan admin harus dilakukan secara eksplisit melalui mekanisme pengelolaan assignment, bukan ditebak dari nama akun atau teks jabatan.
+5. Maksimal satu Customer Admin per customer dan satu Branch Admin per branch. Validasi keunikan ini harus ditegakkan pada service/API assignment, bukan hanya UI.
+6. Pengguna dapat memiliki beberapa assignment bila memang ditunjuk pada scope berbeda; jangan menggabungkan assignment menjadi satu role inti.
 
-Sesuai permintaan, user demo akan dikelompokkan sebagai berikut:
+## Seeder demo
 
-### 1. Penambahan Role ke DB
-Perlu mekanisme untuk memasukkan 3 role baru ke tabel `role`. Usulan ID:
-*   `3`: **Customer Admin**
-*   `4`: **Branch Admin**
-*   `5`: **Customer**
+- Akun demo milik modul (ID 3–46) menggunakan role inti `user`, bukan `admin`.
+- Data customer, branch, staff, dan hubungan `staff.userId` dipertahankan.
+- Setelah data demo dimasukkan, setiap user yang terhubung ke staff mendapat assignment `customer` pada branch staff tersebut, kecuali user itu sudah memiliki assignment admin yang eksplisit pada scope terkait.
+- Seeder tidak menetapkan Customer Admin atau Branch Admin berdasarkan asumsi dari nama email, nama staff, atau jabatan. Penunjukan admin harus berasal dari data penugasan yang eksplisit.
+- Seeder bersifat idempotent dan tidak mengubah akun host ID 1–2.
 
-### 2. Update Role pada User Demo
-User accounts (id 3-46) di `customer-demo-data.sql.ts` akan diupdate `roleId`-nya:
+## Batas implementasi
 
-| Jabatan Staff | Lokasi | Role yang Diberikan | Role ID (Usulan) |
-| :--- | :--- | :--- | :--- |
-| **Staff di Kantor Pusat** | Head Office | Customer Admin + Branch Admin + Customer | `3` |
-| **Staff di Cabang** | Branch | Branch Admin + Customer | `4` |
+Role assignment tidak mengubah `user.roleId` dan tidak menambah record pada tabel `role`. Otorisasi wajib dilakukan di backend. Untuk resource branch, Customer Admin harus diotorisasi berdasarkan customer pemilik branch; Branch Admin dan Customer hanya boleh mengakses branch yang menjadi scope assignment-nya. Query data juga wajib dibatasi berdasarkan scope, bukan sekadar menyembunyikan menu di frontend.
 
-*Catatan: Sistem saat ini hanya mendukung 1 `roleId` per user. Role ID `3` (Customer Admin) secara hierarki (berdasarkan permission di manifest) sudah mencakup semua permission `branch-admin` dan `customer`.*
-
-## Pertimbangan Teknis
-
-1.  **Idempotensi**: Seeder menggunakan `ON CONFLICT (id) DO UPDATE`, jadi perubahan `roleId` akan langsung diaplikasikan saat seeder dijalankan ulang.
-2.  **Mapping Permission**: Setelah role baru dibuat di DB, tabel `roles_permissions_role` harus diisi sesuai dengan daftar permission di `customer.manifest.ts`.
-3.  **Host Registry**: Host perlu diupdate untuk mendukung field `roles` pada manifest agar sinkronisasi role & permission bisa otomatis di masa depan. Saat ini harus dilakukan manual via SQL atau service khusus di module.
-
----
-*Silakan review temuan ini sebelum saya melanjutkan ke implementasi update seeder.*
