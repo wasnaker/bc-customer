@@ -43,8 +43,11 @@ function PageInner() {
   // Nama province untuk tabel (≤ 40 baris, satu fetch).
   const { data: provinces } = useProvinceOptions();
 
+  // Saat edit dari list global, gunakan customer milik branch yang diedit.
+  const formCustomerId = editItem?.customerId ?? customerId;
+
   // Max-1-HO: cek apakah customer sudah punya kantor pusat.
-  const { data: headOffice } = useHeadOffice(customerId);
+  const { data: headOffice } = useHeadOffice(formCustomerId);
 
   // Detail SELALU diambil dari endpoint detail, bukan dari baris list.
   const { data: selectedBranch, isLoading: detailLoading } = useBranch(
@@ -327,11 +330,11 @@ function PageInner() {
       </div>
 
       {/* ── Create / Edit dialog ──────────────────────────────────────── */}
-      {formOpen && customerId ? (
+      {formOpen && formCustomerId ? (
         <BranchFormDialog
           open={formOpen}
           onOpenChange={setFormOpen}
-          customerId={customerId}
+          customerId={formCustomerId}
           editItem={editItem}
           hasHeadOffice={Boolean(headOffice)}
           onSuccess={(savedId) => afterSave(savedId)}
