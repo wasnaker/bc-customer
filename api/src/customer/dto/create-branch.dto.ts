@@ -67,7 +67,7 @@ export class CreateBranchDto {
   @IsOptional()
   @IsString()
   @MaxLength(24)
-  nitkuNumber?: string | null;
+  vatNumber?: string | null;
 
   @ApiPropertyOptional({
     example: 'npwp',

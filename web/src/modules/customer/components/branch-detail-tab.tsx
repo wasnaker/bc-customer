@@ -64,8 +64,8 @@ export function BranchOverviewTab({ item }: { item: Branch }) {
         <dd className="font-mono text-foreground">{item.postalCode ?? "—"}</dd>
       </div>
       <div>
-        <dt className="text-muted-foreground">{t("form.field.nitkuNumber")}</dt>
-        <dd className="font-mono text-foreground">{item.nitkuNumber ?? "—"}</dd>
+        <dt className="text-muted-foreground">{t("form.field.vatNumber")}</dt>
+        <dd className="font-mono text-foreground">{item.vatNumber ?? "—"}</dd>
       </div>
       <div>
         <dt className="text-muted-foreground">{t("table.vatType")}</dt>

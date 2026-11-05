@@ -29,7 +29,7 @@ export class BranchMapper {
     domainEntity.provinceId = raw.provinceId;
     domainEntity.cityId = raw.cityId;
     domainEntity.postalCode = raw.postalCode;
-    domainEntity.nitkuNumber = raw.nitkuNumber;
+    domainEntity.vatNumber = raw.vatNumber;
     domainEntity.vatType = raw.vatType as Branch["vatType"];
     domainEntity.isActive = raw.isActive;
     domainEntity.createdAt = raw.createdAt;
@@ -69,7 +69,7 @@ export class BranchMapper {
       persistenceEntity.cityId = domainEntity.cityId;
     }
     persistenceEntity.postalCode = domainEntity.postalCode ?? null;
-    persistenceEntity.nitkuNumber = domainEntity.nitkuNumber ?? null;
+    persistenceEntity.vatNumber = domainEntity.vatNumber ?? null;
     if (domainEntity.vatType !== undefined) {
       persistenceEntity.vatType = domainEntity.vatType;
     }

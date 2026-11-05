@@ -41,7 +41,7 @@ export interface Branch {
   /** Regency id (int, milik modul region). */
   cityId: number;
   postalCode: string | null;
-  nitkuNumber: string | null;
+  vatNumber: string | null;
   vatType: VatType;
   isActive: boolean;
   createdAt: string;
@@ -117,6 +117,6 @@ export interface HeadOfficeInput {
   provinceId: number;
   cityId: number;
   postalCode?: string | null;
-  nitkuNumber?: string | null;
+  vatNumber?: string | null;
   vatType?: VatType;
 }

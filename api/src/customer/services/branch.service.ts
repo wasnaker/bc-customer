@@ -52,7 +52,7 @@ export class BranchService {
       provinceId: createBranchDto.provinceId,
       cityId: createBranchDto.cityId,
       postalCode: createBranchDto.postalCode ?? null,
-      nitkuNumber: createBranchDto.nitkuNumber ?? null,
+      vatNumber: createBranchDto.vatNumber ?? null,
       vatType: createBranchDto.vatType ?? "npwp",
       isActive: createBranchDto.isActive ?? true,
     });

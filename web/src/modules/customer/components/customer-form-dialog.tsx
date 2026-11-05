@@ -30,7 +30,7 @@ interface FormState {
   hoAddressLine: string;
   hoAddress: AddressValue;
   hoPostalCode: string;
-  hoNitkuNumber: string;
+  hoVatNumber: string;
   hoVatType: VatType;
 }
 
@@ -51,7 +51,7 @@ const EMPTY_FORM: FormState = {
   hoAddressLine: "",
   hoAddress: { provinceId: "", cityId: "" },
   hoPostalCode: "",
-  hoNitkuNumber: "",
+  hoVatNumber: "",
   hoVatType: "npwp",
 };
 
@@ -135,7 +135,7 @@ export function CustomerFormDialog({
             provinceId: Number(form.hoAddress.provinceId),
             cityId: Number(form.hoAddress.cityId),
             postalCode: form.hoPostalCode.trim() || null,
-            nitkuNumber: form.hoNitkuNumber.trim() || null,
+            vatNumber: form.hoVatNumber.trim() || null,
             vatType: form.hoVatType,
           },
         });
@@ -321,14 +321,14 @@ export function CustomerFormDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="customer-ho-nitku">
-                {t("form.field.nitkuNumber")}
+              <Label htmlFor="customer-ho-vat">
+                {t("form.field.vatNumber")}
               </Label>
               <Input
-                id="customer-ho-nitku"
-                value={form.hoNitkuNumber}
-                onChange={(e) => setField("hoNitkuNumber", e.target.value)}
-                placeholder={t("form.placeholder.nitkuNumber")}
+                id="customer-ho-vat"
+                value={form.hoVatNumber}
+                onChange={(e) => setField("hoVatNumber", e.target.value)}
+                placeholder={t("form.placeholder.vatNumber")}
                 maxLength={24}
                 className="font-mono"
               />

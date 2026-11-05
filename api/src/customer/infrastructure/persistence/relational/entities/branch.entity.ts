@@ -69,8 +69,8 @@ export class BranchEntity extends EntityRelationalHelper {
   @Column({ type: 'varchar', length: 10, nullable: true })
   postalCode: string | null;
 
-  @Column({ type: 'varchar', length: 24, nullable: true })
-  nitkuNumber: string | null;
+  @Column({ name: 'nitkuNumber', type: 'varchar', length: 24, nullable: true })
+  vatNumber: string | null;
 
   /** VAT basis for invoices: 'npwp' (default) or 'nitku'. */
   @Column({ type: 'varchar', length: 10, default: 'npwp' })

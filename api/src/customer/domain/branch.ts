@@ -46,7 +46,7 @@ export class Branch {
   postalCode: string | null;
 
   @ApiProperty({ example: "123456789012345678901234", nullable: true })
-  nitkuNumber: string | null;
+  vatNumber: string | null;
 
   @ApiProperty({
     example: "npwp",

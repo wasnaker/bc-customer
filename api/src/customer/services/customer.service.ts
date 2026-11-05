@@ -72,7 +72,7 @@ export class CustomerService {
           provinceId: createCustomerDto.headOffice.provinceId,
           cityId: createCustomerDto.headOffice.cityId,
           postalCode: createCustomerDto.headOffice.postalCode ?? null,
-          nitkuNumber: createCustomerDto.headOffice.nitkuNumber ?? null,
+          vatNumber: createCustomerDto.headOffice.vatNumber ?? null,
           vatType: createCustomerDto.headOffice.vatType ?? 'npwp',
           isActive: true,
         } as Branch)),

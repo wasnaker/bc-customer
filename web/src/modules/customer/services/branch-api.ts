@@ -71,7 +71,7 @@ export type BranchPostRequest = {
   provinceId: number;
   cityId: number;
   postalCode?: string | null;
-  nitkuNumber?: string | null;
+  vatNumber?: string | null;
   vatType?: VatType;
   isActive?: boolean;
 };

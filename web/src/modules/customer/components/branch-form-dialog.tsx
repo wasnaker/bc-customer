@@ -29,7 +29,7 @@ interface FormState {
   addressLine: string;
   address: AddressValue;
   postalCode: string;
-  nitkuNumber: string;
+  vatNumber: string;
   vatType: VatType;
   isActive: boolean;
 }
@@ -48,7 +48,7 @@ const EMPTY_FORM: FormState = {
   addressLine: "",
   address: { provinceId: "", cityId: "" },
   postalCode: "",
-  nitkuNumber: "",
+  vatNumber: "",
   vatType: "npwp",
   isActive: true,
 };
@@ -88,7 +88,7 @@ export function BranchFormDialog({
                 cityId: editItem.cityId != null ? String(editItem.cityId) : "",
               },
               postalCode: editItem.postalCode ?? "",
-              nitkuNumber: editItem.nitkuNumber ?? "",
+              vatNumber: editItem.vatNumber ?? "",
               vatType: editItem.vatType ?? "npwp",
               isActive: editItem.isActive,
             }
@@ -127,7 +127,7 @@ export function BranchFormDialog({
       provinceId: Number(form.address.provinceId),
       cityId: Number(form.address.cityId),
       postalCode: form.postalCode.trim() || null,
-      nitkuNumber: form.nitkuNumber.trim() || null,
+      vatNumber: form.vatNumber.trim() || null,
       vatType: form.vatType,
       isActive: form.isActive,
     };
@@ -284,12 +284,12 @@ export function BranchFormDialog({
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="branch-nitku">{t("form.field.nitkuNumber")}</Label>
+          <Label htmlFor="branch-vat">{t("form.field.vatNumber")}</Label>
           <Input
-            id="branch-nitku"
-            value={form.nitkuNumber}
-            onChange={(e) => setField("nitkuNumber", e.target.value)}
-            placeholder={t("form.placeholder.nitkuNumber")}
+            id="branch-vat"
+            value={form.vatNumber}
+            onChange={(e) => setField("vatNumber", e.target.value)}
+            placeholder={t("form.placeholder.vatNumber")}
             maxLength={24}
             className="font-mono"
           />
