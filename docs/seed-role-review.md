@@ -16,7 +16,7 @@ Assignment disimpan di tabel host `module_role_assignment` menggunakan `moduleId
 
 ## Penugasan pada data demo saat ini
 
-Data demo saat ini memiliki tepat satu staff pada setiap branch. Karena staff tersebut sekaligus menjadi pengelola awal, penugasannya adalah:
+Data demo saat ini memiliki satu akun staff yang terhubung ke user pada setiap branch (staff tambahan yang belum memiliki akun user tidak menerima assignment). Karena staff tersebut sekaligus menjadi pengelola awal, penugasannya adalah:
 
 1. **Staff pada branch:** `customer` pada scope branch dan `branch-admin` pada scope branch yang sama.
 2. **Staff pada kantor pusat (HO):** `customer` dan `branch-admin` pada scope branch HO, serta `customer-admin` pada scope customer pemilik HO.
