@@ -55,7 +55,7 @@ export class CreateCustomerCoreTables1793820000000000
         "provinceId" integer NOT NULL,
         "cityId" integer NOT NULL,
         "postalCode" character varying(10),
-        "nitkuNumber" character varying(24),
+        "vatNumber" character varying(24),
         "vatType" character varying(10) NOT NULL DEFAULT 'npwp',
         "isActive" boolean NOT NULL DEFAULT true,
         "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
