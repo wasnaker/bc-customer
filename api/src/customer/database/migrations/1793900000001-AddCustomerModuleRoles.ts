@@ -10,7 +10,7 @@ export class AddCustomerModuleRoles1793900000001 implements MigrationInterface {
       INSERT INTO "role" ("id", "name") 
       VALUES 
         (3, 'Customer Admin'),
-        (4, 'Branch Admin'),
+        (4, 'Customer Branch Admin'),
         (5, 'Customer')
       ON CONFLICT ("id") DO UPDATE SET "name" = EXCLUDED."name"
     `);

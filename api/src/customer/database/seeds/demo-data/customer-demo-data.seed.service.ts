@@ -14,6 +14,12 @@ import { CUSTOMER_DEMO_DATA_SQL } from "./customer-demo-data.sql";
  * - the current head-office staff account also receives Customer Admin
  *   at its customer scope.
  *
+ * The demo accounts also carry the same role set in the canonical
+ * `user_roles_role` relation so the admin panel shows them consistently:
+ * - Customer Admin (3)          -> Customer Admin + Customer Branch Admin + Customer
+ * - Customer Branch Admin (4)   -> Customer Branch Admin + Customer
+ * - Customer (5)                -> Customer
+ *
  * This is demo-data appointment only. Staff created later receive Customer
  * only by default; administrative roles must be assigned explicitly.
  * Core user.roleId values are preserved by the SQL dataset.
@@ -88,6 +94,36 @@ export class CustomerDemoDataSeedService {
         DO NOTHING
       `);
       this.logger.log("Role assignments complete.");
+
+      // Mirror the demo appointments into the canonical user_roles_role
+      // relation so the admin panel lists the same role set that the scoped
+      // module assignments imply. Additive and idempotent: manual edits made
+      // through the admin panel are preserved, missing demo roles are restored.
+      await manager.query(`
+        INSERT INTO "user_roles_role" ("userId", "roleId")
+        SELECT "id", 5
+        FROM "user"
+        WHERE "id" BETWEEN 3 AND 46
+          AND "roleId" IN (3, 4, 5)
+        ON CONFLICT ("userId", "roleId") DO NOTHING
+      `);
+      await manager.query(`
+        INSERT INTO "user_roles_role" ("userId", "roleId")
+        SELECT "id", 4
+        FROM "user"
+        WHERE "id" BETWEEN 3 AND 46
+          AND "roleId" IN (3, 4)
+        ON CONFLICT ("userId", "roleId") DO NOTHING
+      `);
+      await manager.query(`
+        INSERT INTO "user_roles_role" ("userId", "roleId")
+        SELECT "id", 3
+        FROM "user"
+        WHERE "id" BETWEEN 3 AND 46
+          AND "roleId" = 3
+        ON CONFLICT ("userId", "roleId") DO NOTHING
+      `);
+      this.logger.log("Canonical user roles synchronised.");
     });
   }
 }
