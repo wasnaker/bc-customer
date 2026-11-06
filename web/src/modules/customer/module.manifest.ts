@@ -9,11 +9,11 @@ import { MyCompanyTab } from "./pages/my-customer-page";
 export default defineModuleManifest({
   alias: "customer",
   profileTabs: [
-    { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, permission: null, content: { kind: "component", component: MyCompanyTab } },
+    { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, content: { kind: "component", component: MyCompanyTab } },
   ],
   pages: [
     { path: "/admin/customer", component: CustomerPage, title: { namespace: "module-customer", key: "customer.title" }, permission: "read:customer" },
-    { path: "/admin/customer/branch", component: BranchPage, title: { namespace: "module-customer", key: "branch.title" }, permission: null },
+    { path: "/admin/customer/branch", component: BranchPage, title: { namespace: "module-customer", key: "branch.title" } },
     { path: "/admin/customer/staff", component: StaffPage, title: { namespace: "module-customer", key: "staff.title" }, permission: "read:staff" },
   ],
   menu: [
@@ -22,7 +22,7 @@ export default defineModuleManifest({
       href: "/admin/customer", position: 100, icon: Building2, permission: "read:customer",
       children: [
         { slug: "customers", label: { namespace: "module-customer", key: "menu.customer" }, href: "/admin/customer", position: 1, permission: "read:customer" },
-        { slug: "branch", label: { namespace: "module-customer", key: "menu.branch" }, href: "/admin/customer/branch", position: 2, permission: null },
+        { slug: "branch", label: { namespace: "module-customer", key: "menu.branch" }, href: "/admin/customer/branch", position: 2 },
         { slug: "staff", label: { namespace: "module-customer", key: "menu.staff" }, href: "/admin/customer/staff", position: 3, permission: "read:staff" },
       ],
     },
