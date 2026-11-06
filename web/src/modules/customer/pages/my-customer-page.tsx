@@ -19,7 +19,7 @@ export function MyCompanyTab() {
     queryKey: ["customer", "my-branch", user?.id ?? "anonymous"],
     queryFn: async () => {
       const response = await getMyBranch();
-      if (response.status === (HTTP_CODES_ENUM.NOT_FOUND as any)) return null;
+      if (response.status === HTTP_CODES_ENUM.NOT_FOUND) return null;
       if (response.status !== HTTP_CODES_ENUM.OK || !response.data) {
         throw new Error(t("myCompany.error"));
       }
