@@ -134,3 +134,21 @@ export function useDeleteBranchService() {
     [fetch],
   );
 }
+
+
+export type MyBranchResponse = Branch & {
+  staffName: string;
+  staffPosition: string | null;
+};
+
+/** Read only the branch linked to the currently authenticated account. */
+export function useGetMyBranchService() {
+  const fetch = useFetch();
+  return useCallback(
+    () =>
+      fetch(`${API_URL}/v1/customer/me/branch`, {
+        method: "GET",
+      }).then(wrapperFetchJsonResponse<MyBranchResponse>),
+    [fetch],
+  );
+}
