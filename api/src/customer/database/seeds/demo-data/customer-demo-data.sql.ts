@@ -161,4 +161,37 @@ SELECT setval(pg_get_serial_sequence('"user"', 'id'), (SELECT COALESCE(MAX(id), 
 SELECT setval(pg_get_serial_sequence('"customer"', 'id'), (SELECT COALESCE(MAX(id), 1) FROM "customer"));
 SELECT setval(pg_get_serial_sequence('"branch"', 'id'), (SELECT COALESCE(MAX(id), 1) FROM "branch"));
 SELECT setval(pg_get_serial_sequence('"staff"', 'id'), (SELECT COALESCE(MAX(id), 1) FROM "staff"));
+
+-- == Additional Staff for Testing ==
+DO $$
+DECLARE
+    u_id INT;
+    b_id INT;
+    branch_ids INT[];
+    b_idx INT;
+BEGIN
+    -- Get first 10 branch IDs
+    SELECT ARRAY(SELECT id FROM branch ORDER BY id LIMIT 10) INTO branch_ids;
+    
+    FOR i IN 1..20 LOOP
+        u_id := 200 + i;
+        
+        -- Create user
+        INSERT INTO "user" ("id", "email", "password", "firstName", "lastName", "language", "statusId", "createdAt", "updatedAt") 
+        VALUES (u_id, 'staff' || u_id || '@demo.test', '$2b$10$YourHashedPasswordHere', 'Staff', 'User' || u_id, 'en', 1, NOW(), NOW()) 
+        ON CONFLICT ("id") DO NOTHING;
+        
+        -- Assign role
+        INSERT INTO "user_roles_role" ("userId", "roleId") VALUES (u_id, 5) ON CONFLICT DO NOTHING;
+        
+        -- Pick a branch from the array (2 staff per branch for 10 branches)
+        b_idx := ((i - 1) % 10) + 1;
+        b_id := branch_ids[b_idx];
+        
+        -- Link staff
+        INSERT INTO "staff" ("id", "ulid", "branchId", "name", "userId", "position", "isActive", "createdAt", "updatedAt") 
+        VALUES (200 + i, '01M6J1STF' || i, b_id, 'Staff Customer ' || u_id, u_id, 'Staff', TRUE, NOW(), NOW()) 
+        ON CONFLICT ("id") DO UPDATE SET "userId" = EXCLUDED."userId", "branchId" = EXCLUDED."branchId";
+    END LOOP;
+END $$;
 `;
