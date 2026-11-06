@@ -5,16 +5,18 @@ import { useTranslation } from "@/services/i18n/client";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { useGetMyBranchService } from "../services/branch-api";
 import { BranchOverviewTab } from "../components/branch-detail-tab";
+import useAuth from "@/services/auth/use-auth";
 
 export function MyCustomerPage() {
   const { t } = useTranslation("module-customer");
+  const { user } = useAuth();
   const getMyBranch = useGetMyBranchService();
   const {
     data: branch,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["customer", "my-branch"],
+    queryKey: ["customer", "my-branch", user?.id ?? "anonymous"],
     queryFn: async () => {
       const response = await getMyBranch();
       if (response.status === 404) return null;
@@ -23,6 +25,7 @@ export function MyCustomerPage() {
       }
       return response.data;
     },
+    enabled: Boolean(user?.id),
   });
 
   return (
