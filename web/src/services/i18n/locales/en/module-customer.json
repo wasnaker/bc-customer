@@ -3,7 +3,9 @@
     "parent": "Customer",
     "customer": "Customers",
     "branch": "Customer Branches",
-    "staff": "Customer Staff"
+    "staff": "Customer Staff",
+    "myCustomer": "My Customer",
+    "myBranch": "My Branch"
   },
   "customer": {
     "title": "Customers",
@@ -164,5 +166,13 @@
     "branchNotExists": "Branch not found.",
     "customerNotExists": "Customer not found.",
     "unknown": "Something went wrong. Please try again."
+  },
+  "myCustomer": {
+    "title": "My Customer",
+    "subtitle": "Your customer branch linked to this account.",
+    "branch": "Branch",
+    "linkedStaff": "Linked staff member",
+    "noBranch": "No branch is linked to this account yet.",
+    "error": "Unable to load your branch. Please try again."
   }
 }
