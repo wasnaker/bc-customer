@@ -7,8 +7,14 @@ import {
   Optional,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { CUSTOMER_MODULE_OPTIONS, CustomerModuleOptions } from '../customer.options';
-import { CUSTOMER_RESOURCE_METADATA, CUSTOMER_SELF_BRANCH_METADATA } from './customer-resource.decorator';
+import {
+  CUSTOMER_MODULE_OPTIONS,
+  CustomerModuleOptions,
+} from '../customer.options';
+import {
+  CUSTOMER_RESOURCE_METADATA,
+  CUSTOMER_SELF_BRANCH_METADATA,
+} from './customer-resource.decorator';
 import {
   CUSTOMER_DOCUMENT_OWNER_TYPES,
   CustomerDocumentOwnerTypeEnum,
