@@ -17,6 +17,7 @@ export default defineModuleManifest({
       label: { namespace: "module-customer", key: "myCompany.tabTitle" },
       position: 30,
       icon: Building2,
+      permission: "read:branch",
       content: { kind: "component", component: MyCompanyTab },
     },
   ],
