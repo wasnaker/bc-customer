@@ -3,7 +3,9 @@
     "parent": "Pelanggan",
     "customer": "Pelanggan",
     "branch": "Cabang Pelanggan",
-    "staff": "Staf Pelanggan"
+    "staff": "Staf Pelanggan",
+    "myCustomer": "Pelanggan Saya",
+    "myBranch": "Cabang Saya"
   },
   "customer": {
     "title": "Pelanggan",
@@ -164,5 +166,13 @@
     "branchNotExists": "Cabang tidak ditemukan.",
     "customerNotExists": "Pelanggan tidak ditemukan.",
     "unknown": "Terjadi kesalahan. Silakan coba lagi."
+  },
+  "myCustomer": {
+    "title": "Pelanggan Saya",
+    "subtitle": "Cabang pelanggan yang terhubung dengan akun ini.",
+    "branch": "Cabang",
+    "linkedStaff": "Staf terhubung",
+    "noBranch": "Belum ada cabang yang terhubung dengan akun ini.",
+    "error": "Gagal memuat data cabang Anda. Silakan coba lagi."
   }
 }
