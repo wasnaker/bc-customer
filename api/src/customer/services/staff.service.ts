@@ -179,6 +179,11 @@ export class StaffService {
     return this.staffRepository.findById(id);
   }
 
+  /** Resolve the signed-in host account to its single linked staff record. */
+  async findStaffByUserId(userId: number): Promise<NullableType<Staff>> {
+    return this.staffRepository.findByUserId(userId);
+  }
+
   async update(
     id: Staff["id"],
     updateStaffDto: UpdateStaffDto,
