@@ -3,6 +3,7 @@ import Building2 from "lucide-react/dist/esm/icons/building-2";
 import { CustomerPage } from "./pages/customer-page";
 import { BranchPage } from "./pages/branch-page";
 import { StaffPage } from "./pages/staff-page";
+import { MyCustomerPage } from "./pages/my-customer-page";
 
 /**
  * Customer owns its admin pages and navigation. The host only resolves the
@@ -29,8 +30,28 @@ export default defineModuleManifest({
       title: { namespace: "module-customer", key: "staff.title" },
       permission: "read:staff",
     },
+    {
+      path: "/admin/my-customer/branch",
+      component: MyCustomerPage,
+      title: { namespace: "module-customer", key: "myCustomer.title" },
+    },
   ],
   menu: [
+    {
+      slug: "my-customer",
+      label: { namespace: "module-customer", key: "menu.myCustomer" },
+      href: "/admin/my-customer/branch",
+      position: 90,
+      icon: Building2,
+      children: [
+        {
+          slug: "my-customer-branch",
+          label: { namespace: "module-customer", key: "menu.myBranch" },
+          href: "/admin/my-customer/branch",
+          position: 1,
+        },
+      ],
+    },
     {
       slug: "customer",
       label: { namespace: "module-customer", key: "menu.parent" },
