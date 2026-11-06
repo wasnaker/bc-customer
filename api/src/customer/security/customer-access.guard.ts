@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CUSTOMER_MODULE_OPTIONS, CustomerModuleOptions } from '../customer.options';
-import { CUSTOMER_RESOURCE_METADATA } from './customer-resource.decorator';
+import { CUSTOMER_RESOURCE_METADATA, CUSTOMER_SELF_BRANCH_METADATA } from './customer-resource.decorator';
 import {
   CUSTOMER_DOCUMENT_OWNER_TYPES,
   CustomerDocumentOwnerTypeEnum,
@@ -19,6 +19,7 @@ interface AuthenticatedRequest {
   query?: Record<string, unknown>;
   body?: Record<string, unknown>;
   user?: {
+    id?: number | string;
     role?: { id?: number | string } | null;
     roles?: Array<{ id?: number | string }>;
   };
@@ -44,6 +45,17 @@ export class CustomerAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    const selfBranch = this.reflector?.getAllAndOverride<boolean>(
+      CUSTOMER_SELF_BRANCH_METADATA,
+      [context.getHandler(), context.getClass()],
+    );
+    if (selfBranch) {
+      if (request.user?.id === undefined || request.user?.id === null) {
+        throw new ForbiddenException();
+      }
+      return true;
+    }
+
     const action = ACTION_BY_METHOD[request.method.toUpperCase()];
     const resource = this.resolveResource(context, request);
     const permission = action ? `${action}:${resource}` : null;
