@@ -18,10 +18,7 @@ export function MyCustomerPage() {
     queryFn: async () => {
       const response = await getMyBranch();
       if (response.status === 404) return null;
-      if (
-        response.status !== HTTP_CODES_ENUM.OK ||
-        !response.data
-      ) {
+      if (response.status !== HTTP_CODES_ENUM.OK || !response.data) {
         throw new Error(t("myCustomer.error"));
       }
       return response.data;
@@ -66,7 +63,11 @@ export function MyCustomerPage() {
                     {t("branch.headOfficeBadge")}
                   </span>
                 ) : null}
-                <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${branch.isActive ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-muted text-muted-foreground"}`}>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${branch.isActive
+                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                    : "bg-muted text-muted-foreground"}`}
+                >
                   {branch.isActive ? t("table.active") : t("table.inactive")}
                 </span>
               </div>
@@ -74,15 +75,21 @@ export function MyCustomerPage() {
 
             <div className="space-y-5 p-5">
               <div>
-                <h3 className="text-sm font-semibold">{t("myCustomer.branchDetails")}</h3>
+                <h3 className="text-sm font-semibold">
+                  {t("myCustomer.branchDetails")}
+                </h3>
                 <div className="mt-3">
                   <BranchOverviewTab item={branch} />
                 </div>
               </div>
               <div className="border-t pt-4">
-                <h3 className="text-sm font-semibold">{t("myCustomer.linkedStaff")}</h3>
+                <h3 className="text-sm font-semibold">
+                  {t("myCustomer.linkedStaff")}
+                </h3>
                 <p className="mt-1 text-sm">{branch.staffName}</p>
-                <p className="text-sm text-muted-foreground">{branch.staffPosition ?? "—"}</p>
+                <p className="text-sm text-muted-foreground">
+                  {branch.staffPosition ?? "—"}
+                </p>
               </div>
             </div>
           </section>
