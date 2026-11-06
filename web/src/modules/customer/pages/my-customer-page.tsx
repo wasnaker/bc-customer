@@ -19,7 +19,7 @@ export function MyCompanyTab() {
     queryKey: ["customer", "my-branch", user?.id ?? "anonymous"],
     queryFn: async () => {
       const response = await getMyBranch();
-      if (response.status === 404) return null;
+      if (response.status === (HTTP_CODES_ENUM.NOT_FOUND as any)) return null;
       if (response.status !== HTTP_CODES_ENUM.OK || !response.data) {
         throw new Error(t("myCompany.error"));
       }
@@ -32,20 +32,20 @@ export function MyCompanyTab() {
     <div className="page-content--narrow">
       <div className="page-content--body space-y-6">
         <div>
-          <h1 className="page-title">{t("myCustomer.title")}</h1>
-          <p className="page-subtitle">{t("myCustomer.subtitle")}</p>
+          <h1 className="page-title">{t("myCompany.title")}</h1>
+          <p className="page-subtitle">{t("myCompany.subtitle")}</p>
         </div>
 
         {isLoading ? (
           <p className="text-sm text-muted-foreground">{t("table.loading")}</p>
         ) : error ? (
           <p role="alert" className="text-sm text-destructive">
-            {t("myCustomer.error")}
+            {t("myCompany.error")}
           </p>
         ) : !branch ? (
           <div className="rounded-lg border bg-card p-6">
             <p className="text-sm text-muted-foreground">
-              {t("myCustomer.noBranch")}
+              {t("myCompany.noBranch")}
             </p>
           </div>
         ) : (
@@ -53,7 +53,7 @@ export function MyCompanyTab() {
             <div className="flex flex-wrap items-start justify-between gap-3 border-b p-5">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {t("myCustomer.branch")}
+                  {t("myCompany.branch")}
                 </p>
                 <h2 className="mt-1 text-lg font-semibold">{branch.name}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -79,7 +79,7 @@ export function MyCompanyTab() {
             <div className="space-y-5 p-5">
               <div>
                 <h3 className="text-sm font-semibold">
-                  {t("myCustomer.branchDetails")}
+                  {t("myCompany.branchDetails")}
                 </h3>
                 <div className="mt-3">
                   <BranchOverviewTab item={branch} />
@@ -87,7 +87,7 @@ export function MyCompanyTab() {
               </div>
               <div className="border-t pt-4">
                 <h3 className="text-sm font-semibold">
-                  {t("myCustomer.linkedStaff")}
+                  {t("myCompany.linkedStaff")}
                 </h3>
                 <p className="mt-1 text-sm">{branch.staffName}</p>
                 <p className="text-sm text-muted-foreground">
