@@ -17,15 +17,13 @@ export interface BackendModuleManifest {
   capabilities: readonly ('api' | 'web')[];
   permissions: readonly ModulePermissionDefinition[];
   roles?: readonly ModuleRoleDefinition[];
-  /** Hard dependencies on other modules (by manifest id). */
   requires?: readonly string[];
 }
 
 export const moduleManifest: BackendModuleManifest = {
   id: 'customer',
-  version: '0.1.0',
+  version: '0.1.1',
   capabilities: ['api', 'web'],
-  // region owns the province/regency tables this module's FKs point at.
   requires: ['region'],
   permissions: [
     { name: 'read:customer', description: 'Allows viewing customer module navigation and customer data' },
@@ -47,30 +45,22 @@ export const moduleManifest: BackendModuleManifest = {
       name: 'Customer Admin',
       description: 'Administrator at the customer company / head-office scope.',
       scope: 'customer',
-      permissions: [
-        'read:customer', 'create:customer', 'update:customer', 'delete:customer',
-        'read:branch', 'create:branch', 'update:branch', 'delete:branch',
-        'read:staff', 'create:staff', 'update:staff', 'delete:staff',
-      ],
+      permissions: ['read:customer', 'create:customer', 'update:customer', 'delete:customer', 'read:branch', 'create:branch', 'update:branch', 'delete:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff'],
     },
     {
       key: 'customer-branch-admin',
       name: 'Customer Branch Admin',
       description: 'Administrator limited to one assigned branch.',
       scope: 'branch',
-      permissions: [
-        'read:customer', 'read:branch', 'read:staff',
-        'create:staff', 'update:staff', 'delete:staff',
-      ],
+      permissions: ['read:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff'],
     },
     {
       key: 'customer',
       name: 'Customer',
       description: 'Standard customer staff account limited to its registered branch.',
       scope: 'branch',
-      permissions: ['read:customer', 'read:branch', 'read:staff'],
+      permissions: ['read:branch', 'read:staff'],
     },
   ],
 };
-
 export const customerModuleManifest = moduleManifest;
