@@ -3,9 +3,7 @@
     "parent": "Pelanggan",
     "customer": "Pelanggan",
     "branch": "Cabang Pelanggan",
-    "staff": "Staf Pelanggan",
-    "myCustomer": "Pelanggan Saya",
-    "myBranch": "Cabang Saya"
+    "staff": "Staf Pelanggan"
   },
   "customer": {
     "title": "Pelanggan",
@@ -167,13 +165,14 @@
     "customerNotExists": "Pelanggan tidak ditemukan.",
     "unknown": "Terjadi kesalahan. Silakan coba lagi."
   },
-  "myCustomer": {
-    "title": "Pelanggan Saya",
-    "subtitle": "Cabang pelanggan yang terhubung dengan akun ini.",
+  "myCompany": {
+    "title": "Perusahaan Saya",
+    "subtitle": "Cabang yang terhubung dengan akun Anda.",
     "branch": "Cabang",
     "linkedStaff": "Staf terhubung",
     "noBranch": "Belum ada cabang yang terhubung dengan akun ini.",
     "error": "Gagal memuat data cabang Anda. Silakan coba lagi.",
-    "branchDetails": "Detail cabang"
+    "branchDetails": "Detail cabang",
+    "tabTitle": "Perusahaan Saya"
   }
 }

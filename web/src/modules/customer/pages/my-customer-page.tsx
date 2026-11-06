@@ -7,7 +7,7 @@ import { useGetMyBranchService } from "../services/branch-api";
 import { BranchOverviewTab } from "../components/branch-detail-tab";
 import useAuth from "@/services/auth/use-auth";
 
-export function MyCustomerPage() {
+export function MyCompanyTab() {
   const { t } = useTranslation("module-customer");
   const { user } = useAuth();
   const getMyBranch = useGetMyBranchService();
@@ -21,7 +21,7 @@ export function MyCustomerPage() {
       const response = await getMyBranch();
       if (response.status === 404) return null;
       if (response.status !== HTTP_CODES_ENUM.OK || !response.data) {
-        throw new Error(t("myCustomer.error"));
+        throw new Error(t("myCompany.error"));
       }
       return response.data;
     },

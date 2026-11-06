@@ -164,5 +164,15 @@
     "branchNotExists": "未找到该分支。",
     "customerNotExists": "未找到该客户。",
     "unknown": "出现问题，请重试。"
+  },
+  "myCompany": {
+    "tabTitle": "我的公司",
+    "title": "我的公司",
+    "subtitle": "与此账户关联的分支机构。",
+    "branch": "分支",
+    "linkedStaff": "关联员工",
+    "noBranch": "此账户尚未关联分支机构。",
+    "error": "无法加载分支信息，请重试。",
+    "branchDetails": "分支详情"
   }
 }

@@ -164,5 +164,15 @@
     "branchNotExists": "지점을 찾을 수 없습니다.",
     "customerNotExists": "고객을 찾을 수 없습니다.",
     "unknown": "문제가 발생했습니다. 다시 시도해 주세요."
+  },
+  "myCompany": {
+    "tabTitle": "내 회사",
+    "title": "내 회사",
+    "subtitle": "이 계정에 연결된 지점입니다.",
+    "branch": "지점",
+    "linkedStaff": "연결된 직원",
+    "noBranch": "이 계정에 연결된 지점이 없습니다.",
+    "error": "지점 정보를 불러오지 못했습니다. 다시 시도해 주세요.",
+    "branchDetails": "지점 상세 정보"
   }
 }

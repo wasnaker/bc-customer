@@ -3,7 +3,7 @@ import Building2 from "lucide-react/dist/esm/icons/building-2";
 import { CustomerPage } from "./pages/customer-page";
 import { BranchPage } from "./pages/branch-page";
 import { StaffPage } from "./pages/staff-page";
-import { MyCustomerPage } from "./pages/my-customer-page";
+import { MyCompanyTab } from "./pages/my-customer-page";
 
 /**
  * Customer owns its admin pages and navigation. The host only resolves the
@@ -11,6 +11,15 @@ import { MyCustomerPage } from "./pages/my-customer-page";
  */
 export default defineModuleManifest({
   alias: "customer",
+  profileTabs: [
+    {
+      slug: "my-company",
+      label: { namespace: "module-customer", key: "myCompany.tabTitle" },
+      position: 30,
+      icon: Building2,
+      content: { kind: "component", component: MyCompanyTab },
+    },
+  ],
   pages: [
     {
       path: "/admin/customer",
@@ -30,30 +39,8 @@ export default defineModuleManifest({
       title: { namespace: "module-customer", key: "staff.title" },
       permission: "read:staff",
     },
-    {
-      path: "/admin/my-customer/branch",
-      component: MyCustomerPage,
-      title: { namespace: "module-customer", key: "myCustomer.title" },
-      permission: "read:branch",
-    },
   ],
   menu: [
-    {
-      slug: "my-customer",
-      label: { namespace: "module-customer", key: "menu.myCustomer" },
-      href: "/admin/my-customer/branch",
-      position: 90,
-      icon: Building2,
-      children: [
-        {
-          slug: "my-customer-branch",
-          label: { namespace: "module-customer", key: "menu.myBranch" },
-          href: "/admin/my-customer/branch",
-          position: 1,
-          permission: "read:branch",
-        },
-      ],
-    },
     {
       slug: "customer",
       label: { namespace: "module-customer", key: "menu.parent" },

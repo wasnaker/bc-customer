@@ -164,5 +164,15 @@
     "branchNotExists": "支店が見つかりません。",
     "customerNotExists": "顧客が見つかりません。",
     "unknown": "問題が発生しました。もう一度お試しください。"
+  },
+  "myCompany": {
+    "tabTitle": "会社情報",
+    "title": "会社情報",
+    "subtitle": "このアカウントに紐付けられた支店です。",
+    "branch": "支店",
+    "linkedStaff": "関連スタッフ",
+    "noBranch": "このアカウントに支店が紐付けられていません。",
+    "error": "支店情報を読み込めません。もう一度お試しください。",
+    "branchDetails": "支店詳細"
   }
 }
