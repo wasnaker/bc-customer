@@ -216,6 +216,7 @@ export class CustomerController {
     const customer = await this.customerService.findCustomerById(
       branch.customerId,
     );
+    if (!customer?.isActive) throw new NotFoundException();
 
     return {
       ...branch,
