@@ -84,7 +84,7 @@ export function MyCustomerPage() {
                 <p className="mt-1 text-sm">{branch.staffName}</p>
                 <p className="text-sm text-muted-foreground">{branch.staffPosition ?? "—"}</p>
               </div>
-            </div>       </dl>
+            </div>
           </section>
         )}
       </div>
