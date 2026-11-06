@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "@/services/i18n/client";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { useGetMyBranchService } from "../services/branch-api";
+import { BranchOverviewTab } from "../components/branch-detail-tab";
 
 export function MyCustomerPage() {
   const { t } = useTranslation("module-customer");
@@ -71,44 +72,19 @@ export function MyCustomerPage() {
               </div>
             </div>
 
-            <dl className="grid gap-x-8 gap-y-5 p-5 sm:grid-cols-2">
+            <div className="space-y-5 p-5">
               <div>
-                <dt className="text-xs text-muted-foreground">{t("table.code")}</dt>
-                <dd className="mt-1 font-mono text-sm">{branch.code ?? "—"}</dd>
+                <h3 className="text-sm font-semibold">{t("myCustomer.branchDetails")}</h3>
+                <div className="mt-3">
+                  <BranchOverviewTab item={branch} />
+                </div>
               </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("table.name")}</dt>
-                <dd className="mt-1 text-sm font-medium">{branch.name}</dd>
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-semibold">{t("myCustomer.linkedStaff")}</h3>
+                <p className="mt-1 text-sm">{branch.staffName}</p>
+                <p className="text-sm text-muted-foreground">{branch.staffPosition ?? "—"}</p>
               </div>
-              <div className="sm:col-span-2">
-                <dt className="text-xs text-muted-foreground">{t("table.addressLine")}</dt>
-                <dd className="mt-1 text-sm">{branch.addressLine}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("table.province")}</dt>
-                <dd className="mt-1 text-sm">{branch.provinceId}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("table.city")}</dt>
-                <dd className="mt-1 text-sm">{branch.cityId}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("form.field.postalCode")}</dt>
-                <dd className="mt-1 text-sm">{branch.postalCode ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("form.field.vatNumber")}</dt>
-                <dd className="mt-1 text-sm">{branch.vatNumber ?? "—"}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("myCustomer.linkedStaff")}</dt>
-                <dd className="mt-1 text-sm">{branch.staffName}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">{t("table.position")}</dt>
-                <dd className="mt-1 text-sm">{branch.staffPosition ?? "—"}</dd>
-              </div>
-            </dl>
+            </div>       </dl>
           </section>
         )}
       </div>
