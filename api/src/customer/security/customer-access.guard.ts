@@ -18,7 +18,10 @@ interface AuthenticatedRequest {
   method: string;
   query?: Record<string, unknown>;
   body?: Record<string, unknown>;
-  user?: { role?: { id?: number | string } };
+  user?: {
+    role?: { id?: number | string } | null;
+    roles?: Array<{ id?: number | string }>;
+  };
 }
 
 const ACTION_BY_METHOD: Record<string, string> = {
@@ -44,24 +47,31 @@ export class CustomerAccessGuard implements CanActivate {
     const action = ACTION_BY_METHOD[request.method.toUpperCase()];
     const resource = this.resolveResource(context, request);
     const permission = action ? `${action}:${resource}` : null;
-    const roleId = request.user?.role?.id;
+    const roleIds = [
+      ...new Set(
+        [
+          ...(request.user?.roles ?? []).map((role) => role.id),
+          request.user?.role?.id,
+        ].filter(
+          (id): id is number | string => id !== undefined && id !== null,
+        ),
+      ),
+    ];
 
-    if (!permission || roleId === undefined || !this.options?.authorize) {
+    if (!permission || roleIds.length === 0 || !this.options?.authorize) {
       throw new ForbiddenException();
     }
 
-    const allowed = await this.options.authorize(roleId, permission);
-    if (!allowed) throw new ForbiddenException();
-    return true;
+    // Multirole users receive the union of permissions from every assigned
+    // central role. Checking only the legacy singular role silently denied
+    // users whose required permission belonged to another assigned role.
+    for (const roleId of roleIds) {
+      if (await this.options.authorize(roleId, permission)) return true;
+    }
+
+    throw new ForbiddenException();
   }
 
-  /**
-   * Resource resolution order:
-   * 1. `@CustomerResource('branch' | 'staff')` metadata on the route.
-   * 2. Document routes: the polymorphic `ownerType` from query/body
-   *    (customer/branch/staff documents are guarded by the owner's perms).
-   * 3. Default: 'customer'.
-   */
   private resolveResource(
     context: ExecutionContext,
     request: AuthenticatedRequest,
@@ -70,9 +80,7 @@ export class CustomerAccessGuard implements CanActivate {
       CUSTOMER_RESOURCE_METADATA,
       [context.getHandler(), context.getClass()],
     );
-    if (metadata) {
-      return metadata;
-    }
+    if (metadata) return metadata;
 
     const ownerType = request.query?.ownerType ?? request.body?.ownerType;
     if (
