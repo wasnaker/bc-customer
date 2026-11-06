@@ -10,6 +10,8 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UnauthorizedException,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -44,7 +46,7 @@ import { BranchService } from "../services/branch.service";
 import { StaffService } from "../services/staff.service";
 import { CustomerDocumentService } from "../services/customer-document.service";
 import { CustomerAccessGuard } from "../security/customer-access.guard";
-import { CustomerResource } from "../security/customer-resource.decorator";
+import { CustomerResource, CustomerSelfBranch } from "../security/customer-resource.decorator";
 import { NullableType } from "../../utils/types/nullable.type";
 import {
   InfinityPaginationResponse,
@@ -185,6 +187,42 @@ export class CustomerController {
     );
 
     return infinityPagination(data, { page, limit }, total);
+  }
+
+  /**
+   * Self-service branch lookup. The branch is derived only from the
+   * authenticated user's linked staff record; no user/branch ID is accepted
+   * from the client, so this endpoint cannot be used to enumerate other
+   * customers or branches.
+   */
+  @ApiOkResponse({ type: Branch })
+  @CustomerSelfBranch()
+  @Get("me/branch")
+  @HttpCode(HttpStatus.OK)
+  async findMyBranch(
+    @Req() request: { user?: { id?: number | string } },
+  ): Promise<Branch & { staffName: string; staffPosition: string | null }> {
+    const userId = Number(request.user?.id);
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+      throw new UnauthorizedException();
+    }
+
+    const staff = await this.staffService.findStaffByUserId(userId);
+    if (!staff || !staff.isActive) throw new NotFoundException();
+
+    const branch = await this.branchService.findBranchById(staff.branchId);
+    if (!branch || !branch.isActive) throw new NotFoundException();
+
+    const customer = await this.customerService.findCustomerById(
+      branch.customerId,
+    );
+
+    return {
+      ...branch,
+      customerName: customer?.name ?? null,
+      staffName: staff.name,
+      staffPosition: staff.position,
+    };
   }
 
   // ─── Customers ─────────────────────────────────────────────────────────────
