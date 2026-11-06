@@ -34,6 +34,7 @@ export default defineModuleManifest({
       path: "/admin/my-customer/branch",
       component: MyCustomerPage,
       title: { namespace: "module-customer", key: "myCustomer.title" },
+      permission: "read:branch",
     },
   ],
   menu: [
@@ -49,6 +50,7 @@ export default defineModuleManifest({
           label: { namespace: "module-customer", key: "menu.myBranch" },
           href: "/admin/my-customer/branch",
           position: 1,
+          permission: "read:branch",
         },
       ],
     },
