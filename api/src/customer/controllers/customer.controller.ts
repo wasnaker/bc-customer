@@ -46,7 +46,10 @@ import { BranchService } from "../services/branch.service";
 import { StaffService } from "../services/staff.service";
 import { CustomerDocumentService } from "../services/customer-document.service";
 import { CustomerAccessGuard } from "../security/customer-access.guard";
-import { CustomerResource, CustomerSelfBranch } from "../security/customer-resource.decorator";
+import {
+  CustomerResource,
+  CustomerSelfBranch,
+} from "../security/customer-resource.decorator";
 import { NullableType } from "../../utils/types/nullable.type";
 import {
   InfinityPaginationResponse,
