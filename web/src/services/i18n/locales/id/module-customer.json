@@ -173,6 +173,7 @@
     "branch": "Cabang",
     "linkedStaff": "Staf terhubung",
     "noBranch": "Belum ada cabang yang terhubung dengan akun ini.",
-    "error": "Gagal memuat data cabang Anda. Silakan coba lagi."
+    "error": "Gagal memuat data cabang Anda. Silakan coba lagi.",
+    "branchDetails": "Detail cabang"
   }
 }
