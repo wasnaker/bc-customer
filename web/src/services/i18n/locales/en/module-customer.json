@@ -173,6 +173,7 @@
     "branch": "Branch",
     "linkedStaff": "Linked staff member",
     "noBranch": "No branch is linked to this account yet.",
-    "error": "Unable to load your branch. Please try again."
+    "error": "Unable to load your branch. Please try again.",
+    "branchDetails": "Branch details"
   }
 }
