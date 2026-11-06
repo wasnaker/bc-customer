@@ -17,7 +17,7 @@ export default defineModuleManifest({
       label: { namespace: "module-customer", key: "myCompany.tabTitle" },
       position: 30,
       icon: Building2,
-      permission: "read:branch",
+      permission: null,
       content: { kind: "component", component: MyCompanyTab },
     },
   ],
@@ -32,7 +32,7 @@ export default defineModuleManifest({
       path: "/admin/customer/branch",
       component: BranchPage,
       title: { namespace: "module-customer", key: "branch.title" },
-      permission: "read:branch",
+      permission: null,
     },
     {
       path: "/admin/customer/staff",
@@ -61,7 +61,7 @@ export default defineModuleManifest({
           label: { namespace: "module-customer", key: "menu.branch" },
           href: "/admin/customer/branch",
           position: 2,
-          permission: "read:branch",
+          permission: null,
         },
         {
           slug: "staff",
