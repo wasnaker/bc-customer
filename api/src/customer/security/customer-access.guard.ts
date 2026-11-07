@@ -52,12 +52,29 @@ export class CustomerAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const selfBranch = this.reflector?.getAllAndOverride<boolean>(
+    const selfBranch = this.reflector?.getAllAndOverride<boolean | string>(
       CUSTOMER_SELF_BRANCH_METADATA,
       [context.getHandler(), context.getClass()],
     );
     if (selfBranch) {
       if (request.user?.id === undefined || request.user?.id === null) {
+        throw new ForbiddenException();
+      }
+      if (typeof selfBranch === 'string') {
+        const assignedRoles = request.user?.roles?.length
+          ? request.user.roles
+          : request.user?.role
+            ? [request.user.role]
+            : [];
+        const roleIds = [...new Set(assignedRoles.map((role) => role.id).filter(
+          (id): id is number | string => id !== undefined && id !== null,
+        ))];
+        if (!this.options?.authorize || roleIds.length === 0) {
+          throw new ForbiddenException();
+        }
+        for (const roleId of roleIds) {
+          if (await this.options.authorize(roleId, selfBranch)) return true;
+        }
         throw new ForbiddenException();
       }
       return true;
