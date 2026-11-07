@@ -37,3 +37,5 @@ next-env.d.ts
 
 # build output (dibangun ulang oleh  saat npm install)
 api/dist/
+
+.codegraph/
