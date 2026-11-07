@@ -215,7 +215,7 @@ export class CustomerScopeGuard implements CanActivate {
         );
         if (!customer) throw new NotFoundException();
         return {
-          resource: 'branch',
+          resource: source.permissionResource ?? 'branch',
           branch: {
             id: String(branch.id),
             customerId: String(branch.customerId),

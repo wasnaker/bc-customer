@@ -551,7 +551,7 @@ export class CustomerController {
 
   @ApiCreatedResponse({ type: Staff })
   @CustomerResource("staff")
-  @CustomerScope({ kind: 'branch-param', param: 'branchId' })
+  @CustomerScope({ kind: 'branch-param', param: 'branchId', permissionResource: 'staff' })
   @Post("branches/:branchId/staff")
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({ name: "branchId", type: String, required: true })
@@ -567,7 +567,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Staff) })
   @CustomerResource("staff")
-  @CustomerScope({ kind: 'branch-param', param: 'branchId' })
+  @CustomerScope({ kind: 'branch-param', param: 'branchId', permissionResource: 'staff' })
   @Get("branches/:branchId/staff")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "branchId", type: String, required: true })
