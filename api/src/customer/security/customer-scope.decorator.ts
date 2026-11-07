@@ -13,7 +13,8 @@ export type CustomerScopeSource =
   | { kind: 'document-lookup'; param: string }
   | { kind: 'branch-list' }
   | { kind: 'staff-list' }
-  | { kind: 'customer-list' };
+  | { kind: 'customer-list' }
+  | { kind: 'global-create' };
 
 /** Declares how a route target is resolved into verified module scope. */
 export const CustomerScope = (source: CustomerScopeSource) =>
