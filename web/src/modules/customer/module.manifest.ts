@@ -11,7 +11,7 @@ export default defineModuleManifest({
   profileTabs: [
     { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, permission: "read:my-customer-company", content: { kind: "component", component: MyCompanyTab } },
     { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:my-customer-branch", content: { kind: "component", component: MyBranchTab } },
-    { slug: "my-staff", label: { namespace: "module-customer", key: "staff.title" }, position: 32, icon: Building2, permission: "read:my-customer-staff", content: { kind: "component", component: MyStaffTab } },
+    { slug: "my-staff", label: { namespace: "module-customer", key: "myStaff.tabTitle" }, position: 32, icon: Building2, permission: "read:my-customer-staff", content: { kind: "component", component: MyStaffTab } },
   ],
   pages: [
     { path: "/admin/customer", component: CustomerPage, title: { namespace: "module-customer", key: "customer.title" }, permission: "read:customer" },
