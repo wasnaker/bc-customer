@@ -7,12 +7,12 @@ export type CustomerScopeSource =
   | { kind: 'customer-lookup'; param: string }
   | { kind: 'branch-param'; param: string }
   | { kind: 'branch-lookup'; param: string }
-  | { kind: 'staff-lookup'; param: string }
+  | { kind: 'staff-lookup'; param: string; permissionResource?: string }
   | { kind: 'document-owner-body' }
   | { kind: 'document-owner-query' }
   | { kind: 'document-lookup'; param: string }
   | { kind: 'branch-list' }
-  | { kind: 'staff-list' }
+  | { kind: 'staff-list'; permissionResource?: string }
   | { kind: 'customer-list' }
   | { kind: 'global-create' };
 
