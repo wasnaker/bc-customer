@@ -80,9 +80,14 @@ export class CustomerAccessGuard implements CanActivate {
     const action = ACTION_BY_METHOD[request.method.toUpperCase()];
     const resource = this.resolveResource(context, request);
     const permission = action ? `${action}:${resource}` : null;
+    const assignedRoles = request.user?.roles?.length
+      ? request.user.roles
+      : request.user?.role
+        ? [request.user.role]
+        : [];
     const roleIds = [
       ...new Set(
-        (request.user?.roles ?? []).map((role) => role.id).filter(
+        assignedRoles.map((role) => role.id).filter(
           (id): id is number | string => id !== undefined && id !== null,
         ),
       ),
