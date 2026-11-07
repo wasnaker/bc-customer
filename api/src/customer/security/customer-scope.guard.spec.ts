@@ -222,6 +222,53 @@ describe('CustomerScopeGuard', () => {
     );
   });
 
+  it('resolves My Staff list scope using the dedicated Profile read permission', async () => {
+    const request = { method: 'GET', user: { id: 44 } };
+    await expect(
+      execute(
+        { kind: 'staff-list', permissionResource: 'my-customer-staff' },
+        request,
+      ),
+    ).resolves.toBe(true);
+    expect(options.resolveScopes).toHaveBeenCalledWith(
+      44,
+      'read:my-customer-staff',
+    );
+    expect(request).toHaveProperty('customerAuthorizationScope', {
+      global: false,
+      customerIds: [],
+      branchIds: ['43'],
+    });
+  });
+
+  it('authorizes My Staff updates against the stored staff branch and customer scope', async () => {
+    await expect(
+      execute(
+        {
+          kind: 'staff-lookup',
+          param: 'id',
+          permissionResource: 'my-customer-staff',
+        },
+        {
+          method: 'PATCH',
+          params: { id: '90' },
+          body: {},
+          user: { id: 44 },
+        },
+      ),
+    ).resolves.toBe(true);
+    expect(options.authorizeScoped).toHaveBeenCalledWith(
+      44,
+      'update:my-customer-staff',
+      {
+        scopes: [
+          { type: 'branch', id: '43' },
+          { type: 'customer', id: '17' },
+        ],
+      },
+    );
+  });
+
   it('filters list scopes through the host callback', async () => {
     const request = { method: 'GET', user: { id: 44 } };
     await expect(
