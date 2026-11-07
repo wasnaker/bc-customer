@@ -165,7 +165,13 @@
     "customerNotExists": "Pelanggan tidak ditemukan.",
     "unknown": "Terjadi kesalahan. Silakan coba lagi."
   },
-  "myBranch": { "title": "Cabang Saya", "subtitle": "Kelola seluruh cabang milik perusahaan Anda.", "tabTitle": "Cabang Saya", "branchCount": "cabang", "error": "Tidak dapat menentukan cakupan cabang perusahaan Anda." },
+  "myBranch": {
+    "title": "Cabang Saya",
+    "subtitle": "Kelola seluruh cabang milik perusahaan Anda.",
+    "tabTitle": "Cabang Saya",
+    "branchCount": "cabang",
+    "error": "Tidak dapat menentukan cakupan cabang perusahaan Anda."
+  },
   "myCompany": {
     "title": "Perusahaan Saya",
     "subtitle": "Cabang yang terhubung dengan akun Anda.",
@@ -175,5 +181,10 @@
     "error": "Gagal memuat data cabang Anda. Silakan coba lagi.",
     "branchDetails": "Detail cabang",
     "tabTitle": "Perusahaan Saya"
+  },
+  "myStaff": {
+    "tabTitle": "Staf Saya",
+    "title": "Staf Saya",
+    "subtitle": "Lihat dan kelola staf pada cabang pelanggan sesuai cakupan akses Anda."
   }
 }
