@@ -12,6 +12,12 @@ import { useMyCustomerScope } from "../hooks/use-customers";
 import { Button } from "@/components/ui/button";
 import PencilIcon from "lucide-react/dist/esm/icons/pencil";
 import useAuth from "@/services/auth/use-auth";
+import { useState } from "react";
+import PencilIcon from "lucide-react/dist/esm/icons/pencil";
+import { Button } from "@/components/ui/button";
+import { useBranchesServerSide, useHeadOffice } from "../hooks/use-branches";
+import { useMyCustomerScope } from "../hooks/use-customers";
+import { BranchFormDialog } from "../components/branch-form-dialog";
 
 export function MyCompanyTab() {
   const { t } = useTranslation("module-customer");
@@ -139,6 +145,144 @@ export function MyCompanyTab() {
             queryClient.invalidateQueries({ queryKey: ["customer", "my-branch"] });
             queryClient.invalidateQueries({ queryKey: ["customer", "branches"] });
             queryClient.invalidateQueries({ queryKey: ["customer", "head-office"] });
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+
+/** Customer Admin's consolidated branch management inside Profile. */
+export function MyBranchTab() {
+  const { t } = useTranslation("module-customer");
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const getMyBranch = useGetMyBranchService();
+  const { data: accessScope } = useMyCustomerScope();
+  const [formOpen, setFormOpen] = useState(false);
+  const [editItem, setEditItem] = useState<import("../types/customer").Branch | null>(null);
+  const {
+    data: ownBranch,
+    isLoading: ownBranchLoading,
+    error: ownBranchError,
+  } = useQuery({
+    queryKey: ["customer", "my-branch", user?.id ?? "anonymous"],
+    queryFn: async () => {
+      const response = await getMyBranch();
+      if (response.status === HTTP_CODES_ENUM.NOT_FOUND) return null;
+      if (response.status !== HTTP_CODES_ENUM.OK || !response.data) {
+        throw new Error(t("myCompany.error"));
+      }
+      return response.data;
+    },
+    enabled: Boolean(user?.id),
+  });
+  const customerId = ownBranch?.customerId ?? null;
+  const table = useBranchesServerSide(customerId);
+  const { data: headOffice } = useHeadOffice(customerId);
+  const updateScope = accessScope?.permissions["update:branch"];
+  const canEdit = (item: import("../types/customer").Branch) =>
+    Boolean(
+      updateScope &&
+        (updateScope.global ||
+          updateScope.customerIds.includes(String(item.customerId)) ||
+          updateScope.branchIds.includes(String(item.id))),
+    );
+  const canChangeHeadOffice = Boolean(
+    updateScope?.global ||
+      (customerId != null &&
+        updateScope?.customerIds.includes(String(customerId))),
+  );
+
+  if (ownBranchLoading) {
+    return <p className="text-sm text-muted-foreground">{t("table.loading")}</p>;
+  }
+  if (ownBranchError || !ownBranch || !customerId) {
+    return <p role="alert" className="text-sm text-destructive">{t("myBranch.error")}</p>;
+  }
+
+  return (
+    <div className="page-content--wide">
+      <div className="page-content--body space-y-4">
+        <div>
+          <h1 className="page-title">{t("myBranch.title")}</h1>
+          <p className="page-subtitle">{t("myBranch.subtitle")}</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <input
+            aria-label={t("branch.searchLabel")}
+            value={table.search}
+            onChange={(event) => {
+              table.setSearch(event.target.value);
+              table.setPage(1);
+            }}
+            placeholder={t("branch.search")}
+            className="h-9 w-full max-w-sm rounded-md border bg-background px-3 text-sm"
+          />
+          <span className="text-sm text-muted-foreground">{table.total} {t("myBranch.branchCount")}</span>
+        </div>
+        <div className="overflow-x-auto rounded-lg border bg-card">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-left">
+              <tr>
+                <th className="px-4 py-3 font-medium">{t("table.code")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.name")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.addressLine")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.isActive")}</th>
+                <th className="px-4 py-3 text-right font-medium">{t("actions.edit")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {table.isLoading ? (
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">{t("table.loading")}</td></tr>
+              ) : table.error ? (
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-destructive">{t("table.error")}</td></tr>
+              ) : table.data.length === 0 ? (
+                <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">{t("branch.empty")}</td></tr>
+              ) : table.data.map((item) => (
+                <tr key={item.id} className="border-t">
+                  <td className="px-4 py-3 font-mono text-muted-foreground">{item.code ?? "—"}</td>
+                  <td className="px-4 py-3 font-medium">
+                    {item.name}
+                    {item.isHeadOffice ? <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{t("branch.headOfficeBadge")}</span> : null}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">{item.addressLine}</td>
+                  <td className="px-4 py-3">{item.isActive ? t("table.active") : t("table.inactive")}</td>
+                  <td className="px-4 py-3 text-right">
+                    {canEdit(item) ? (
+                      <Button size="sm" variant="outline" onClick={() => { setEditItem(item); setFormOpen(true); }}>
+                        <PencilIcon className="mr-2 size-3.5" />{t("actions.edit")}
+                      </Button>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {table.total === 0 ? "0" : `${(table.page - 1) * table.limit + 1}–${Math.min(table.page * table.limit, table.total)}`} {t("table.of")} {table.total}
+          </span>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" disabled={table.page <= 1} onClick={() => table.setPage(table.page - 1)}>{t("actions.prev_page")}</Button>
+            <Button size="sm" variant="outline" disabled={table.page * table.limit >= table.total} onClick={() => table.setPage(table.page + 1)}>{t("actions.next_page")}</Button>
+          </div>
+        </div>
+      </div>
+      {editItem && canEdit(editItem) ? (
+        <BranchFormDialog
+          open={formOpen}
+          onOpenChange={(open) => { setFormOpen(open); if (!open) setEditItem(null); }}
+          customerId={customerId}
+          editItem={editItem}
+          hasHeadOffice={Boolean(headOffice)}
+          canChangeHeadOffice={canChangeHeadOffice}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["customer", "branches"] });
+            queryClient.invalidateQueries({ queryKey: ["customer", "head-office"] });
+            queryClient.invalidateQueries({ queryKey: ["customer", "my-branch"] });
           }}
         />
       ) : null}
