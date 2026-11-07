@@ -46,6 +46,8 @@ import { BranchService } from "../services/branch.service";
 import { StaffService } from "../services/staff.service";
 import { CustomerDocumentService } from "../services/customer-document.service";
 import { CustomerAccessGuard } from "../security/customer-access.guard";
+import { CustomerScopeGuard } from "../security/customer-scope.guard";
+import { CustomerScope } from "../security/customer-scope.decorator";
 import {
   CustomerResource,
   CustomerSelfBranch,
@@ -64,7 +66,7 @@ import { infinityPagination } from "../../utils/infinity-pagination";
  * and document ownerType for polymorphic document routes).
  */
 @ApiBearerAuth()
-@UseGuards(AuthGuard("jwt"), CustomerAccessGuard)
+@UseGuards(AuthGuard("jwt"), CustomerAccessGuard, CustomerScopeGuard)
 @ApiTags("Customer")
 @Controller({ path: "customer", version: "1" })
 export class CustomerController {
@@ -80,6 +82,7 @@ export class CustomerController {
   // as an id param by NestJS route matching.
 
   @ApiCreatedResponse({ type: CustomerDocument })
+  @CustomerScope({ kind: 'document-owner-body' })
   @Post("documents")
   @HttpCode(HttpStatus.CREATED)
   createDocument(
@@ -89,6 +92,7 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: InfinityPaginationResponse(CustomerDocument) })
+  @CustomerScope({ kind: 'document-owner-query' })
   @Get("documents")
   @HttpCode(HttpStatus.OK)
   async findDocuments(
@@ -117,6 +121,7 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: CustomerDocument })
+  @CustomerScope({ kind: 'document-lookup', param: 'id' })
   @Patch("documents/:id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -127,6 +132,7 @@ export class CustomerController {
     return this.customerDocumentService.update(id, updateCustomerDocumentDto);
   }
 
+  @CustomerScope({ kind: 'document-lookup', param: 'id' })
   @Delete("documents/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: "id", type: String, required: true })
@@ -262,6 +268,7 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: Customer })
+  @CustomerScope({ kind: 'customer-lookup', param: 'id' })
   @Get(":id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -275,6 +282,7 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: Customer })
+  @CustomerScope({ kind: 'customer-lookup', param: 'id' })
   @Patch(":id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -285,6 +293,7 @@ export class CustomerController {
     return this.customerService.update(id, updateCustomerDto);
   }
 
+  @CustomerScope({ kind: 'customer-lookup', param: 'id' })
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: "id", type: String, required: true })
@@ -296,6 +305,7 @@ export class CustomerController {
 
   @ApiCreatedResponse({ type: Branch })
   @CustomerResource("branch")
+  @CustomerScope({ kind: 'customer-param', param: 'customerId' })
   @Post(":customerId/branches")
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({ name: "customerId", type: String, required: true })
@@ -308,6 +318,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Branch) })
   @CustomerResource("branch")
+  @CustomerScope({ kind: 'customer-param', param: 'customerId' })
   @Get(":customerId/branches")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "customerId", type: String, required: true })
@@ -336,6 +347,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: Branch })
   @CustomerResource("branch")
+  @CustomerScope({ kind: 'branch-lookup', param: 'id' })
   @Get("branches/:id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -345,6 +357,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: Branch })
   @CustomerResource("branch")
+  @CustomerScope({ kind: 'branch-lookup', param: 'id' })
   @Patch("branches/:id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -356,6 +369,7 @@ export class CustomerController {
   }
 
   @CustomerResource("branch")
+  @CustomerScope({ kind: 'branch-lookup', param: 'id' })
   @Delete("branches/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: "id", type: String, required: true })
@@ -367,6 +381,7 @@ export class CustomerController {
 
   @ApiCreatedResponse({ type: Staff })
   @CustomerResource("staff")
+  @CustomerScope({ kind: 'branch-param', param: 'branchId' })
   @Post("branches/:branchId/staff")
   @HttpCode(HttpStatus.CREATED)
   @ApiParam({ name: "branchId", type: String, required: true })
@@ -379,6 +394,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Staff) })
   @CustomerResource("staff")
+  @CustomerScope({ kind: 'branch-param', param: 'branchId' })
   @Get("branches/:branchId/staff")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "branchId", type: String, required: true })
@@ -407,6 +423,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: Staff })
   @CustomerResource("staff")
+  @CustomerScope({ kind: 'staff-lookup', param: 'id' })
   @Get("staff/:id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -416,6 +433,7 @@ export class CustomerController {
 
   @ApiOkResponse({ type: Staff })
   @CustomerResource("staff")
+  @CustomerScope({ kind: 'staff-lookup', param: 'id' })
   @Patch("staff/:id")
   @HttpCode(HttpStatus.OK)
   @ApiParam({ name: "id", type: String, required: true })
@@ -427,6 +445,7 @@ export class CustomerController {
   }
 
   @CustomerResource("staff")
+  @CustomerScope({ kind: 'staff-lookup', param: 'id' })
   @Delete("staff/:id")
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiParam({ name: "id", type: String, required: true })
