@@ -19,6 +19,7 @@ interface StaffFormDialogProps {
   branchId: Staff["branchId"];
   editItem?: Staff | null;
   onSuccess: (savedId: Staff["id"]) => void;
+  profileMode?: boolean;
 }
 
 interface FormState {
@@ -61,10 +62,11 @@ export function StaffFormDialog({
   branchId,
   editItem,
   onSuccess,
+  profileMode = false,
 }: StaffFormDialogProps) {
   const { t } = useTranslation("module-customer");
   const createMutation = useCreateStaff();
-  const updateMutation = useUpdateStaff();
+  const updateMutation = useUpdateStaff(profileMode);
 
   const isEditing = Boolean(editItem);
   const isPending = createMutation.isPending || updateMutation.isPending;
