@@ -1,6 +1,6 @@
 # Implementasi Scope Authorization untuk bc-customer
 
-Status: **rencana implementasi — belum ada enforcement scope yang diaktifkan**
+Status: **implementasi backend dan UI sudah di-commit; rollout production tetap menunggu audit/backfill assignment dan pengujian PostgreSQL**
 Tanggal revisi: 2026-11-07
 
 Dokumen ini adalah rencana implementasi khusus modul Customer. Kontrak universal ada di [scope-authorization-architecture.md](./scope-authorization-architecture.md). Keputusan di sini wajib mengikuti kontrak tersebut.
@@ -24,15 +24,23 @@ Per 2026-11-07:
 - `bc-equipment` terbaru: `41ef498ae8568b0afd36a3faf22e7c6cd1a31b19`.
 - `bc-region` terbaru: `0203ffbf5813635dcdf3687dd84e41558576c8de`.
 
-Implementasi yang sudah dikonfirmasi:
-- `CustomerAccessGuard` saat ini hanya mengecek permission per role ID dan belum memeriksa scope.
-- `CustomerModuleOptions` hanya menyediakan callback `authorize(roleId, permission)`.
-- Host `ModuleAuthorizationService.hasModulePermission` sudah membaca assignment dan manifest role, tetapi API tersebut hanya menerima satu `scopeType/scopeId`, belum mengikat permission dan assignment secara aman pada role yang sama untuk semua skenario, dan belum dipakai oleh customer guard.
-- `module_role_assignment` memiliki `moduleId`, `roleKey`, `scopeType`, `scopeId`, `assignedBy`; role identity tersedia di host sebagai `moduleId + moduleRoleKey`.
-- Branch menyimpan `customerId`; staff menyimpan `branchId`. Karena itu scope staff harus diturunkan melalui staff → branch → customer di server.
-- Controller Customer memuat endpoint list dan detail lintas customer/branch/staff serta dokumen polymorphic. Semua endpoint tersebut harus dimasukkan ke inventaris scope, bukan hanya endpoint update.
+Implementasi yang sudah di-commit:
+- Host `ModuleAuthorizationService.hasScopedModulePermission` mengevaluasi permission dan assignment dari role yang sama (`moduleId + moduleRoleKey`) serta mengenali bypass global hanya dari wildcard core `*`.
+- Host `resolveModuleScopes` mengembalikan scope yang benar-benar dimiliki role pemegang permission; callback memuat ulang role user dari database pada setiap request.
+- Host seed service mengikat role manifest ke identitas stabil `moduleId + moduleRoleKey` dan menolak wildcard dari module.
+- `CustomerScopeGuard` memvalidasi target customer/branch/staff/document dari database dan fail-closed bila callback scoped tidak tersedia.
+- Endpoint list customer/branch/staff menerapkan scope pada query database sebelum pagination dan count; detail dan mutasi resource menggunakan target scope tersimpan.
+- Endpoint self-service `GET /customer/me/scope` menyediakan konteks untuk UX; bukan otoritas keamanan.
+- Frontend branch/staff page menyembunyikan filter dan aksi yang tidak didukung scope; backend tetap menjadi enforcement utama.
+- `bc-region` dan `bc-equipment` telah menerima kontrak callback scope universal pada module options agar host dapat menyediakan bentuk opsi yang sama.
 
-Angka snapshot assignment pada dokumen sebelumnya (44 user memiliki assignment dan 77 user belum memiliki assignment) belum dianggap fakta terkini. Query audit dan dry-run backfill harus dijalankan kembali terhadap database target.
+Belum dilakukan:
+- Audit live dan dry-run backfill pada database PostgreSQL.
+- Eksekusi test suite/build di lingkungan repository; commit telah dibuat melalui GitHub, tetapi belum ada hasil CI/build yang dapat diverifikasi dari sesi ini.
+- Verifikasi data demo Vera/Maria pada database aktif.
+- Kebijakan create customer: `POST /customer` masih menggunakan permission `create:customer` tanpa scope target karena resource belum ada saat create. Sebelum production, putuskan secara eksplisit apakah hanya global administrator yang boleh membuat customer atau apakah ada proses assignment customer-scope khusus.
+
+Snapshot assignment lama (44 user memiliki assignment dan 77 user belum memiliki assignment) tidak dianggap fakta terkini. Query audit dan dry-run backfill wajib dijalankan ulang pada database target. Jangan anggap implementasi siap production sebelum gate pada §10 lulus.
 
 ## 3. Keputusan desain yang tidak boleh dilanggar
 
