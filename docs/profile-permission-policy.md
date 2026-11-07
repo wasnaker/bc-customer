@@ -1,58 +1,50 @@
 # Kebijakan Permission Profile Customer
 
-Status: **kontrak implementasi untuk Profile My Company dan My Branch**
+Status: **keputusan role final disetujui 2026-11-07**
 
-## Tujuan
+## Matriks akses
 
-Informasi perusahaan milik akun yang sedang login ditampilkan melalui Profile. Role standar `Customer` tidak boleh memperoleh akses ke menu atau halaman administrasi Customer, dan tidak boleh membaca data customer lain.
+| Role | Menu Customer | Profile |
+|---|---|---|
+| Customer Admin | Tidak tampil | My Company + My Branch |
+| Customer Branch Admin | Tidak tampil | My Company |
+| Customer | Tidak tampil | My Company |
 
-## Permission Profile (terpisah dari permission resource)
-
-| Permission | Fungsi |
-|---|---|
-| `read:my-customer-company` | Membaca branch/perusahaan yang terhubung ke user login |
-| `read:my-customer-branch` | Membaca seluruh branch milik customer user login melalui tab My Branch |
-
-Permission Profile hanya membuka kapabilitas Profile. Operasi edit tetap membutuhkan `update:branch` beserta scope yang sesuai. Permission resource seperti `read:branch` tidak otomatis membuka tab Profile.
-
-## Matriks role
+## Permission khusus Profile
 
 | Permission | Customer Admin | Customer Branch Admin | Customer |
 |---|---:|---:|---:|
 | `read:my-customer-company` | Ya | Ya | Ya |
 | `read:my-customer-branch` | Ya | Tidak | Tidak |
-| `read:customer` | Ya | Tidak | Tidak |
-| `read:branch` | Ya | Ya | Tidak |
-| `read:staff` | Ya | Ya | Tidak |
-| `update:branch` | Ya | Ya | Tidak |
-| `update:staff` | Ya | Ya | Tidak |
 
-Role Customer tetap memiliki scope branch dan hanya dapat melihat company/branch miliknya melalui endpoint self-service. Customer Branch Admin masih dapat menggunakan menu administrasi Branch/Staff dalam branch scope-nya, tetapi tidak memperoleh tab My Branch. Customer Admin memperoleh tab My Branch dalam customer scope.
+Permission Profile terpisah dari permission resource. `read:branch` tidak otomatis membuka tab My Branch. Permission `update:branch` beserta scope yang cocok tetap wajib untuk edit branch dari My Company.
 
-## Endpoint dan enforcement
+## Implementasi frontend
 
-- `GET /customer/me/branch`: identitas user diambil dari JWT; server mencari staff aktif, branch aktif, dan customer aktif. Tidak menerima userId/customerId/branchId dari client. Wajib `read:my-customer-company` dan scope target harus mencakup branch sendiri.
-- `GET /customer/me/branches`: identitas dan customer scope diturunkan dari user login; tidak menerima customerId dari client. Wajib `read:my-customer-branch`; hasil hanya branch dari customer scope yang terverifikasi.
-- `PATCH /customer/branches/:id`: tetap membutuhkan `update:branch` dan scope resource target. Tombol Edit di My Company hanya ditampilkan bila scope update mencakup branch sendiri.
-- `GET /customer`, `GET /customer/branches`, `GET /customer/staff` serta detail/mutasi tetap menggunakan permission resource dan scoped authorization. Tidak ada fallback berdasarkan role name atau ID.
-- `GET /customer/me/scope` hanya menyediakan affordance UI; bukan otoritas akses. Backend mengevaluasi ulang permission dan scope pada setiap request.
+- Manifest module menetapkan `menu: []`; menu Customer tidak ditampilkan kepada role mana pun.
+- Tab My Company memakai `read:my-customer-company`.
+- Tab My Branch memakai `read:my-customer-branch`.
+- Halaman administrasi yang sudah ada tetap memiliki permission route masing-masing. Keputusan menyembunyikan menu tidak dengan sendirinya menghapus izin route/API; itu perubahan kebijakan terpisah.
+- Menu/tab visibility bukan batas keamanan. Backend harus tetap menolak request yang tidak memiliki permission atau scope.
 
-## Frontend
+## Implementasi backend
 
-- Manifest Profile tab menggunakan permission khusus Profile.
-- Halaman/menu administrasi tetap menggunakan permission resource.
-- Root menu Customer menggunakan `read:branch`; role Customer tidak memilikinya sehingga menu tidak tampil.
-- Menyembunyikan menu/tab bukan kontrol keamanan. Direct URL dan request API harus tetap ditolak backend.
+- `GET /customer/me/branch` menggunakan identitas JWT, mencari staff aktif yang terhubung, lalu branch/customer aktif. Client tidak boleh mengirim userId, customerId, atau branchId untuk menentukan record.
+- Endpoint tersebut wajib `read:my-customer-company`; guard memeriksa permission terhadap role-role user yang terautentikasi.
+- Edit branch tetap menggunakan endpoint resource yang ada dengan `update:branch` dan customer/branch scope.
+- My Branch hanya ditampilkan kepada Customer Admin. UI saat ini mengambil branch melalui endpoint branch list yang difilter scope di backend; query customerId dari UI bukan sumber otorisasi.
+- Scope selalu diambil dari assignment role yang sama dengan permission. Tidak boleh menggabungkan permission satu role dengan scope role lain.
 
-## Negative tests wajib
+## Negative tests
 
-1. Role Customer tidak dapat membuka menu/halaman Customer, Branch, Staff, maupun API list/detail/mutasi resource.
-2. Role Customer tetap dapat membaca `/customer/me/branch` miliknya, tetapi tidak dapat mengubah branch.
-3. Customer Branch Admin dapat membaca/edit branch sendiri dan staff sesuai scope, tetapi tidak dapat membuka tab/endpoint My Branch.
-4. Customer Admin dapat membaca My Branch hanya untuk customer yang ditugaskan.
-5. Mengubah ID/query/body tidak dapat mengakses customer atau branch lain.
-6. User tanpa assignment scope atau dengan assignment role lain ditolak (fail-closed).
+1. Ketiga role tidak melihat menu Customer.
+2. Ketiga role melihat My Company; role tanpa permission Profile ditolak pada `GET /customer/me/branch`.
+3. Hanya Customer Admin melihat My Branch.
+4. Customer Branch Admin dan Customer tidak memperoleh tab My Branch.
+5. Customer Admin hanya melihat branch dari customer scope yang diberikan.
+6. Manipulasi ID/query/body tidak dapat mengakses customer/branch lain.
+7. Edit My Company memerlukan `update:branch` dan scope yang mencakup branch user.
 
-## Rollout
+## Catatan rollout
 
-Permission baru didaftarkan melalui manifest module dan disinkronkan oleh Authorization Core. Seeder tidak boleh mengubah assignment scope secara otomatis. Setelah deploy, jalankan module registration/seed sesuai lifecycle host, lalu verifikasi role-permission dan assignment pada PostgreSQL. Jangan menyatakan rollout production selesai sebelum negative API tests dan PostgreSQL integration tests lulus.
+Manifest module mendefinisikan permission/role. Pastikan Authorization Core melakukan sinkronisasi manifest dan grant ke PostgreSQL sebelum menguji UI. Assignment scope existing tidak boleh diperluas otomatis. Build, unit test, API negative tests, dan PostgreSQL integration tests wajib lulus sebelum merge/deploy.
