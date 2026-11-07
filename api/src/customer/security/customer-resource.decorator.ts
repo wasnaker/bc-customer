@@ -12,8 +12,8 @@ export const CustomerResource = (resource: string) =>
 
 /**
  * Marks a self-service endpoint whose data is always resolved from the
- * authenticated user ID. The guard still requires a valid JWT, but does not
- * require administrative customer permissions for this strictly scoped read.
+ * authenticated user ID. Pass a permission to require a dedicated Profile
+ * capability in addition to the authenticated session.
  */
-export const CustomerSelfBranch = () =>
-  SetMetadata(CUSTOMER_SELF_BRANCH_METADATA, true);
+export const CustomerSelfBranch = (permission?: string) =>
+  SetMetadata(CUSTOMER_SELF_BRANCH_METADATA, permission ?? true);
