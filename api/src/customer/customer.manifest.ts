@@ -65,7 +65,7 @@ export const moduleManifest: BackendModuleManifest = {
       name: 'Customer',
       description: 'Standard customer staff account. Customer information is available only through its own Profile.',
       scope: 'branch',
-      permissions: ['read:my-customer-company'],
+      permissions: ['read:branch', 'read:staff', 'read:my-customer-company'],
     },
   ],
 };
