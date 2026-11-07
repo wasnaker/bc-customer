@@ -47,6 +47,9 @@ function PageInner() {
     );
   };
 
+  // ── Pemilih customer (master dari master-detail) ────────────────────────
+  const [customer, setCustomer] = useState<SearchableSelectOption | null>(null);
+  const customerId = customer?.value ?? null;
   const canCreateBranch = (() => {
     const scope = accessScope?.permissions["create:branch"];
     return Boolean(
@@ -56,10 +59,6 @@ function PageInner() {
             scope.customerIds.includes(String(customerId)))),
     );
   })();
-
-  // ── Pemilih customer (master dari master-detail) ────────────────────────
-  const [customer, setCustomer] = useState<SearchableSelectOption | null>(null);
-  const customerId = customer?.value ?? null;
   const fetchCustomerOptions = useCustomerOptionsFetcher();
 
   const { selectedId, showDetail, select, close, toggle, afterSave } =
