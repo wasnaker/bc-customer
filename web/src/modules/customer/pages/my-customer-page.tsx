@@ -309,8 +309,8 @@ export function MyStaffTab() {
     <div className="page-content--wide">
       <div className="page-content--body space-y-4">
         <div>
-          <h1 className="page-title">{t("staff.title")}</h1>
-          <p className="page-subtitle">{t("staff.subtitle")}</p>
+          <h1 className="page-title">{t("myStaff.title")}</h1>
+          <p className="page-subtitle">{t("myStaff.subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <input
