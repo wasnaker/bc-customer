@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/services/i18n/client";
 import {
   useStaffServerSide,
@@ -8,7 +8,8 @@ import {
   useDeleteStaff,
 } from "../hooks/use-staff";
 import { useCustomerOptionsFetcher } from "../hooks/use-customers";
-import { useBranchesOptions } from "../hooks/use-branches";
+import { useBranchesOptions, useBranch } from "../hooks/use-branches";
+import { useMyCustomerScope } from "../hooks/use-customers";
 import { useMasterDetail } from "@/core/master-detail/use-master-detail";
 import { SmallTable, type SmallTableColumn } from "@/components/small-table";
 import { StaffFormDialog } from "../components/staff-form-dialog";
@@ -35,6 +36,12 @@ import type { Staff } from "../types/customer";
 
 function PageInner() {
   const { t } = useTranslation("module-customer");
+  const { data: accessScope } = useMyCustomerScope();
+  const readStaffScope = accessScope?.permissions["read:staff"];
+  const allowedBranchIds = readStaffScope?.branchIds ?? [];
+  const canSelectCustomer = Boolean(
+    readStaffScope?.global || (readStaffScope?.customerIds.length ?? 0) > 0,
+  );
 
   // ── Cascade: customer → branch ──────────────────────────────────────────
   const [customer, setCustomer] = useState<SearchableSelectOption | null>(null);
@@ -42,6 +49,42 @@ function PageInner() {
   const customerId = customer?.value ?? null;
   const fetchCustomerOptions = useCustomerOptionsFetcher();
   const { data: branchOptions } = useBranchesOptions(customerId);
+  const { data: selectedBranch } = useBranch(branchId || null);
+
+  useEffect(() => {
+    if (
+      branchId ||
+      !readStaffScope ||
+      readStaffScope.global ||
+      readStaffScope.customerIds.length > 0
+    ) {
+      return;
+    }
+    if (allowedBranchIds.length === 1) {
+      setBranchId(allowedBranchIds[0]);
+    }
+  }, [branchId, readStaffScope, allowedBranchIds]);
+
+  const canManageStaff = (permission: string, item: Staff): boolean => {
+    const scope = accessScope?.permissions[permission];
+    return Boolean(
+      scope &&
+        (scope.global ||
+          scope.branchIds.includes(String(item.branchId)) ||
+          scope.customerIds.length > 0),
+    );
+  };
+
+  const createStaffScope = accessScope?.permissions["create:staff"];
+  const canCreateStaff = Boolean(
+    createStaffScope &&
+      (createStaffScope.global ||
+        (branchId && createStaffScope.branchIds.includes(String(branchId))) ||
+        (selectedBranch &&
+          createStaffScope.customerIds.includes(
+            String(selectedBranch.customerId),
+          ))),
+  );
 
   // Ganti customer → reset branch.
   function handleCustomerChange(next: SearchableSelectOption | null) {
@@ -161,27 +204,31 @@ function PageInner() {
   function toolbar(item: Staff) {
     return (
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          title={t("actions.edit")}
+        {canManageStaff("update:staff", item) ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            title={t("actions.edit")}
           onClick={() => {
             setEditItem(item);
             setFormOpen(true);
           }}
-        >
-          <PencilIcon className="size-3.5" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          className="text-destructive hover:bg-destructive/10"
+          >
+            <PencilIcon className="size-3.5" />
+          </Button>
+        ) : null}
+        {canManageStaff("delete:staff", item) ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            className="text-destructive hover:bg-destructive/10"
           title={t("actions.delete")}
           onClick={() => handleDelete(item.id)}
           disabled={deleteMutation.isPending}
-        >
-          <TrashIcon className="size-3.5" />
-        </Button>
+          >
+            <TrashIcon className="size-3.5" />
+          </Button>
+        ) : null}
         <Button
           variant="ghost"
           size="icon-sm"
@@ -227,56 +274,61 @@ function PageInner() {
             <p className="page-subtitle">{t("staff.subtitle")}</p>
           </div>
           <div className="page-header__actions">
-            <Button
-              onClick={() => {
-                setEditItem(null);
-                setFormOpen(true);
-              }}
-              disabled={!branchReady}
-            >
-              {t("staff.create")}
-            </Button>
+            {canCreateStaff ? (
+              <Button
+                onClick={() => {
+                  setEditItem(null);
+                  setFormOpen(true);
+                }}
+                disabled={!branchReady}
+              >
+                {t("staff.create")}
+              </Button>
+            ) : null}
           </div>
         </div>
 
         {/* ── Filter customer (opsional) + cabang ────────────────────── */}
         <div className="mb-4 grid grid-cols-1 gap-3 sm:max-w-2xl sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="staff-customer-picker">
-              {t("staff.selectCustomer")}
-            </Label>
-            <div className="flex items-center gap-2">
-              <SearchableSelect
-                id="staff-customer-picker"
-                ariaLabel={t("staff.selectCustomer")}
-                value={customer}
-                onSelect={handleCustomerChange}
-                fetchOptions={fetchCustomerOptions}
-                placeholder={t("staff.filterAllCustomers")}
-                loadingText={t("picker.loading")}
-                emptyText={t("picker.empty")}
-                errorText={t("picker.error")}
-                className="flex-1"
-              />
-              {customer && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  title={t("staff.clearCustomerFilter")}
-                  onClick={() => handleCustomerChange(null)}
-                >
-                  <TrashIcon className="size-3.5" />
-                </Button>
-              )}
+          {canSelectCustomer ? (
+            <div className="space-y-1.5">
+              <Label htmlFor="staff-customer-picker">
+                {t("staff.selectCustomer")}
+              </Label>
+              <div className="flex items-center gap-2">
+                <SearchableSelect
+                  id="staff-customer-picker"
+                  ariaLabel={t("staff.selectCustomer")}
+                  value={customer}
+                  onSelect={handleCustomerChange}
+                  fetchOptions={fetchCustomerOptions}
+                  placeholder={t("staff.filterAllCustomers")}
+                  loadingText={t("picker.loading")}
+                  emptyText={t("picker.empty")}
+                  errorText={t("picker.error")}
+                  className="flex-1"
+                />
+                {customer && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    title={t("staff.clearCustomerFilter")}
+                    onClick={() => handleCustomerChange(null)}
+                  >
+                    <TrashIcon className="size-3.5" />
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
+
           <div className="space-y-1.5">
             <Label htmlFor="staff-branch-select">
               {t("staff.selectBranch")}
             </Label>
             <Select
               value={branchId || "__all__"}
-              disabled={!customerId}
+              disabled={!customerId && allowedBranchIds.length === 0}
               onValueChange={handleBranchChange}
             >
               <SelectTrigger id="staff-branch-select">
@@ -289,18 +341,30 @@ function PageInner() {
                 />
               </SelectTrigger>
               <SelectContent>
-                {/* Nilai "Semua cabang" — list global tanpa filter branch. */}
-                <SelectItem value="__all__">
-                  {t("staff.allBranches")}
-                </SelectItem>
-                {(branchOptions ?? []).map((branch) => (
-                  <SelectItem key={String(branch.id)} value={String(branch.id)}>
-                    {branch.name}
-                    {branch.isHeadOffice
-                      ? ` · ${t("branch.headOfficeBadge")}`
-                      : ""}
-                  </SelectItem>
-                ))}
+                {canSelectCustomer ? (
+                  <>
+                    {/* Nilai "Semua cabang" — list tetap difilter scope di API. */}
+                    <SelectItem value="__all__">
+                      {t("staff.allBranches")}
+                    </SelectItem>
+                    {(branchOptions ?? []).map((branch) => (
+                      <SelectItem key={String(branch.id)} value={String(branch.id)}>
+                        {branch.name}
+                        {branch.isHeadOffice
+                          ? ` · ${t("branch.headOfficeBadge")}`
+                          : ""}
+                      </SelectItem>
+                    ))}
+                  </>
+                ) : (
+                  allowedBranchIds.map((id) => (
+                    <SelectItem key={id} value={id}>
+                      {String(selectedBranch?.id) === id
+                        ? selectedBranch?.name ?? id
+                        : id}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
