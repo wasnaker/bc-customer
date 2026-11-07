@@ -98,7 +98,7 @@ export class CustomerScopeGuard implements CanActivate {
         source.kind === 'branch-list'
           ? 'branch'
           : source.kind === 'staff-list'
-            ? 'staff'
+            ? (source.permissionResource ?? 'staff')
             : 'customer';
       const resolvedScopes = await resolveScopes(
         userId,
@@ -241,7 +241,7 @@ export class CustomerScopeGuard implements CanActivate {
         );
         if (!customer) throw new NotFoundException();
         return {
-          resource: 'staff',
+          resource: source.permissionResource ?? 'staff',
           target: {
             scopes: [
               { type: 'branch', id: String(branch.id) },
