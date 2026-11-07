@@ -178,7 +178,8 @@
     "customerNotExists": "Customer not found.",
     "unknown": "Something went wrong. Please try again.",
     "emailAlreadyExists": "This email address is already registered.",
-    "accountProvisioningUnavailable": "Login account provisioning is currently unavailable."
+    "accountProvisioningUnavailable": "Login account provisioning is currently unavailable.",
+    "staffLoginEmailImmutable": "The login email cannot be changed from the staff form."
   },
   "myBranch": {
     "title": "My Branch",

@@ -132,7 +132,7 @@ export function StaffFormDialog({
       name: form.name.trim(),
       position: form.position.trim() || null,
       phone: form.phone.trim() || null,
-      email: form.email.trim(),
+      ...(form.email.trim() ? { email: form.email.trim() } : {}),
       nip: form.nip.trim() || null,
       addressLine: form.addressLine.trim() || null,
       // Provinsi & kota opsional — hanya dikirim bila provinsi dipilih.
@@ -156,6 +156,7 @@ export function StaffFormDialog({
         const result = await createMutation.mutateAsync({
           branchId,
           ...payload,
+          email: form.email.trim(),
           password: form.password,
         });
         onOpenChange(false);

@@ -211,6 +211,13 @@ export class StaffService {
       });
     }
 
+    if (updateStaffDto.email !== undefined && updateStaffDto.email !== staff.email) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { email: "staffLoginEmailImmutable" },
+      });
+    }
+
     if (
       updateStaffDto.provinceId !== undefined ||
       updateStaffDto.cityId !== undefined

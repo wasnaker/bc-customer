@@ -178,7 +178,8 @@
     "customerNotExists": "Pelanggan tidak ditemukan.",
     "unknown": "Terjadi kesalahan. Silakan coba lagi.",
     "emailAlreadyExists": "Alamat email ini sudah terdaftar.",
-    "accountProvisioningUnavailable": "Pembuatan akun login belum tersedia."
+    "accountProvisioningUnavailable": "Pembuatan akun login belum tersedia.",
+    "staffLoginEmailImmutable": "Email login tidak dapat diubah melalui form staff."
   },
   "myBranch": {
     "title": "Cabang Saya",
