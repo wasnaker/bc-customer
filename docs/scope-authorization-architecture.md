@@ -29,7 +29,7 @@ Tidak boleh menggabungkan permission dari Role A dengan assignment scope milik R
 
 ### 2.1 Global administrator
 
-Global administrator dikenali oleh Authorization Core melalui permission wildcard yang eksplisit dan dikelola core (mis. `*.*` atau konstanta permission global yang disepakati core), bukan melalui:
+Global administrator dikenali oleh Authorization Core melalui permission wildcard yang eksplisit dan dikelola core (yaitu permission wildcard core `*`), bukan melalui:
 - angka role yang di-hardcode;
 - nama role yang tidak dikenal module;
 - ketiadaan module role;
