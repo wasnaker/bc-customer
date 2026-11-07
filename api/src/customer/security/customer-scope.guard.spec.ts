@@ -78,6 +78,33 @@ describe('CustomerScopeGuard', () => {
     });
   });
 
+  it('fails closed when a controller route has no scope metadata', async () => {
+    const reflector = {
+      getAllAndOverride: jest.fn(() => undefined),
+    };
+    guard = new CustomerScopeGuard(
+      reflector as unknown as Reflector,
+      customers as never,
+      branches as never,
+      staff as never,
+      documents as never,
+      options as never,
+    );
+
+    await expect(
+      guard.canActivate({
+        switchToHttp: () => ({
+          getRequest: () => ({
+            method: 'GET',
+            user: { id: 44 },
+          }),
+        }),
+        getHandler: () => jest.fn(),
+        getClass: () => class TestController {},
+      } as never),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
   it('denies when scoped authorization is unavailable', async () => {
     const reflector = {
       getAllAndOverride: jest.fn((key: string) =>
