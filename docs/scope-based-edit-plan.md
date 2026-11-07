@@ -25,7 +25,7 @@ Per 2026-11-07:
 - `bc-region` kontrak module options scope: `e9cbdd97bb7b4211f1bb08b6d6c4feaae4d91f36`.
 
 Implementasi yang sudah di-commit:
-- Host `ModuleAuthorizationService.hasScopedModulePermission` mengevaluasi permission dan assignment dari role yang sama (`moduleId + moduleRoleKey`) serta mengenali bypass global hanya dari wildcard core `*`.
+- Host `ModuleAuthorizationService.hasScopedModulePermission` mengevaluasi permission dan assignment dari role yang sama: role module memakai `moduleId + moduleRoleKey`, sedangkan custom role core memakai key internal `core-role:<roleId>` dan `scopeTypes` manifest. Bypass sistem hanya dari wildcard core `*`.
 - Host `resolveModuleScopes` mengembalikan scope yang benar-benar dimiliki role pemegang permission; callback memuat ulang role user dari database pada setiap request.
 - Host seed service mengikat role manifest ke identitas stabil `moduleId + moduleRoleKey` dan menolak wildcard dari module.
 - `CustomerScopeGuard` memvalidasi target customer/branch/staff/document dari database dan fail-closed bila callback scoped tidak tersedia.
