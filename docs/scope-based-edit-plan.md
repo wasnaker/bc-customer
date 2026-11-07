@@ -161,7 +161,7 @@ Setiap tahap harus berupa commit kecil yang dapat direview dan diuji. Jangan men
 
 | Tahap | Repository | Perubahan | Status saat ini | Gate berikutnya |
 |---|---|---|---|---|
-| 0 | bc-customer | Dokumen arsitektur, implementasi, dan test plan | <badge label="Selesai" color="success"/> | Review akhir dokumen |
+| 0 | bc-customer | Dokumen arsitektur, implementasi, dan test plan | Selesai | Review akhir dokumen |
 | 1 | brocoders-api | Core evaluator permission+scope universal, admin bypass eksplisit, matching roleKey, unit tests | Kode dan unit test sudah di-commit; hasil eksekusi belum terverifikasi | Jalankan test core dan build |
 | 2 | bc-customer | Resolver target customer/branch/staff/document dan callback contract | Kode dan test resolver sudah di-commit; hasil eksekusi belum terverifikasi | Jalankan test resolver |
 | 3 | bc-customer + brocoders-api | Assignment audit/dry-run/backfill dan permission manifest | SQL audit/backfill serta permission manifest tersedia; belum dijalankan pada PostgreSQL target | Review dry-run, mapping user, dan approval |
