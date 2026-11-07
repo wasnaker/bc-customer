@@ -5,12 +5,12 @@ import { BranchPage } from "./pages/branch-page";
 import { StaffPage } from "./pages/staff-page";
 import { MyCompanyTab, MyBranchTab } from "./pages/my-customer-page";
 
-/** Customer owns its admin pages and navigation; the menu is gated at its root. */
+/** Customer owns its admin pages and navigation; each capability is independently permission-gated. */
 export default defineModuleManifest({
   alias: "customer",
   profileTabs: [
-    { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, content: { kind: "component", component: MyCompanyTab } },
-    { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:branch", content: { kind: "component", component: MyBranchTab } },
+    { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, permission: "read:my-customer-company", content: { kind: "component", component: MyCompanyTab } },
+    { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:my-customer-branch", content: { kind: "component", component: MyBranchTab } },
   ],
   pages: [
     { path: "/admin/customer", component: CustomerPage, title: { namespace: "module-customer", key: "customer.title" }, permission: "read:customer" },
