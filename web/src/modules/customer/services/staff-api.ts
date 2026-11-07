@@ -53,7 +53,7 @@ export function useGetStaffService(profileMode = false) {
 export type StaffGetRequest = { id: Staff["id"] };
 export type StaffGetResponse = Staff;
 
-export function useGetStaffByIdService() {
+export function useGetStaffByIdService(profileMode = false) {
   const fetch = useFetch();
   return useCallback(
     (data: StaffGetRequest, requestConfig?: RequestConfigType) => {
@@ -62,7 +62,7 @@ export function useGetStaffByIdService() {
         ...requestConfig,
       }).then(wrapperFetchJsonResponse<StaffGetResponse>);
     },
-    [fetch],
+    [fetch, profileMode],
   );
 }
 
@@ -130,6 +130,6 @@ export function useDeleteStaffService() {
         ...requestConfig,
       }).then(wrapperFetchJsonResponse<StaffDeleteResponse>);
     },
-    [fetch, profileMode],
+    [fetch],
   );
 }
