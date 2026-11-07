@@ -165,6 +165,7 @@
     "customerNotExists": "Pelanggan tidak ditemukan.",
     "unknown": "Terjadi kesalahan. Silakan coba lagi."
   },
+  "myBranch": { "title": "Cabang Saya", "subtitle": "Kelola seluruh cabang milik perusahaan Anda.", "tabTitle": "Cabang Saya", "branchCount": "cabang", "error": "Tidak dapat menentukan cakupan cabang perusahaan Anda." },
   "myCompany": {
     "title": "Perusahaan Saya",
     "subtitle": "Cabang yang terhubung dengan akun Anda.",
