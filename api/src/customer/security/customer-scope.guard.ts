@@ -33,6 +33,11 @@ interface ScopedRequest {
   query?: Record<string, unknown>;
   body?: Record<string, unknown>;
   user?: { id?: number | string };
+  customerAuthorizationScope?: {
+    global: boolean;
+    customerIds: string[];
+    branchIds: string[];
+  };
 }
 
 interface ResolvedCustomerTarget {
@@ -81,6 +86,36 @@ export class CustomerScopeGuard implements CanActivate {
     if (userId === undefined || userId === null) {
       throw new ForbiddenException();
     }
+    if (
+      source.kind === 'branch-list' ||
+      source.kind === 'staff-list' ||
+      source.kind === 'customer-list'
+    ) {
+      if (!this.options.resolveScopes) {
+        throw new ForbiddenException('Scoped read authorization is not configured');
+      }
+      const resource =
+        source.kind === 'branch-list'
+          ? 'branch'
+          : source.kind === 'staff-list'
+            ? 'staff'
+            : 'customer';
+      const resolvedScopes = await this.options.resolveScopes(
+        userId,
+        `read:${resource}`,
+      );
+      request.customerAuthorizationScope = {
+        global: resolvedScopes.global,
+        customerIds: resolvedScopes.scopes
+          .filter((scope) => scope.type === 'customer')
+          .map((scope) => String(scope.id)),
+        branchIds: resolvedScopes.scopes
+          .filter((scope) => scope.type === 'branch')
+          .map((scope) => String(scope.id)),
+      };
+      return true;
+    }
+
     if (!this.options?.authorizeScoped) {
       throw new ForbiddenException('Scoped authorization is not configured');
     }
