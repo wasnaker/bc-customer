@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { FindOptionsWhere, ILike, Repository } from "typeorm";
+import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { BranchEntity } from "../entities/branch.entity";
 import { NullableType } from "../../../../../utils/types/nullable.type";
 import {
@@ -77,21 +77,42 @@ export class BranchesRelationalRepository implements BranchRepository {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
     customerId?: Branch["customerId"] | null;
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] };
     filterOptions?: FilterBranchDto | null;
     sortOptions?: SortBranchDto[] | null;
     paginationOptions: IPaginationOptions;
   }): Promise<Branch[]> {
-    const where: FindOptionsWhere<BranchEntity> = {};
+    const baseWhere: FindOptionsWhere<BranchEntity> = {};
     if (customerId != null) {
-      where.customerId = BigInt(customerId);
+      baseWhere.customerId = BigInt(customerId);
     }
     if (filterOptions?.name) {
-      where.name = ILike(`%${filterOptions.name}%`);
+      baseWhere.name = ILike(`%${filterOptions.name}%`);
     }
     if (filterOptions?.isHeadOffice !== undefined) {
-      where.isHeadOffice = filterOptions.isHeadOffice;
+      baseWhere.isHeadOffice = filterOptions.isHeadOffice;
+    }
+
+    let where: FindOptionsWhere<BranchEntity> | FindOptionsWhere<BranchEntity>[] = baseWhere;
+    if (scope && !scope.global) {
+      const scopedWhere: FindOptionsWhere<BranchEntity>[] = [];
+      if (scope.customerIds.length > 0) {
+        scopedWhere.push({
+          ...baseWhere,
+          customerId: In(scope.customerIds.map((id) => BigInt(id))),
+        });
+      }
+      if (scope.branchIds.length > 0) {
+        scopedWhere.push({
+          ...baseWhere,
+          id: In(scope.branchIds.map((id) => BigInt(id))),
+        });
+      }
+      if (scopedWhere.length === 0) return [];
+      where = scopedWhere;
     }
 
     const entities = await this.branchRepository.find({
@@ -117,16 +138,36 @@ export class BranchesRelationalRepository implements BranchRepository {
   async countMany(
     customerId?: Branch["customerId"] | null,
     filterOptions?: FilterBranchDto | null,
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number> {
-    const where: FindOptionsWhere<BranchEntity> = {};
+    const baseWhere: FindOptionsWhere<BranchEntity> = {};
     if (customerId != null) {
-      where.customerId = BigInt(customerId);
+      baseWhere.customerId = BigInt(customerId);
     }
     if (filterOptions?.name) {
-      where.name = ILike(`%${filterOptions.name}%`);
+      baseWhere.name = ILike(`%${filterOptions.name}%`);
     }
     if (filterOptions?.isHeadOffice !== undefined) {
-      where.isHeadOffice = filterOptions.isHeadOffice;
+      baseWhere.isHeadOffice = filterOptions.isHeadOffice;
+    }
+
+    let where: FindOptionsWhere<BranchEntity> | FindOptionsWhere<BranchEntity>[] = baseWhere;
+    if (scope && !scope.global) {
+      const scopedWhere: FindOptionsWhere<BranchEntity>[] = [];
+      if (scope.customerIds.length > 0) {
+        scopedWhere.push({
+          ...baseWhere,
+          customerId: In(scope.customerIds.map((id) => BigInt(id))),
+        });
+      }
+      if (scope.branchIds.length > 0) {
+        scopedWhere.push({
+          ...baseWhere,
+          id: In(scope.branchIds.map((id) => BigInt(id))),
+        });
+      }
+      if (scopedWhere.length === 0) return 0;
+      where = scopedWhere;
     }
     return this.branchRepository.count({ where });
   }
