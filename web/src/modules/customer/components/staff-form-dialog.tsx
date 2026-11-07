@@ -24,7 +24,8 @@ interface StaffFormDialogProps {
 
 interface FormState {
   name: string;
-  userId: string;
+  password: string;
+  passwordConfirm: string;
   position: string;
   phone: string;
   email: string;
@@ -38,14 +39,14 @@ interface FormState {
 interface FormErrors {
   name?: string;
   email?: string;
-  userId?: string;
   provinceId?: string;
   cityId?: string;
 }
 
 const EMPTY_FORM: FormState = {
   name: "",
-  userId: "",
+  password: "",
+  passwordConfirm: "",
   position: "",
   phone: "",
   email: "",
@@ -81,7 +82,6 @@ export function StaffFormDialog({
         editItem
           ? {
               name: editItem.name ?? "",
-              userId: editItem.userId != null ? String(editItem.userId) : "",
               position: editItem.position ?? "",
               phone: editItem.phone ?? "",
               email: editItem.email ?? "",
@@ -107,11 +107,11 @@ export function StaffFormDialog({
   function validate(): boolean {
     const e: FormErrors = {};
     if (!form.name.trim()) e.name = t("form.validation.required");
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
-      e.email = t("form.validation.email");
-    }
-    if (form.userId && !/^\d+$/.test(form.userId.trim())) {
-      e.userId = t("form.validation.positiveInt");
+    if (!isEditing && !form.email.trim()) e.email = t("form.validation.required");
+    else if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) e.email = t("form.validation.email");
+    if (!isEditing) {
+      if (form.password.length < 6) e.password = t("form.validation.password");
+      if (form.password !== form.passwordConfirm) e.passwordConfirm = t("form.validation.passwordMismatch");
     }
     // Provinsi dipilih → kota wajib (pasangan divalidasi API).
     if (form.address.provinceId && !form.address.cityId) {
@@ -128,7 +128,7 @@ export function StaffFormDialog({
 
     const payload = {
       name: form.name.trim(),
-      userId: form.userId.trim() ? Number(form.userId.trim()) : null,
+      ...(!isEditing ? { password: form.password } : {}),
       position: form.position.trim() || null,
       phone: form.phone.trim() || null,
       email: form.email.trim() || null,
@@ -165,7 +165,6 @@ export function StaffFormDialog({
         setErrors({
           name: fieldErrors.name,
           email: fieldErrors.email,
-          userId: fieldErrors.userId,
           provinceId: fieldErrors.provinceId,
           cityId: fieldErrors.cityId,
         });
@@ -259,6 +258,7 @@ export function StaffFormDialog({
             type="email"
             value={form.email}
             onChange={(e) => setField("email", e.target.value)}
+            disabled={isEditing}
             placeholder={t("form.placeholder.email")}
             maxLength={190}
             aria-invalid={Boolean(errors.email)}
@@ -282,36 +282,16 @@ export function StaffFormDialog({
         </div>
       </div>
 
-      {/* Linked user */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="staff-user-id">{t("form.field.userId")}</Label>
-          <Input
-            id="staff-user-id"
-            type="number"
-            min={1}
-            value={form.userId}
-            onChange={(e) => setField("userId", e.target.value)}
-            placeholder={t("form.placeholder.userId")}
-            aria-invalid={Boolean(errors.userId)}
-          />
-          {errors.userId && (
-            <p className="text-xs text-destructive">
-              {t(`errors.${errors.userId}`)}
-            </p>
-          )}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="staff-photo-id">{t("form.field.photoId")}</Label>
-          <Input
-            id="staff-photo-id"
-            value={form.photoId}
-            onChange={(e) => setField("photoId", e.target.value)}
-            placeholder={t("form.placeholder.photoId")}
-            className="font-mono"
-          />
-        </div>
-      </div>
+      <div className="space-y-1.5"><Label htmlFor="staff-photo-id">{t("form.field.photoId")}</Label><Input id="staff-photo-id" value={form.photoId} onChange={(e) => setField("photoId", e.target.value)} placeholder={t("form.placeholder.photoId")} className="font-mono" /></div>
+      {!isEditing ? (
+        <section className="space-y-3 rounded-md border p-4">
+          <div><h3 className="text-sm font-semibold">{t("form.loginAccount.title")}</h3><p className="text-xs text-muted-foreground">{t("form.loginAccount.description")}</p></div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5"><Label htmlFor="staff-password">{t("form.field.password")}</Label><Input id="staff-password" type="password" value={form.password} onChange={(e) => setField("password", e.target.value)} />{errors.password ? <p className="text-xs text-destructive">{errors.password}</p> : null}</div>
+            <div className="space-y-1.5"><Label htmlFor="staff-password-confirm">{t("form.field.confirmPassword")}</Label><Input id="staff-password-confirm" type="password" value={form.passwordConfirm} onChange={(e) => setField("passwordConfirm", e.target.value)} />{errors.passwordConfirm ? <p className="text-xs text-destructive">{errors.passwordConfirm}</p> : null}</div>
+          </div>
+        </section>
+      ) : null}
 
       {/* Address (optional) */}
       <div className="space-y-1.5">

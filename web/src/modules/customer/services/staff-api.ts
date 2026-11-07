@@ -70,7 +70,7 @@ export type StaffPostRequest = {
   branchId: Staff["branchId"];
   name: string;
   /** Host user id — unik antar staff, API menolak `staffUserAlreadyLinked`. */
-  userId?: number | null;
+  password: string;
   position?: string | null;
   phone?: string | null;
   email?: string | null;

@@ -74,6 +74,9 @@ export type BranchPostRequest = {
   vatNumber?: string | null;
   vatType?: VatType;
   isActive?: boolean;
+  adminName: string;
+  adminEmail: string;
+  adminPassword: string;
 };
 export type BranchPostResponse = Branch;
 

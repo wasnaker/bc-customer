@@ -34,6 +34,10 @@ interface FormState {
   vatNumber: string;
   vatType: VatType;
   isActive: boolean;
+  adminName: string;
+  adminEmail: string;
+  adminPassword: string;
+  adminPasswordConfirm: string;
 }
 
 interface FormErrors {
@@ -42,6 +46,10 @@ interface FormErrors {
   provinceId?: string;
   cityId?: string;
   isHeadOffice?: string;
+  adminName?: string;
+  adminEmail?: string;
+  adminPassword?: string;
+  adminPasswordConfirm?: string;
 }
 
 const EMPTY_FORM: FormState = {
@@ -53,6 +61,7 @@ const EMPTY_FORM: FormState = {
   vatNumber: "",
   vatType: "npwp",
   isActive: true,
+  adminName: "", adminEmail: "", adminPassword: "", adminPasswordConfirm: "",
 };
 
 export function BranchFormDialog({
@@ -94,6 +103,7 @@ export function BranchFormDialog({
               vatNumber: editItem.vatNumber ?? "",
               vatType: editItem.vatType ?? "npwp",
               isActive: editItem.isActive,
+              adminName: "", adminEmail: "", adminPassword: "", adminPasswordConfirm: "",
             }
           : EMPTY_FORM,
       );
@@ -115,6 +125,12 @@ export function BranchFormDialog({
     if (!form.addressLine.trim()) e.addressLine = t("form.validation.required");
     if (!form.address.provinceId) e.provinceId = t("form.validation.required");
     if (!form.address.cityId) e.cityId = t("form.validation.required");
+    if (!isEditing) {
+      if (!form.adminName.trim()) e.adminName = t("form.validation.required");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.adminEmail.trim())) e.adminEmail = t("form.validation.email");
+      if (form.adminPassword.length < 6) e.adminPassword = t("form.validation.password");
+      if (form.adminPassword !== form.adminPasswordConfirm) e.adminPasswordConfirm = t("form.validation.passwordMismatch");
+    }
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -134,6 +150,7 @@ export function BranchFormDialog({
       vatNumber: form.vatNumber.trim() || null,
       vatType: form.vatType,
       isActive: form.isActive,
+      ...(!isEditing ? { adminName: form.adminName.trim(), adminEmail: form.adminEmail.trim().toLowerCase(), adminPassword: form.adminPassword } : {}),
     };
 
     try {
@@ -161,6 +178,9 @@ export function BranchFormDialog({
           provinceId: fieldErrors.provinceId,
           cityId: fieldErrors.cityId,
           isHeadOffice: fieldErrors.isHeadOffice,
+          adminName: fieldErrors.adminName,
+          adminEmail: fieldErrors.adminEmail,
+          adminPassword: fieldErrors.adminPassword,
         });
       }
       setSubmitError(err);
@@ -217,6 +237,26 @@ export function BranchFormDialog({
           </p>
         )}
       </div>
+
+      {!isEditing ? (
+        <section className="space-y-3 rounded-md border p-4">
+          <div><h3 className="text-sm font-semibold">{t("form.branchAdmin.title")}</h3><p className="text-xs text-muted-foreground">{t("form.branchAdmin.description")}</p></div>
+          <div className="space-y-1.5">
+            <Label htmlFor="branch-admin-name">{t("form.field.adminName")}</Label>
+            <Input id="branch-admin-name" value={form.adminName} onChange={(e) => setField("adminName", e.target.value)} maxLength={190} />
+            {errors.adminName ? <p className="text-xs text-destructive">{t("errors." + errors.adminName)}</p> : null}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="branch-admin-email">{t("form.field.email")}</Label>
+            <Input id="branch-admin-email" type="email" value={form.adminEmail} onChange={(e) => setField("adminEmail", e.target.value)} maxLength={190} />
+            {errors.adminEmail ? <p className="text-xs text-destructive">{t("errors." + errors.adminEmail)}</p> : null}
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5"><Label htmlFor="branch-admin-password">{t("form.field.password")}</Label><Input id="branch-admin-password" type="password" value={form.adminPassword} onChange={(e) => setField("adminPassword", e.target.value)} />{errors.adminPassword ? <p className="text-xs text-destructive">{errors.adminPassword}</p> : null}</div>
+            <div className="space-y-1.5"><Label htmlFor="branch-admin-password-confirm">{t("form.field.confirmPassword")}</Label><Input id="branch-admin-password-confirm" type="password" value={form.adminPasswordConfirm} onChange={(e) => setField("adminPasswordConfirm", e.target.value)} />{errors.adminPasswordConfirm ? <p className="text-xs text-destructive">{errors.adminPasswordConfirm}</p> : null}</div>
+          </div>
+        </section>
+      ) : null}
 
       {/* isHeadOffice */}
       <div className="space-y-1.5">

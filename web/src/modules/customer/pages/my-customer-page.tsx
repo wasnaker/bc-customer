@@ -1,13 +1,13 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "@/services/i18n/client";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { useGetMyBranchService } from "../services/branch-api";
 import { BranchOverviewTab } from "../components/branch-detail-tab";
 import { BranchFormDialog } from "../components/branch-form-dialog";
-import { useBranchesServerSide, useHeadOffice } from "../hooks/use-branches";
+import { useBranchesServerSide, useBranchesOptions, useHeadOffice } from "../hooks/use-branches";
 import { useMyCustomerScope } from "../hooks/use-customers";
 import { Button } from "@/components/ui/button";
 import PencilIcon from "lucide-react/dist/esm/icons/pencil";
@@ -15,6 +15,7 @@ import useAuth from "@/services/auth/use-auth";
 import { useStaffServerSide } from "../hooks/use-staff";
 import { StaffFormDialog } from "../components/staff-form-dialog";
 import type { Staff } from "../types/customer";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function MyCompanyTab() {
   const { t } = useTranslation("module-customer");
@@ -191,6 +192,9 @@ export function MyBranchTab() {
       (customerId != null &&
         updateScope?.customerIds.includes(String(customerId))),
   );
+  const createScope = accessScope?.permissions["create:branch"];
+  const canCreateBranch = Boolean(createScope && (createScope.global ||
+    (customerId != null && createScope.customerIds.includes(String(customerId)))));
 
   if (ownBranchLoading) {
     return <p className="text-sm text-muted-foreground">{t("table.loading")}</p>;
@@ -202,10 +206,7 @@ export function MyBranchTab() {
   return (
     <div className="page-content--wide">
       <div className="page-content--body space-y-4">
-        <div>
-          <h1 className="page-title">{t("myBranch.title")}</h1>
-          <p className="page-subtitle">{t("myBranch.subtitle")}</p>
-        </div>
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="page-title">{t("myBranch.title")}</h1><p className="page-subtitle">{t("myBranch.subtitle")}</p></div>{canCreateBranch ? <Button onClick={() => { setEditItem(null); setFormOpen(true); }}>{t("branch.create")}</Button> : null}</div>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <input
             aria-label={t("branch.searchLabel")}
@@ -268,7 +269,7 @@ export function MyBranchTab() {
           </div>
         </div>
       </div>
-      {editItem && canEdit(editItem) ? (
+      {formOpen && (editItem ? canEdit(editItem) : canCreateBranch) ? (
         <BranchFormDialog
           open={formOpen}
           onOpenChange={(open) => { setFormOpen(open); if (!open) setEditItem(null); }}
@@ -292,11 +293,37 @@ export function MyBranchTab() {
 export function MyStaffTab() {
   const { t } = useTranslation("module-customer");
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const getMyBranch = useGetMyBranchService();
   const { data: accessScope } = useMyCustomerScope();
+  const { data: ownBranch } = useQuery({
+    queryKey: ["customer", "my-branch", user?.id ?? "anonymous"],
+    queryFn: async () => {
+      const response = await getMyBranch();
+      if (response.status === HTTP_CODES_ENUM.NOT_FOUND) return null;
+      if (response.status !== HTTP_CODES_ENUM.OK || !response.data) throw new Error(t("myCompany.error"));
+      return response.data;
+    },
+    enabled: Boolean(user?.id),
+  });
+  const customerId = ownBranch?.customerId != null ? String(ownBranch.customerId) : null;
+  const { data: branchOptions = [] } = useBranchesOptions(customerId);
   const table = useStaffServerSide(null, null, true);
   const [editItem, setEditItem] = useState<Staff | null>(null);
   const [formOpen, setFormOpen] = useState(false);
+  const [createBranchId, setCreateBranchId] = useState("");
   const updateScope = accessScope?.permissions["update:my-customer-staff"];
+  const createScope = accessScope?.permissions["create:staff"];
+  const canCreateStaff = Boolean(createScope && (createScope.global || createScope.customerIds.length > 0 || createScope.branchIds.length > 0));
+  const canChooseBranch = Boolean(createScope?.global || (createScope?.customerIds.length ?? 0) > 0);
+  const permittedBranchIds = createScope?.branchIds ?? [];
+  useEffect(() => {
+    if (canChooseBranch) {
+      if (createBranchId && branchOptions.some((branch) => String(branch.id) === createBranchId)) return;
+      if (branchOptions.length === 1) setCreateBranchId(String(branchOptions[0].id));
+    } else if (permittedBranchIds.length === 1) setCreateBranchId(permittedBranchIds[0]);
+  }, [canChooseBranch, branchOptions, permittedBranchIds, createBranchId]);
+  const selectedCreateBranchId = canChooseBranch ? createBranchId : permittedBranchIds.length === 1 ? permittedBranchIds[0] : createBranchId;
   const canEdit = (item: Staff) =>
     Boolean(
       updateScope &&
@@ -308,10 +335,8 @@ export function MyStaffTab() {
   return (
     <div className="page-content--wide">
       <div className="page-content--body space-y-4">
-        <div>
-          <h1 className="page-title">{t("myStaff.title")}</h1>
-          <p className="page-subtitle">{t("myStaff.subtitle")}</p>
-        </div>
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="page-title">{t("myStaff.title")}</h1><p className="page-subtitle">{t("myStaff.subtitle")}</p></div>{canCreateStaff ? <Button disabled={!selectedCreateBranchId} onClick={() => { setEditItem(null); setFormOpen(true); }}>{t("staff.create")}</Button> : null}</div>
+        {canChooseBranch ? <div className="max-w-sm space-y-1.5"><label className="text-sm font-medium" htmlFor="my-staff-create-branch">{t("staff.selectBranch")}</label><Select value={createBranchId} onValueChange={setCreateBranchId}><SelectTrigger id="my-staff-create-branch"><SelectValue placeholder={t("staff.selectBranchPlaceholder")} /></SelectTrigger><SelectContent>{branchOptions.map((branch) => <SelectItem key={String(branch.id)} value={String(branch.id)}>{branch.name}</SelectItem>)}</SelectContent></Select></div> : null}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <input
             aria-label={t("staff.searchLabel")}
@@ -375,11 +400,11 @@ export function MyStaffTab() {
           </div>
         </div>
       </div>
-      {editItem && canEdit(editItem) ? (
+      {formOpen && (editItem ? canEdit(editItem) : canCreateStaff && Boolean(selectedCreateBranchId)) ? (
         <StaffFormDialog
           open={formOpen}
           onOpenChange={(open) => { setFormOpen(open); if (!open) setEditItem(null); }}
-          branchId={editItem.branchId}
+          branchId={editItem?.branchId ?? selectedCreateBranchId}
           editItem={editItem}
           profileMode
           onSuccess={() => {

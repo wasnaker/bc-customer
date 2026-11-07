@@ -125,7 +125,10 @@
       "nip": "NIP",
       "userId": "ID Pengguna Terhubung",
       "photoId": "ID File Foto",
-      "isHeadOffice": "Kantor Pusat"
+      "isHeadOffice": "Kantor Pusat",
+      "adminName": "Nama Administrator Cabang",
+      "password": "Kata Sandi",
+      "confirmPassword": "Konfirmasi Kata Sandi"
     },
     "placeholder": {
       "customerName": "mis. PT Wasnaker Mandiri",
@@ -150,7 +153,17 @@
     "validation": {
       "required": "Kolom ini wajib diisi.",
       "email": "Harus berupa alamat email yang valid.",
-      "positiveInt": "Harus berupa bilangan bulat positif."
+      "positiveInt": "Harus berupa bilangan bulat positif.",
+      "password": "Kata sandi minimal 6 karakter.",
+      "passwordMismatch": "Konfirmasi kata sandi tidak sama."
+    },
+    "branchAdmin": {
+      "title": "Akun Administrator Cabang",
+      "description": "Akun login dengan role Customer Branch Admin akan dibuat untuk cabang ini."
+    },
+    "loginAccount": {
+      "title": "Akun Login",
+      "description": "Staff ini akan mendapatkan akun login dengan role Customer."
     }
   },
   "errors": {
@@ -163,7 +176,9 @@
     "customerHasStaff": "Pelanggan ini masih memiliki staf di cabangnya. Hapus stafnya terlebih dahulu.",
     "branchNotExists": "Cabang tidak ditemukan.",
     "customerNotExists": "Pelanggan tidak ditemukan.",
-    "unknown": "Terjadi kesalahan. Silakan coba lagi."
+    "unknown": "Terjadi kesalahan. Silakan coba lagi.",
+    "emailAlreadyExists": "Alamat email ini sudah terdaftar.",
+    "accountProvisioningUnavailable": "Pembuatan akun login belum tersedia."
   },
   "myBranch": {
     "title": "Cabang Saya",

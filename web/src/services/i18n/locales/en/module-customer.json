@@ -125,7 +125,10 @@
       "nip": "NIP",
       "userId": "Linked User ID",
       "photoId": "Photo File ID",
-      "isHeadOffice": "Head Office"
+      "isHeadOffice": "Head Office",
+      "adminName": "Branch Administrator Name",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
     },
     "placeholder": {
       "customerName": "e.g. PT Wasnaker Mandiri",
@@ -150,7 +153,17 @@
     "validation": {
       "required": "This field is required.",
       "email": "Must be a valid email address.",
-      "positiveInt": "Must be a positive whole number."
+      "positiveInt": "Must be a positive whole number.",
+      "password": "Password must contain at least 6 characters.",
+      "passwordMismatch": "Passwords do not match."
+    },
+    "branchAdmin": {
+      "title": "Branch Administrator Account",
+      "description": "A login account with the Customer Branch Admin role will be created for this branch."
+    },
+    "loginAccount": {
+      "title": "Login Account",
+      "description": "This staff member will receive a login account with the Customer role."
     }
   },
   "errors": {
@@ -163,7 +176,9 @@
     "customerHasStaff": "This customer still has staff in its branches. Remove them before deleting.",
     "branchNotExists": "Branch not found.",
     "customerNotExists": "Customer not found.",
-    "unknown": "Something went wrong. Please try again."
+    "unknown": "Something went wrong. Please try again.",
+    "emailAlreadyExists": "This email address is already registered.",
+    "accountProvisioningUnavailable": "Login account provisioning is currently unavailable."
   },
   "myBranch": {
     "title": "My Branch",
