@@ -22,7 +22,7 @@ export interface BackendModuleManifest {
 
 export const moduleManifest: BackendModuleManifest = {
   id: 'customer',
-  version: '0.1.1',
+  version: '0.1.2',
   capabilities: ['api', 'web'],
   requires: ['region'],
   permissions: [
@@ -52,7 +52,7 @@ export const moduleManifest: BackendModuleManifest = {
       name: 'Customer Branch Admin',
       description: 'Administrator limited to one assigned branch.',
       scope: 'branch',
-      permissions: ['read:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff'],
+      permissions: ['read:branch', 'update:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff'],
     },
     {
       key: 'customer',
