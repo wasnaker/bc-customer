@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { FindOptionsWhere, ILike, Repository } from "typeorm";
+import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { StaffEntity } from "../entities/staff.entity";
 import { NullableType } from "../../../../../utils/types/nullable.type";
 import { FilterStaffDto, SortStaffDto } from "../../../../dto/query-staff.dto";
@@ -70,25 +70,59 @@ export class StaffRelationalRepository implements StaffRepository {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
     branchId?: Staff["branchId"] | null;
     customerId?: Staff["branchId"] | null;
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] };
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
   }): Promise<Staff[]> {
-    const where: FindOptionsWhere<StaffEntity> = {};
+    const baseWhere: FindOptionsWhere<StaffEntity> = {};
     if (branchId != null) {
-      where.branchId = BigInt(branchId);
+      baseWhere.branchId = BigInt(branchId);
     } else if (customerId != null) {
       // Filter nested via relasi branch → customer.
-      where.branch = { customerId: BigInt(customerId) };
+      baseWhere.branch = { customerId: BigInt(customerId) };
     }
     if (filterOptions?.name) {
-      where.name = ILike(`%${filterOptions.name}%`);
+      baseWhere.name = ILike(`%${filterOptions.name}%`);
     }
     if (filterOptions?.position) {
-      where.position = ILike(`%${filterOptions.position}%`);
+      baseWhere.position = ILike(`%${filterOptions.position}%`);
+    }
+
+    let where: FindOptionsWhere<StaffEntity> | FindOptionsWhere<StaffEntity>[] = baseWhere;
+    if (scope && !scope.global) {
+      const scopedWhere: FindOptionsWhere<StaffEntity>[] = [];
+      const allowedCustomers = new Set(scope.customerIds);
+      if (
+        scope.customerIds.length > 0 &&
+        (customerId == null || allowedCustomers.has(String(customerId)))
+      ) {
+        scopedWhere.push({
+          ...baseWhere,
+          branch: {
+            ...(baseWhere.branch as FindOptionsWhere<BranchEntity> | undefined),
+            customerId:
+              customerId != null
+                ? BigInt(customerId)
+                : In(scope.customerIds.map((id) => BigInt(id))),
+          },
+        });
+      }
+      if (scope.branchIds.length > 0) {
+        scopedWhere.push({
+          ...baseWhere,
+          ...(customerId != null
+            ? { branch: { customerId: BigInt(customerId) } }
+            : {}),
+          branchId: In(scope.branchIds.map((id) => BigInt(id))),
+        });
+      }
+      if (scopedWhere.length === 0) return [];
+      where = scopedWhere;
     }
 
     const entities = await this.staffRepository.find({
@@ -114,18 +148,51 @@ export class StaffRelationalRepository implements StaffRepository {
     branchId?: Staff["branchId"] | null,
     filterOptions?: FilterStaffDto | null,
     customerId?: Staff["branchId"] | null,
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number> {
-    const where: FindOptionsWhere<StaffEntity> = {};
+    const baseWhere: FindOptionsWhere<StaffEntity> = {};
     if (branchId != null) {
-      where.branchId = BigInt(branchId);
+      baseWhere.branchId = BigInt(branchId);
     } else if (customerId != null) {
-      where.branch = { customerId: BigInt(customerId) };
+      baseWhere.branch = { customerId: BigInt(customerId) };
     }
     if (filterOptions?.name) {
-      where.name = ILike(`%${filterOptions.name}%`);
+      baseWhere.name = ILike(`%${filterOptions.name}%`);
     }
     if (filterOptions?.position) {
-      where.position = ILike(`%${filterOptions.position}%`);
+      baseWhere.position = ILike(`%${filterOptions.position}%`);
+    }
+
+    let where: FindOptionsWhere<StaffEntity> | FindOptionsWhere<StaffEntity>[] = baseWhere;
+    if (scope && !scope.global) {
+      const scopedWhere: FindOptionsWhere<StaffEntity>[] = [];
+      const allowedCustomers = new Set(scope.customerIds);
+      if (
+        scope.customerIds.length > 0 &&
+        (customerId == null || allowedCustomers.has(String(customerId)))
+      ) {
+        scopedWhere.push({
+          ...baseWhere,
+          branch: {
+            ...(baseWhere.branch as FindOptionsWhere<BranchEntity> | undefined),
+            customerId:
+              customerId != null
+                ? BigInt(customerId)
+                : In(scope.customerIds.map((id) => BigInt(id))),
+          },
+        });
+      }
+      if (scope.branchIds.length > 0) {
+        scopedWhere.push({
+          ...baseWhere,
+          ...(customerId != null
+            ? { branch: { customerId: BigInt(customerId) } }
+            : {}),
+          branchId: In(scope.branchIds.map((id) => BigInt(id))),
+        });
+      }
+      if (scopedWhere.length === 0) return 0;
+      where = scopedWhere;
     }
     return this.staffRepository.count({ where });
   }
