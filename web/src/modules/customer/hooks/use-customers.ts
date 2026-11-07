@@ -10,6 +10,7 @@ import {
   useUpdateCustomerService,
   useDeleteCustomerService,
   useGetCustomerDocumentsService,
+  useGetMyScopeService,
   useCreateCustomerDocumentService,
   useUpdateCustomerDocumentService,
   useDeleteCustomerDocumentService,
@@ -148,6 +149,23 @@ export function useDeleteCustomer() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["customer"] });
+    },
+  });
+}
+
+// ── Current user's resolved scopes (UI affordances only) ───────────────────
+
+export function useMyCustomerScope() {
+  const service = useGetMyScopeService();
+  return useQuery({
+    queryKey: ["customer", "my-scope"],
+    queryFn: async () => {
+      const res = await service();
+      assertOk(res.status, res.data);
+      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+        throw new Error("Failed to load customer access scope");
+      }
+      return res.data;
     },
   });
 }
