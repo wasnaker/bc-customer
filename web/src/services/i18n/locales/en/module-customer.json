@@ -165,7 +165,13 @@
     "customerNotExists": "Customer not found.",
     "unknown": "Something went wrong. Please try again."
   },
-  "myBranch": { "title": "My Branch", "subtitle": "Manage branches belonging to your customer.", "tabTitle": "My Branch", "branchCount": "branches", "error": "Unable to determine your customer branch scope." },
+  "myBranch": {
+    "title": "My Branch",
+    "subtitle": "Manage branches belonging to your customer.",
+    "tabTitle": "My Branch",
+    "branchCount": "branches",
+    "error": "Unable to determine your customer branch scope."
+  },
   "myCompany": {
     "title": "My Company",
     "subtitle": "The branch linked to your account.",
@@ -175,5 +181,10 @@
     "error": "Unable to load your branch. Please try again.",
     "branchDetails": "Branch details",
     "tabTitle": "My Company"
+  },
+  "myStaff": {
+    "tabTitle": "My Staff",
+    "title": "My Staff",
+    "subtitle": "View and manage staff across your assigned customer branches."
   }
 }
