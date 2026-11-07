@@ -185,6 +185,11 @@ export class CustomerScopeGuard implements CanActivate {
     request: ScopedRequest,
   ): Promise<ResolvedCustomerTarget> {
     switch (source.kind) {
+      case 'global-create':
+        // A new customer has no existing tenant scope. Only the core wildcard
+        // administrator can authorize this target-less operation.
+        return { resource: 'customer', target: { scopes: [] } };
+
       case 'customer-param':
       case 'customer-lookup': {
         const id = this.readParam(request, source.param);
