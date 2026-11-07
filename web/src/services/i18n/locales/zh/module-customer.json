@@ -1,0 +1,183 @@
+{
+  "menu": {
+    "parent": "客户管理",
+    "customer": "客户",
+    "branch": "客户分支",
+    "staff": "客户员工"
+  },
+  "customer": {
+    "title": "客户",
+    "subtitle": "管理客户及其总部信息",
+    "search": "搜索客户…",
+    "searchLabel": "按名称搜索客户",
+    "empty": "暂无客户。",
+    "create": "添加客户",
+    "edit": "编辑客户",
+    "headOfficeSection": "总部",
+    "headOfficeEditHint": "总部数据在“客户分支”页面中管理。"
+  },
+  "branch": {
+    "title": "客户分支",
+    "subtitle": "管理所选客户的分支",
+    "search": "搜索分支…",
+    "searchLabel": "按名称搜索分支",
+    "empty": "该客户暂无分支。",
+    "create": "添加分支",
+    "edit": "编辑分支",
+    "selectCustomer": "客户",
+    "selectCustomerPlaceholder": "选择客户…",
+    "selectCustomerFirst": "请先选择客户以查看其分支。",
+    "clearCustomerFilter": "清除客户筛选",
+    "filterAllCustomers": "所有客户",
+    "headOfficeBadge": "总部",
+    "headOfficeTaken": "该客户已设有总部。"
+  },
+  "staff": {
+    "title": "客户员工",
+    "subtitle": "管理客户分支的员工",
+    "search": "搜索员工…",
+    "searchLabel": "按名称搜索员工",
+    "empty": "该分支暂无员工。",
+    "create": "添加员工",
+    "edit": "编辑员工",
+    "selectCustomer": "客户",
+    "selectCustomerPlaceholder": "选择客户…",
+    "selectCustomerFirst": "请选择客户和分支以查看其员工。",
+    "allBranches": "所有分支",
+    "clearCustomerFilter": "清除客户筛选",
+    "filterAllCustomers": "所有客户",
+    "selectBranch": "分支",
+    "selectBranchPlaceholder": "选择分支…",
+    "selectBranchNeedCustomer": "请先选择客户",
+    "selectBranchFirst": "请先选择分支以查看其员工。"
+  },
+  "table": {
+    "code": "代码",
+    "name": "名称",
+    "npwpNumber": "NPWP 号",
+    "nibNumber": "NIB 号",
+    "isActive": "状态",
+    "isHeadOffice": "类型",
+    "addressLine": "地址",
+    "province": "省",
+    "city": "市/县",
+    "vatType": "税号类型",
+    "position": "职位",
+    "phone": "电话",
+    "email": "邮箱",
+    "userId": "关联用户",
+    "active": "启用",
+    "inactive": "停用",
+    "loading": "加载中…",
+    "of": "/",
+    "error": "数据加载失败，请重试。",
+    "customer": "客户",
+    "admin": "管理员",
+    "branch": "分支"
+  },
+  "detail": {
+    "overview": "概览",
+    "empty": "暂无数据。",
+    "headOffice": "总部",
+    "headOfficeEmpty": "该客户尚未设置总部。",
+    "branches": "分公司",
+    "branchesEmpty": "该客户还没有分公司。"
+  },
+  "picker": {
+    "loading": "加载中…",
+    "empty": "未找到匹配项。",
+    "error": "选项加载失败。"
+  },
+  "actions": {
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "saving": "保存中…",
+    "cancel": "取消",
+    "collapse": "收起面板",
+    "expand": "展开面板",
+    "prev_page": "上一页",
+    "next_page": "下一页"
+  },
+  "confirm": {
+    "delete": {
+      "message": "删除此项？此操作无法撤销。",
+      "customer": "删除该客户？其所有分支也将被删除。此操作无法撤销。"
+    }
+  },
+  "form": {
+    "field": {
+      "name": "名称",
+      "npwpNumber": "NPWP 号",
+      "nibNumber": "NIB 号",
+      "isActive": "启用",
+      "headOfficeName": "总部名称",
+      "branchName": "分支名称",
+      "addressLine": "地址",
+      "province": "省",
+      "city": "市/县",
+      "postalCode": "邮政编码",
+      "vatNumber": "VAT 号",
+      "vatType": "税号类型",
+      "position": "职位",
+      "phone": "电话",
+      "email": "邮箱",
+      "nip": "NIP",
+      "userId": "关联用户 ID",
+      "photoId": "照片文件 ID",
+      "isHeadOffice": "总部"
+    },
+    "placeholder": {
+      "customerName": "例如：PT Wasnaker Mandiri",
+      "staffName": "例如：Budi Santoso",
+      "branchName": "例如：万隆分支",
+      "headOfficeName": "例如：雅加达总部",
+      "npwpNumber": "01.234.567.8-901.000",
+      "nibNumber": "1234567890123456",
+      "addressLine": "街道、门牌号",
+      "province": "选择省份",
+      "city": "选择市/县",
+      "cityNeedProvince": "请先选择省份",
+      "postalCode": "例如：12190",
+      "vatNumber": "123456789012345678901234",
+      "position": "例如：经理",
+      "phone": "+6281234567890",
+      "email": "name@example.com",
+      "nip": "例如：19800001",
+      "userId": "例如：5",
+      "photoId": "文件 UUID"
+    },
+    "validation": {
+      "required": "此项为必填项。",
+      "email": "必须是有效的邮箱地址。",
+      "positiveInt": "必须是正整数。"
+    }
+  },
+  "errors": {
+    "customerNameAlreadyExists": "已存在同名的客户。",
+    "customerAlreadyHasHeadOffice": "该客户已设有总部。",
+    "staffUserAlreadyLinked": "该用户已关联到其他员工。",
+    "cityNotInProvince": "所选市/县不属于所选省份。",
+    "provinceNotFound": "未找到该省份。",
+    "branchHasStaff": "该分支仍有员工。请先移除员工再删除分支。",
+    "customerHasStaff": "该客户的分支中仍有员工。请先移除员工。",
+    "branchNotExists": "未找到该分支。",
+    "customerNotExists": "未找到该客户。",
+    "unknown": "出现问题，请重试。"
+  },
+  "myCompany": {
+    "tabTitle": "我的公司",
+    "title": "我的公司",
+    "subtitle": "与此账户关联的分支机构。",
+    "branch": "分支",
+    "linkedStaff": "关联员工",
+    "noBranch": "此账户尚未关联分支机构。",
+    "error": "无法加载分支信息，请重试。",
+    "branchDetails": "分支详情"
+  },
+  "myStaff": {
+    "tabTitle": "我的员工",
+    "title": "我的员工",
+    "subtitle": "查看和管理您获授权客户分支机构中的员工。"
+  }
+}

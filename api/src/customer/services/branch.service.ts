@@ -24,8 +24,7 @@ export class BranchService {
     private readonly customerRepository: CustomerRepository,
     private readonly regionValidation: RegionValidationService,
     private readonly staffRepository: StaffRepository,
-    @Optional()
-    @Inject(CUSTOMER_MODULE_OPTIONS)
+    @Optional() @Inject(CUSTOMER_MODULE_OPTIONS)
     private readonly moduleOptions?: CustomerModuleOptions,
   ) {}
 
@@ -54,50 +53,28 @@ export class BranchService {
     }
 
     if (!this.moduleOptions?.createLoginAccount || !this.moduleOptions.deleteLoginAccount) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: { account: "accountProvisioningUnavailable" },
-      });
+      throw new UnprocessableEntityException({ status: HttpStatus.UNPROCESSABLE_ENTITY, errors: { account: "accountProvisioningUnavailable" } });
     }
-
     const branch = await this.branchRepository.create({
-      customerId,
-      name: createBranchDto.name,
-      isHeadOffice: createBranchDto.isHeadOffice ?? false,
-      addressLine: createBranchDto.addressLine,
-      provinceId: createBranchDto.provinceId,
-      cityId: createBranchDto.cityId,
-      postalCode: createBranchDto.postalCode ?? null,
-      vatNumber: createBranchDto.vatNumber ?? null,
-      vatType: createBranchDto.vatType ?? "npwp",
+      customerId, name: createBranchDto.name, isHeadOffice: createBranchDto.isHeadOffice ?? false,
+      addressLine: createBranchDto.addressLine, provinceId: createBranchDto.provinceId,
+      cityId: createBranchDto.cityId, postalCode: createBranchDto.postalCode ?? null,
+      vatNumber: createBranchDto.vatNumber ?? null, vatType: createBranchDto.vatType ?? "npwp",
       isActive: createBranchDto.isActive ?? true,
     });
-
     let accountId: number | null = null;
     try {
       const account = await this.moduleOptions.createLoginAccount({
-        email: createBranchDto.adminEmail,
-        password: createBranchDto.adminPassword,
-        name: createBranchDto.adminName,
-        roleKey: "customer-branch-admin",
-        scopeType: "branch",
-        scopeId: String(branch.id),
-        assignedBy: actorUserId,
+        email: createBranchDto.adminEmail, password: createBranchDto.adminPassword,
+        name: createBranchDto.adminName, roleKey: "customer-branch-admin",
+        scopeType: "branch", scopeId: String(branch.id), assignedBy: actorUserId,
       });
       accountId = account.id;
       await this.staffRepository.create({
-        branchId: branch.id,
-        name: createBranchDto.adminName,
-        userId: account.id,
-        position: "Branch Administrator",
-        phone: null,
-        email: createBranchDto.adminEmail.trim().toLowerCase(),
-        nip: null,
-        addressLine: null,
-        provinceId: null,
-        cityId: null,
-        photoId: null,
-        isActive: true,
+        branchId: branch.id, name: createBranchDto.adminName, userId: account.id,
+        position: "Branch Administrator", phone: null,
+        email: createBranchDto.adminEmail.trim().toLowerCase(), nip: null,
+        addressLine: null, provinceId: null, cityId: null, photoId: null, isActive: true,
       });
       return branch;
     } catch (error) {

@@ -1,0 +1,183 @@
+{
+  "menu": {
+    "parent": "顧客管理",
+    "customer": "顧客",
+    "branch": "顧客支店",
+    "staff": "顧客スタッフ"
+  },
+  "customer": {
+    "title": "顧客",
+    "subtitle": "顧客と本社情報の管理",
+    "search": "顧客を検索…",
+    "searchLabel": "名前で顧客を検索",
+    "empty": "顧客はまだありません。",
+    "create": "顧客を追加",
+    "edit": "顧客を編集",
+    "headOfficeSection": "本社",
+    "headOfficeEditHint": "本社データは「顧客支店」ページで管理されます。"
+  },
+  "branch": {
+    "title": "顧客支店",
+    "subtitle": "選択した顧客の支店を管理",
+    "search": "支店を検索…",
+    "searchLabel": "名前で支店を検索",
+    "empty": "この顧客の支店はまだありません。",
+    "create": "支店を追加",
+    "edit": "支店を編集",
+    "selectCustomer": "顧客",
+    "selectCustomerPlaceholder": "顧客を選択…",
+    "selectCustomerFirst": "顧客を選択すると支店が表示されます。",
+    "clearCustomerFilter": "顧客フィルターを解除",
+    "filterAllCustomers": "すべての顧客",
+    "headOfficeBadge": "本社",
+    "headOfficeTaken": "この顧客には既に本社があります。"
+  },
+  "staff": {
+    "title": "顧客スタッフ",
+    "subtitle": "顧客支店のスタッフを管理",
+    "search": "スタッフを検索…",
+    "searchLabel": "名前でスタッフを検索",
+    "empty": "この支店のスタッフはまだありません。",
+    "create": "スタッフを追加",
+    "edit": "スタッフを編集",
+    "selectCustomer": "顧客",
+    "selectCustomerPlaceholder": "顧客を選択…",
+    "selectCustomerFirst": "顧客と支店を選択するとスタッフが表示されます。",
+    "allBranches": "すべての支店",
+    "clearCustomerFilter": "顧客フィルターを解除",
+    "filterAllCustomers": "すべての顧客",
+    "selectBranch": "支店",
+    "selectBranchPlaceholder": "支店を選択…",
+    "selectBranchNeedCustomer": "先に顧客を選択してください",
+    "selectBranchFirst": "支店を選択するとスタッフが表示されます。"
+  },
+  "table": {
+    "code": "コード",
+    "name": "名前",
+    "npwpNumber": "NPWP番号",
+    "nibNumber": "NIB番号",
+    "isActive": "ステータス",
+    "isHeadOffice": "種別",
+    "addressLine": "住所",
+    "province": "州",
+    "city": "市・県",
+    "vatType": "税種別",
+    "position": "役職",
+    "phone": "電話",
+    "email": "メール",
+    "userId": "連携ユーザー",
+    "active": "有効",
+    "inactive": "無効",
+    "loading": "読み込み中…",
+    "of": "/",
+    "error": "データを読み込めませんでした。もう一度お試しください。",
+    "customer": "顧客",
+    "admin": "管理者",
+    "branch": "支店"
+  },
+  "detail": {
+    "overview": "概要",
+    "empty": "データがありません。",
+    "headOffice": "本社",
+    "headOfficeEmpty": "この顧客にはまだ本社がありません。",
+    "branches": "支店",
+    "branchesEmpty": "この顧客にはまだ支店がありません。"
+  },
+  "picker": {
+    "loading": "読み込み中…",
+    "empty": "該当なし。",
+    "error": "選択肢の読み込みに失敗しました。"
+  },
+  "actions": {
+    "edit": "編集",
+    "delete": "削除",
+    "save": "保存",
+    "saving": "保存中…",
+    "cancel": "キャンセル",
+    "collapse": "パネルを閉じる",
+    "expand": "パネルを開く",
+    "prev_page": "前へ",
+    "next_page": "次へ"
+  },
+  "confirm": {
+    "delete": {
+      "message": "この項目を削除しますか？この操作は取り消せません。",
+      "customer": "この顧客を削除しますか？すべての支店も削除されます。この操作は取り消せません。"
+    }
+  },
+  "form": {
+    "field": {
+      "name": "名前",
+      "npwpNumber": "NPWP番号",
+      "nibNumber": "NIB番号",
+      "isActive": "有効",
+      "headOfficeName": "本社名",
+      "branchName": "支店名",
+      "addressLine": "住所",
+      "province": "州",
+      "city": "市・県",
+      "postalCode": "郵便番号",
+      "vatNumber": "VAT番号",
+      "vatType": "税種別",
+      "position": "役職",
+      "phone": "電話",
+      "email": "メール",
+      "nip": "NIP",
+      "userId": "連携ユーザーID",
+      "photoId": "写真ファイルID",
+      "isHeadOffice": "本社"
+    },
+    "placeholder": {
+      "customerName": "例：PT Wasnaker Mandiri",
+      "staffName": "例：Budi Santoso",
+      "branchName": "例：バンドン支店",
+      "headOfficeName": "例：ジャカルタ本社",
+      "npwpNumber": "01.234.567.8-901.000",
+      "nibNumber": "1234567890123456",
+      "addressLine": "番地・街区",
+      "province": "州を選択",
+      "city": "市・県を選択",
+      "cityNeedProvince": "先に州を選択してください",
+      "postalCode": "例：12190",
+      "vatNumber": "123456789012345678901234",
+      "position": "例：マネージャー",
+      "phone": "+6281234567890",
+      "email": "name@example.com",
+      "nip": "例：19800001",
+      "userId": "例：5",
+      "photoId": "ファイルUUID"
+    },
+    "validation": {
+      "required": "この項目は必須です。",
+      "email": "有効なメールアドレスを入力してください。",
+      "positiveInt": "正の整数を入力してください。"
+    }
+  },
+  "errors": {
+    "customerNameAlreadyExists": "この名前の顧客は既に登録されています。",
+    "customerAlreadyHasHeadOffice": "この顧客には既に本社があります。",
+    "staffUserAlreadyLinked": "このユーザーは既に他のスタッフに紐付いています。",
+    "cityNotInProvince": "選択した市・県は選択した州に属していません。",
+    "provinceNotFound": "州が見つかりません。",
+    "branchHasStaff": "この支店にはまだスタッフがいます。削除前にスタッフを削除してください。",
+    "customerHasStaff": "この顧客の支店にはまだスタッフがいます。先にスタッフを削除してください。",
+    "branchNotExists": "支店が見つかりません。",
+    "customerNotExists": "顧客が見つかりません。",
+    "unknown": "問題が発生しました。もう一度お試しください。"
+  },
+  "myCompany": {
+    "tabTitle": "会社情報",
+    "title": "会社情報",
+    "subtitle": "このアカウントに紐付けられた支店です。",
+    "branch": "支店",
+    "linkedStaff": "関連スタッフ",
+    "noBranch": "このアカウントに支店が紐付けられていません。",
+    "error": "支店情報を読み込めません。もう一度お試しください。",
+    "branchDetails": "支店詳細"
+  },
+  "myStaff": {
+    "tabTitle": "自社スタッフ",
+    "title": "自社スタッフ",
+    "subtitle": "アクセス権限の範囲内で顧客支店のスタッフを表示・管理します。"
+  }
+}

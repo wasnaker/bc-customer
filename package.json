@@ -1,0 +1,198 @@
+{
+  "name": "@wasnaker/module-customer",
+  "version": "0.1.4",
+  "description": "Wasnaker Indonesia administrative customer module (NestJS API and Next.js web)",
+  "license": "GPL-2.0-only",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "files": [
+    "api/package.json",
+    "api/dist",
+    "web/src/modules/customer",
+    "web/src/services/i18n/locales"
+  ],
+  "exports": {
+    ".": "./web/src/modules/customer/index.ts",
+    "./web": "./web/src/modules/customer/index.ts",
+    "./manifest": "./web/src/modules/customer/module.manifest.ts",
+    "./api": {
+      "types": "./api/dist/index.d.ts",
+      "require": "./api/dist/index.js",
+      "default": "./api/dist/index.js"
+    },
+    "./api/manifest": {
+      "types": "./api/dist/customer/customer.manifest.d.ts",
+      "require": "./api/dist/customer/customer.manifest.js",
+      "default": "./api/dist/customer/customer.manifest.js"
+    },
+    "./api/migrations": {
+      "types": "./api/dist/customer/database/migrations/index.d.ts",
+      "require": "./api/dist/customer/database/migrations/index.js",
+      "default": "./api/dist/customer/database/migrations/index.js"
+    },
+    "./locales/en": "./web/src/services/i18n/locales/en/module-customer.json",
+    "./locales/id": "./web/src/services/i18n/locales/id/module-customer.json",
+    "./locales/ja": "./web/src/services/i18n/locales/ja/module-customer.json",
+    "./locales/ko": "./web/src/services/i18n/locales/ko/module-customer.json",
+    "./locales/zh": "./web/src/services/i18n/locales/zh/module-customer.json",
+    "./api/entities": {
+      "types": "./api/dist/customer/customer.entities.d.ts",
+      "require": "./api/dist/customer/customer.entities.js",
+      "default": "./api/dist/customer/customer.entities.js"
+    },
+    "./api/definition": {
+      "types": "./api/dist/customer/customer.definition.d.ts",
+      "require": "./api/dist/customer/customer.definition.js",
+      "default": "./api/dist/customer/customer.definition.js"
+    },
+    "./api/seeds": {
+      "types": "./api/dist/customer/customer.seeds.d.ts",
+      "require": "./api/dist/customer/customer.seeds.js",
+      "default": "./api/dist/customer/customer.seeds.js"
+    }
+  },
+  "scripts": {
+    "build:api": "tsc -p api/tsconfig.build.json",
+    "prepare": "npm run build:api",
+    "verify:api-package": "node scripts/verify-api-package.mjs"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/passport": "^11.0.0",
+    "@nestjs/swagger": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0 || ^0.15.0",
+    "passport": "^0.7.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.0",
+    "typeorm": "^0.3.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-dialog": "^1.1.16",
+    "@radix-ui/react-select": "^2.3.0",
+    "@tanstack/react-query": "^5.95.2",
+    "lucide-react": "^1.18.0",
+    "next": "^16.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.72.0",
+    "react-i18next": "^16.6.2",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@nestjs/common": "11.1.18",
+    "@nestjs/core": "11.1.18",
+    "@nestjs/passport": "11.0.5",
+    "@nestjs/swagger": "11.2.6",
+    "@nestjs/typeorm": "11.0.1",
+    "@types/node": "25.5.0",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "passport": "0.7.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "typeorm": "0.3.28",
+    "typescript": "5.9.3"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "@nestjs/core": {
+      "optional": true
+    },
+    "@nestjs/passport": {
+      "optional": true
+    },
+    "@nestjs/swagger": {
+      "optional": true
+    },
+    "@nestjs/typeorm": {
+      "optional": true
+    },
+    "class-transformer": {
+      "optional": true
+    },
+    "class-validator": {
+      "optional": true
+    },
+    "passport": {
+      "optional": true
+    },
+    "reflect-metadata": {
+      "optional": true
+    },
+    "rxjs": {
+      "optional": true
+    },
+    "typeorm": {
+      "optional": true
+    },
+    "@hookform/resolvers": {
+      "optional": true
+    },
+    "@radix-ui/react-dialog": {
+      "optional": true
+    },
+    "@radix-ui/react-select": {
+      "optional": true
+    },
+    "@tanstack/react-query": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    },
+    "react-hook-form": {
+      "optional": true
+    },
+    "react-i18next": {
+      "optional": true
+    },
+    "yup": {
+      "optional": true
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "api": [
+        "api/dist/index.d.ts"
+      ],
+      "api/manifest": [
+        "api/dist/customer/customer.manifest.d.ts"
+      ],
+      "api/migrations": [
+        "api/dist/customer/database/migrations/index.d.ts"
+      ],
+      "web": [
+        "web/src/modules/customer/index.ts"
+      ],
+      "manifest": [
+        "web/src/modules/customer/module.manifest.ts"
+      ],
+      "api/entities": [
+        "api/dist/customer/customer.entities.d.ts"
+      ],
+      "api/definition": [
+        "api/dist/customer/customer.definition.d.ts"
+      ],
+      "api/seeds": [
+        "api/dist/customer/customer.seeds.d.ts"
+      ]
+    }
+  }
+}

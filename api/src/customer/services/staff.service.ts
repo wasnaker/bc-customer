@@ -24,8 +24,7 @@ export class StaffService {
     private readonly branchRepository: BranchRepository,
     private readonly customerRepository: CustomerRepository,
     private readonly regionValidation: RegionValidationService,
-    @Optional()
-    @Inject(CUSTOMER_MODULE_OPTIONS)
+    @Optional() @Inject(CUSTOMER_MODULE_OPTIONS)
     private readonly moduleOptions?: CustomerModuleOptions,
   ) {}
 
@@ -45,10 +44,7 @@ export class StaffService {
     }
 
     if (!this.moduleOptions?.createLoginAccount || !this.moduleOptions.deleteLoginAccount) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: { account: "accountProvisioningUnavailable" },
-      });
+      throw new UnprocessableEntityException({ status: HttpStatus.UNPROCESSABLE_ENTITY, errors: { account: "accountProvisioningUnavailable" } });
     }
 
     if (
@@ -64,27 +60,16 @@ export class StaffService {
     }
 
     const account = await this.moduleOptions.createLoginAccount({
-      email: createStaffDto.email,
-      password: createStaffDto.password,
-      name: createStaffDto.name,
-      roleKey: "customer",
-      scopeType: "branch",
-      scopeId: String(branch.id),
-      assignedBy: actorUserId,
+      email: createStaffDto.email, password: createStaffDto.password, name: createStaffDto.name,
+      roleKey: "customer", scopeType: "branch", scopeId: String(branch.id), assignedBy: actorUserId,
     });
     try {
       return await this.staffRepository.create({
-        branchId,
-        name: createStaffDto.name,
-        userId: account.id,
-        position: createStaffDto.position ?? null,
-        phone: createStaffDto.phone ?? null,
-        email: createStaffDto.email.trim().toLowerCase(),
-        nip: createStaffDto.nip ?? null,
-        addressLine: createStaffDto.addressLine ?? null,
-        provinceId: createStaffDto.provinceId ?? null,
-        cityId: createStaffDto.cityId ?? null,
-        photoId: createStaffDto.photoId ?? null,
+        branchId, name: createStaffDto.name, userId: account.id,
+        position: createStaffDto.position ?? null, phone: createStaffDto.phone ?? null,
+        email: createStaffDto.email.trim().toLowerCase(), nip: createStaffDto.nip ?? null,
+        addressLine: createStaffDto.addressLine ?? null, provinceId: createStaffDto.provinceId ?? null,
+        cityId: createStaffDto.cityId ?? null, photoId: createStaffDto.photoId ?? null,
         isActive: createStaffDto.isActive ?? true,
       });
     } catch (error) {
