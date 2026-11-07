@@ -1,10 +1,30 @@
 import type { DynamicModule } from '@nestjs/common';
 
+export interface CustomerAuthorizationScope {
+  type: string;
+  id: string;
+}
+
+export interface CustomerAuthorizationTarget {
+  /** Validated resource scope and its ancestors, resolved from module data. */
+  scopes: readonly CustomerAuthorizationScope[];
+}
+
 export interface CustomerModuleOptions {
-  /** Delegate permission decisions to the host's authorization service. */
+  /** Delegate legacy permission checks to the host authorization service. */
   authorize: (
     roleId: number | string,
     permission: string,
+  ) => boolean | Promise<boolean>;
+
+  /**
+   * Required by every route protected by CustomerScopeGuard.
+   * No permission-only fallback is allowed when this callback is absent.
+   */
+  authorizeScoped?: (
+    userId: number | string,
+    permission: string,
+    target: CustomerAuthorizationTarget,
   ) => boolean | Promise<boolean>;
 }
 
