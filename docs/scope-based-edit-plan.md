@@ -95,7 +95,7 @@ Semua endpoint di bawah wajib dievaluasi. Endpoint self-service hanya dikecualik
 | Endpoint | Resource | Scope source | Enforcement |
 |---|---|---|---|
 | `GET /customer`, `GET /customer/:id` | customer | customer record | filter list/count; detail 404/403 di luar scope |
-| `POST /customer` | customer | global/create policy | permission eksplisit; policy create global diputuskan terpisah |
+| `POST /customer` | customer baru | target belum ada | hanya global administrator core (`*`); Customer Admin customer-scoped ditolak |
 | `PATCH/DELETE /customer/:id` | customer | customer record | customer scope |
 | `GET /customer/branches` | branch | branch + customer | scoped list/count sebelum pagination |
 | `GET /customer/:customerId/branches` | branch | customer param + record | customer scope |
