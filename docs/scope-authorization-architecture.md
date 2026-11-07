@@ -48,6 +48,8 @@ Assignment minimal memuat:
 
 Role yang tidak memiliki assignment yang valid tidak memperoleh akses scoped. Role non-module tidak otomatis memperoleh akses global. Hanya global administrator yang dikenali core yang bypass scope.
 
+Role custom yang dibuat administrator dan diberi permission milik module juga harus memiliki assignment eksplisit. Core mengikat assignment tersebut pada role yang sama menggunakan key stabil `core-role:<roleId>`; `scopeType` harus termasuk `scopeTypes` manifest module. Assignment `global` untuk custom role hanya berlaku bila module mendeklarasikan scope `global`. Permission tanpa assignment tetap ditolak.
+
 ## 3. Kontrak scope universal
 
 Scope adalah identitas lingkup domain, bukan daftar kolom tetap yang ditanamkan ke host. Nilai `scopeType` berupa identifier stabil yang dideklarasikan/didukung module, misalnya `global`, `customer`, `branch`, `group`, `subgroup`, atau `resource`.
@@ -90,7 +92,11 @@ Untuk setiap role user:
    - pastikan roleKey cocok dengan manifest/registrasi;
    - cari assignment untuk user + moduleId + roleKey;
    - pastikan scope assignment ada di target scope path, atau global assignment yang sah.
-4. Lanjutkan role berikutnya bila pasangan tersebut tidak lengkap.
+4. Jika role core/custom memiliki permission module:
+   - cari assignment dengan key `core-role:<roleId>`;
+   - validasi `scopeType` terhadap `scopeTypes` manifest;
+   - cocokkan scope assignment dengan target scope path.
+5. Lanjutkan role berikutnya bila pasangan tersebut tidak lengkap.
 5. Deny jika tidak ada satu pun role yang memenuhi semua kondisi.
 
 Pengecekan permission dan scope harus dilakukan dalam satu service/API authorization core agar tidak ada celah antar guard atau perbedaan aturan.
@@ -133,7 +139,7 @@ Perubahan assignment harus dilakukan melalui Authorization Core:
 - Tidak ada pencampuran permission dari satu role dengan scope role lain.
 - Tidak ada scope yang hanya diperiksa di frontend.
 - Tidak ada asumsi bahwa satu user hanya memiliki satu role, satu assignment, atau satu staff record.
-- Tidak ada penggunaan role ID atau nama tampilan sebagai identitas authorization yang stabil.
+- Tidak ada penggunaan role ID atau nama tampilan sebagai identitas module-role; `roleId` hanya dipakai di key internal assignment untuk role custom yang dikelola core.
 - Tidak ada backfill otomatis yang memperluas akses melebihi data hubungan yang dapat diverifikasi.
 
 ## 9. Kriteria selesai
