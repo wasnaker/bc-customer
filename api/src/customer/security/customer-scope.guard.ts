@@ -91,7 +91,7 @@ export class CustomerScopeGuard implements CanActivate {
       source.kind === 'staff-list' ||
       source.kind === 'customer-list'
     ) {
-      if (!this.options.resolveScopes) {
+      if (!this.options?.resolveScopes) {
         throw new ForbiddenException('Scoped read authorization is not configured');
       }
       const resource =
@@ -131,6 +131,36 @@ export class CustomerScopeGuard implements CanActivate {
       resolved.target,
     );
     if (!allowed) throw new ForbiddenException();
+
+    // A document may not be moved into a different owner scope merely by
+    // changing ownerType/ownerId in the update payload. Authorize both the
+    // stored owner and the requested destination before the service mutates.
+    if (
+      source.kind === 'document-lookup' &&
+      (request.body?.ownerType !== undefined ||
+        request.body?.ownerId !== undefined)
+    ) {
+      const document = await this.documents.findDocumentById(
+        this.readParam(request, source.param),
+      );
+      if (!document) throw new NotFoundException();
+      const destinationOwnerType = (request.body.ownerType ??
+        document.ownerType) as CustomerDocumentOwnerTypeEnum;
+      const destinationOwnerId = String(
+        request.body.ownerId ?? document.ownerId,
+      );
+      const destination = await this.resolveDocumentOwner(
+        destinationOwnerType,
+        destinationOwnerId,
+      );
+      const destinationPermission = `${action}:${destination.resource}`;
+      const canMoveDocument = await this.options.authorizeScoped(
+        userId,
+        destinationPermission,
+        destination.target,
+      );
+      if (!canMoveDocument) throw new ForbiddenException();
+    }
 
     // Changing the head-office marker is a customer-level operation. A
     // branch-scoped administrator must not promote their own branch.
