@@ -272,6 +272,8 @@ export class CustomerController {
       "create:staff",
       "update:staff",
       "delete:staff",
+      "read:my-customer-staff",
+      "update:my-customer-staff",
       "update:customer",
       "delete:customer",
     ];
@@ -299,6 +301,47 @@ export class CustomerController {
       global: resolved.some(([, scope]) => scope.global),
       permissions,
     };
+  }
+
+  /**
+   * Profile staff list. Scope is resolved from the dedicated Profile permission,
+   * so Customer Admin receives company scope and Branch Admin receives only
+   * the assigned branch scope. Client-supplied customer/branch IDs are ignored.
+   */
+  @ApiOkResponse({ type: InfinityPaginationResponse(Staff) })
+  @CustomerResource("my-customer-staff")
+  @CustomerScope({ kind: 'staff-list', permissionResource: 'my-customer-staff' })
+  @Get("me/staff")
+  @HttpCode(HttpStatus.OK)
+  async findMyStaff(
+    @Req() request: { customerAuthorizationScope?: { global: boolean; customerIds: string[]; branchIds: string[] } },
+    @Query() query: QueryStaffDto,
+  ): Promise<InfinityPaginationResponseDto<Staff>> {
+    const page = query?.page ?? 1;
+    const limit = Math.min(query?.limit ?? 10, 50);
+    const scope = request.customerAuthorizationScope ?? { global: false, customerIds: [], branchIds: [] };
+    const data = await this.staffService.findMany({
+      filterOptions: query.filters ?? null,
+      sortOptions: query.sort ?? null,
+      paginationOptions: { page, limit },
+      scope,
+    });
+    const total = await this.staffService.countMany(null, query.filters ?? null, null, scope);
+    return infinityPagination(data, { page, limit }, total);
+  }
+
+  /** Profile-only update endpoint; CustomerScopeGuard enforces the same role's scope. */
+  @ApiOkResponse({ type: Staff })
+  @CustomerResource("my-customer-staff")
+  @CustomerScope({ kind: 'staff-lookup', param: 'id', permissionResource: 'my-customer-staff' })
+  @Patch("me/staff/:id")
+  @HttpCode(HttpStatus.OK)
+  @ApiParam({ name: "id", type: String, required: true })
+  updateMyStaff(
+    @Param("id") id: string,
+    @Body() updateStaffDto: UpdateStaffDto,
+  ): Promise<Staff> {
+    return this.staffService.update(id, updateStaffDto);
   }
 
   /**
