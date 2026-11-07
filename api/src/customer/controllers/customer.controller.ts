@@ -308,7 +308,7 @@ export class CustomerController {
    * customers or branches.
    */
   @ApiOkResponse({ type: Branch })
-  @CustomerSelfBranch()
+  @CustomerSelfBranch("read:my-customer-company")
   @Get("me/branch")
   @HttpCode(HttpStatus.OK)
   async findMyBranch(
