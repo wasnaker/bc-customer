@@ -18,6 +18,10 @@ export class Staff {
   @ApiPropertyOptional({ example: "PT Baja Prima Konstruksi" })
   customerName?: string | null;
 
+  /** Owning customer id, included in scoped global/profile staff lists. */
+  @ApiPropertyOptional({ example: "17", description: "Owning customer id" })
+  customerId?: bigint | string | null;
+
   @ApiProperty({ example: "Budi Santoso" })
   name: string;
 
