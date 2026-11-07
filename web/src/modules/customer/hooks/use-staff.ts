@@ -28,12 +28,13 @@ function assertOk(status: number, data: unknown): void {
 export function useStaffServerSide(
   branchId: string | null,
   customerId: string | null = null,
+  profileMode = false,
 ) {
-  const service = useGetStaffService();
+  const service = useGetStaffService(profileMode);
   // customerId ikut di queryKey: ganti customer memicu refetch meski
   // branchId tetap kosong (branchId = filter server-side, bukan bagian key).
   return useTable<Staff>({
-    queryKey: ["customer", "staff", branchId ?? "all", customerId ?? "all"],
+    queryKey: ["customer", profileMode ? "my-staff" : "staff", branchId ?? "all", customerId ?? "all"],
     searchDebounce: 300,
     defaultSort: { field: "name", order: "ASC" },
     fetchFn: async ({ page, limit, search, sort, signal }) => {
@@ -116,8 +117,8 @@ export function useCreateStaff() {
   });
 }
 
-export function useUpdateStaff() {
-  const service = useUpdateStaffService();
+export function useUpdateStaff(profileMode = false) {
+  const service = useUpdateStaffService(profileMode);
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({
