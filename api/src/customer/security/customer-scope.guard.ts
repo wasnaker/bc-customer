@@ -18,10 +18,7 @@ import { BranchService } from '../services/branch.service';
 import { StaffService } from '../services/staff.service';
 import { CustomerDocumentService } from '../services/customer-document.service';
 import { CustomerDocumentOwnerTypeEnum } from '../domain/customer-document';
-import {
-  CUSTOMER_RESOURCE_METADATA,
-  CUSTOMER_SELF_BRANCH_METADATA,
-} from './customer-resource.decorator';
+import { CUSTOMER_SELF_BRANCH_METADATA } from './customer-resource.decorator';
 import {
   CUSTOMER_SCOPE_METADATA,
   CustomerScopeSource,
@@ -271,6 +268,9 @@ export class CustomerScopeGuard implements CanActivate {
           String(document.ownerId),
         );
       }
+
+      default:
+        throw new ForbiddenException('Unsupported customer scope source');
     }
   }
 
