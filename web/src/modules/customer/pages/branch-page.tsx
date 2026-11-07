@@ -296,7 +296,7 @@ function PageInner() {
         </div>
 
         {canSelectCustomer ? (
-          {/* ── Filter customer (opsional — kosong = semua customer) ───── */}
+          // ── Filter customer (opsional — kosong = semua customer) ─────
           <div className="mb-4 max-w-md space-y-1.5">
             <Label htmlFor="branch-customer-picker">
               {t("branch.selectCustomer")}
