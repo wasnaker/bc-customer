@@ -3,13 +3,14 @@ import Building2 from "lucide-react/dist/esm/icons/building-2";
 import { CustomerPage } from "./pages/customer-page";
 import { BranchPage } from "./pages/branch-page";
 import { StaffPage } from "./pages/staff-page";
-import { MyCompanyTab } from "./pages/my-customer-page";
+import { MyCompanyTab, MyBranchTab } from "./pages/my-customer-page";
 
 /** Customer owns its admin pages and navigation; the menu is gated at its root. */
 export default defineModuleManifest({
   alias: "customer",
   profileTabs: [
     { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, content: { kind: "component", component: MyCompanyTab } },
+    { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:branch", roleNames: ["Customer Admin"], content: { kind: "component", component: MyBranchTab } },
   ],
   pages: [
     { path: "/admin/customer", component: CustomerPage, title: { namespace: "module-customer", key: "customer.title" }, permission: "read:customer" },
