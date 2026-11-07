@@ -42,8 +42,8 @@ export const moduleManifest: BackendModuleManifest = {
     { name: 'delete:staff', description: 'Allows removing staff from branches' },
     { name: 'read:my-customer-company', description: 'Allows viewing the signed-in user\'s own company branch in Profile' },
     { name: 'read:my-customer-branch', description: 'Allows viewing all branches belonging to the signed-in user\'s customer in Profile' },
-    { name: 'read:my-customer-company', description: 'Allows viewing the signed-in user\'s own company branch in Profile' },
-    { name: 'read:my-customer-branch', description: 'Allows viewing all branches belonging to the signed-in user\'s customer in Profile' },
+    { name: 'read:my-customer-staff', description: 'Allows viewing staff within the signed-in user\\'s assigned customer or branch scope in Profile' },
+    { name: 'update:my-customer-staff', description: 'Allows updating staff within the signed-in user\\'s assigned customer or branch scope in Profile' },
   ],
   roles: [
     {
