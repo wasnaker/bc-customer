@@ -41,7 +41,7 @@ Belum dilakukan:
 - Audit live dan dry-run backfill pada database PostgreSQL.
 - Eksekusi test suite/build di lingkungan repository; commit telah dibuat melalui GitHub, tetapi belum ada hasil CI/build yang dapat diverifikasi dari sesi ini.
 - Verifikasi data demo Vera/Maria pada database aktif.
-- Kebijakan create customer: `POST /customer` masih menggunakan permission `create:customer` tanpa scope target karena resource belum ada saat create. Sebelum production, putuskan secara eksplisit apakah hanya global administrator yang boleh membuat customer atau apakah ada proses assignment customer-scope khusus.
+- Kebijakan create customer sudah ditetapkan pada implementasi saat ini: `POST /customer` hanya diizinkan untuk global administrator core; role Customer Admin customer-scoped ditolak karena resource target belum ada saat create.
 
 Snapshot assignment lama (44 user memiliki assignment dan 77 user belum memiliki assignment) tidak dianggap fakta terkini. Query audit dan dry-run backfill wajib dijalankan ulang pada database target. Jangan anggap implementasi siap production sebelum gate pada §10 lulus.
 
