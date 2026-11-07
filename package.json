@@ -1,6 +1,6 @@
 {
   "name": "@wasnaker/module-customer",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "Wasnaker Indonesia administrative customer module (NestJS API and Next.js web)",
   "license": "GPL-2.0-only",
   "type": "module",
