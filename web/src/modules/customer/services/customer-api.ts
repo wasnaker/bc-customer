@@ -124,6 +124,31 @@ export function useDeleteCustomerService() {
   );
 }
 
+// ── Self-scoped authorization context (UI only; API remains authoritative) ──
+
+export interface CustomerPermissionScope {
+  global: boolean;
+  customerIds: string[];
+  branchIds: string[];
+}
+
+export interface CustomerMyScopeResponse {
+  global: boolean;
+  permissions: Record<string, CustomerPermissionScope>;
+}
+
+export function useGetMyScopeService() {
+  const fetch = useFetch();
+  return useCallback(
+    (requestConfig?: RequestConfigType) =>
+      fetch(`${API_URL}/v1/customer/me/scope`, {
+        method: "GET",
+        ...requestConfig,
+      }).then(wrapperFetchJsonResponse<CustomerMyScopeResponse>),
+    [fetch],
+  );
+}
+
 // ── Documents (polymorphic: ownerType = customer | branch | staff) ──────────
 
 export type CustomerDocumentListRequest = {
