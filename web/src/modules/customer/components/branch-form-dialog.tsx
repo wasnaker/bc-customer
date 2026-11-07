@@ -20,6 +20,8 @@ interface BranchFormDialogProps {
   editItem?: Branch | null;
   /** True bila customer SUDAH punya kantor pusat lain (max 1 — API guard). */
   hasHeadOffice: boolean;
+  /** Only customer-scope administrators may change the head-office marker. */
+  canChangeHeadOffice?: boolean;
   onSuccess: (savedId: Branch["id"]) => void;
 }
 
@@ -59,6 +61,7 @@ export function BranchFormDialog({
   customerId,
   editItem,
   hasHeadOffice,
+  canChangeHeadOffice = true,
   onSuccess,
 }: BranchFormDialogProps) {
   const { t } = useTranslation("module-customer");
@@ -102,6 +105,7 @@ export function BranchFormDialog({
   // Aturan max 1 HO: toggle hanya aktif bila belum ada HO, atau bila branch
   // yang diedit adalah HO itu sendiri.
   const headOfficeToggleDisabled =
+    !canChangeHeadOffice ||
     (hasHeadOffice && !isEditing) ||
     (isEditing && hasHeadOffice && !editItem?.isHeadOffice);
 
@@ -230,7 +234,9 @@ export function BranchFormDialog({
             {t("form.field.isHeadOffice")}
           </Label>
         </div>
-        {headOfficeToggleDisabled && !editItem?.isHeadOffice && (
+        {canChangeHeadOffice &&
+          headOfficeToggleDisabled &&
+          !editItem?.isHeadOffice && (
           <p className="text-xs text-amber-600 dark:text-amber-400">
             {t("branch.headOfficeTaken")}
           </p>
