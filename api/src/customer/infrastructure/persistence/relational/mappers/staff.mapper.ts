@@ -14,6 +14,7 @@ export class StaffMapper {
     // Nama branch/customer hanya tersedia bila relasi di-load (list global).
     domainEntity.branchName = raw.branch?.name ?? null;
     domainEntity.customerName = raw.branch?.customer?.name ?? null;
+    domainEntity.customerId = raw.branch?.customerId == null ? null : String(raw.branch.customerId);
     domainEntity.name = raw.name;
     domainEntity.userId = raw.userId;
     domainEntity.position = raw.position;
