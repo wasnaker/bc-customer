@@ -25,6 +25,7 @@ export const moduleManifest: BackendModuleManifest = {
   version: '0.1.2',
   capabilities: ['api', 'web'],
   requires: ['region'],
+  scopeTypes: ['global', 'customer', 'branch'],
   permissions: [
     { name: 'read:customer', description: 'Allows viewing customer module navigation and customer data' },
     { name: 'create:customer', description: 'Allows creating customers with their head-office branch' },
