@@ -163,6 +163,10 @@ describe('CustomerScopeGuard', () => {
   });
 
   it('checks both stored and destination scope when a document owner changes', async () => {
+    customers
+      .findCustomerById
+      .mockImplementation(async (id: string) => ({ id, name: `Cust ${id}` }));
+    branches.findBranchById.mockResolvedValue({ id: '43', customerId: '17' });
     documents.findDocumentById.mockResolvedValue({
       id: '5',
       ownerType: 'customer',
