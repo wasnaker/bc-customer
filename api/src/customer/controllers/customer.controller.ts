@@ -256,7 +256,8 @@ export class CustomerController {
     if (userId === undefined || userId === null) {
       throw new UnauthorizedException();
     }
-    if (!this.moduleOptions?.resolveScopes) {
+    const resolveScopes = this.moduleOptions?.resolveScopes;
+    if (!resolveScopes) {
       throw new NotFoundException();
     }
 
@@ -277,7 +278,7 @@ export class CustomerController {
     const resolved = await Promise.all(
       permissionNames.map(async (permission) => [
         permission,
-        await this.moduleOptions!.resolveScopes!(userId, permission),
+        await resolveScopes(userId, permission),
       ] as const),
     );
     const permissions = Object.fromEntries(
