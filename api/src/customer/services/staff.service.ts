@@ -212,14 +212,6 @@ export class StaffService {
     }
 
     if (
-      updateStaffDto.userId !== undefined &&
-      updateStaffDto.userId !== null &&
-      updateStaffDto.userId !== staff.userId
-    ) {
-      await this.assertUserNotLinked(updateStaffDto.userId);
-    }
-
-    if (
       updateStaffDto.provinceId !== undefined ||
       updateStaffDto.cityId !== undefined
     ) {
@@ -258,19 +250,4 @@ export class StaffService {
     await this.staffRepository.remove(id);
   }
 
-  /**
-   * Friendly pre-check for the one-user-one-staff rule. The unique index
-   * `UQ_staff_userId` is the hard guarantee.
-   */
-  private async assertUserNotLinked(userId: number): Promise<void> {
-    const existing = await this.staffRepository.findByUserId(userId);
-    if (existing) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          userId: "staffUserAlreadyLinked",
-        },
-      });
-    }
-  }
 }
