@@ -209,11 +209,16 @@ function PageInner() {
             variant="outline"
             size="icon-sm"
             title={t("actions.edit")}
-          onClick={() => {
-            setEditItem(item);
-            setFormOpen(true);
-          }}
-          >
+
+            onClick={() => {
+
+              setEditItem(item);
+
+              setFormOpen(true);
+
+            }}
+
+            >
             <PencilIcon className="size-3.5" />
           </Button>
         ) : null}
@@ -223,8 +228,11 @@ function PageInner() {
             size="icon-sm"
             className="text-destructive hover:bg-destructive/10"
           title={t("actions.delete")}
+
           onClick={() => handleDelete(item.id)}
+
           disabled={deleteMutation.isPending}
+
           >
             <TrashIcon className="size-3.5" />
           </Button>
