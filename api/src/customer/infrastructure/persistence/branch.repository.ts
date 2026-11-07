@@ -31,8 +31,10 @@ export abstract class BranchRepository {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
     customerId?: Branch["customerId"] | null;
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] };
     filterOptions?: FilterBranchDto | null;
     sortOptions?: SortBranchDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -41,6 +43,7 @@ export abstract class BranchRepository {
   abstract countMany(
     customerId?: Branch["customerId"] | null,
     filterOptions?: FilterBranchDto | null,
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number>;
 
   abstract findById(id: Branch["id"]): Promise<NullableType<Branch>>;
