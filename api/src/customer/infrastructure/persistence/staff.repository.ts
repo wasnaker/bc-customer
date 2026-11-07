@@ -32,8 +32,10 @@ export abstract class StaffRepository {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
     branchId?: Staff["branchId"] | null;
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] };
     /** Filter via branch.customerId — mode "customer dipilih, cabang belum". */
     customerId?: Staff["branchId"] | null;
     filterOptions?: FilterStaffDto | null;
@@ -45,6 +47,7 @@ export abstract class StaffRepository {
     branchId?: Staff["branchId"] | null,
     filterOptions?: FilterStaffDto | null,
     customerId?: Staff["branchId"] | null,
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number>;
 
   abstract findById(id: Staff["id"]): Promise<NullableType<Staff>>;
