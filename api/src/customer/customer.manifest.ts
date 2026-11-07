@@ -16,6 +16,7 @@ export interface BackendModuleManifest {
   version: string;
   capabilities: readonly ('api' | 'web')[];
   permissions: readonly ModulePermissionDefinition[];
+  scopeTypes?: readonly string[];
   roles?: readonly ModuleRoleDefinition[];
   requires?: readonly string[];
 }
