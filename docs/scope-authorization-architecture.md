@@ -96,8 +96,8 @@ Untuk setiap role user:
    - cari assignment dengan key `core-role:<roleId>`;
    - validasi `scopeType` terhadap `scopeTypes` manifest;
    - cocokkan scope assignment dengan target scope path.
-5. Lanjutkan role berikutnya bila pasangan tersebut tidak lengkap.
-5. Deny jika tidak ada satu pun role yang memenuhi semua kondisi.
+5. Lanjutkan ke role berikutnya bila pasangan tersebut tidak lengkap.
+6. Deny jika tidak ada satu pun role yang memenuhi semua kondisi.
 
 Pengecekan permission dan scope harus dilakukan dalam satu service/API authorization core agar tidak ada celah antar guard atau perbedaan aturan.
 
