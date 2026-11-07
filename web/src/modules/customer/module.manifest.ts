@@ -10,7 +10,7 @@ export default defineModuleManifest({
   alias: "customer",
   profileTabs: [
     { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, content: { kind: "component", component: MyCompanyTab } },
-    { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:branch", roleNames: ["Customer Admin"], content: { kind: "component", component: MyBranchTab } },
+    { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:branch", content: { kind: "component", component: MyBranchTab } },
   ],
   pages: [
     { path: "/admin/customer", component: CustomerPage, title: { namespace: "module-customer", key: "customer.title" }, permission: "read:customer" },

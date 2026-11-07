@@ -7,17 +7,11 @@ import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { useGetMyBranchService } from "../services/branch-api";
 import { BranchOverviewTab } from "../components/branch-detail-tab";
 import { BranchFormDialog } from "../components/branch-form-dialog";
-import { useHeadOffice } from "../hooks/use-branches";
+import { useBranchesServerSide, useHeadOffice } from "../hooks/use-branches";
 import { useMyCustomerScope } from "../hooks/use-customers";
 import { Button } from "@/components/ui/button";
 import PencilIcon from "lucide-react/dist/esm/icons/pencil";
 import useAuth from "@/services/auth/use-auth";
-import { useState } from "react";
-import PencilIcon from "lucide-react/dist/esm/icons/pencil";
-import { Button } from "@/components/ui/button";
-import { useBranchesServerSide, useHeadOffice } from "../hooks/use-branches";
-import { useMyCustomerScope } from "../hooks/use-customers";
-import { BranchFormDialog } from "../components/branch-form-dialog";
 
 export function MyCompanyTab() {
   const { t } = useTranslation("module-customer");
