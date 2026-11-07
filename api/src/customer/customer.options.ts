@@ -10,6 +10,11 @@ export interface CustomerAuthorizationTarget {
   scopes: readonly CustomerAuthorizationScope[];
 }
 
+export interface CustomerResolvedScopes {
+  global: boolean;
+  scopes: readonly CustomerAuthorizationScope[];
+}
+
 export interface CustomerModuleOptions {
   /** Delegate legacy permission checks to the host authorization service. */
   authorize: (
@@ -26,6 +31,12 @@ export interface CustomerModuleOptions {
     permission: string,
     target: CustomerAuthorizationTarget,
   ) => boolean | Promise<boolean>;
+
+  /** Resolves allowed role-bound scopes for backend list/count filtering. */
+  resolveScopes?: (
+    userId: number | string,
+    permission: string,
+  ) => CustomerResolvedScopes | Promise<CustomerResolvedScopes>;
 }
 
 export interface CustomerModuleAsyncOptions {
