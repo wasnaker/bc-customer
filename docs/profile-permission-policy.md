@@ -16,6 +16,8 @@ Status: **keputusan role final disetujui 2026-11-07**
 |---|---:|---:|---:|
 | `read:my-customer-company` | Ya | Ya | Ya |
 | `read:my-customer-branch` | Ya | Tidak | Tidak |
+| `read:my-customer-staff` | Ya | Ya | Tidak |
+| `update:my-customer-staff` | Ya | Ya | Tidak |
 
 Permission Profile terpisah dari permission resource. `read:branch` tidak otomatis membuka tab My Branch. Permission `update:branch` beserta scope yang cocok tetap wajib untuk edit branch dari My Company.
 
@@ -41,9 +43,13 @@ Permission Profile terpisah dari permission resource. `read:branch` tidak otomat
 2. Ketiga role melihat My Company; role tanpa permission Profile ditolak pada `GET /customer/me/branch`.
 3. Hanya Customer Admin melihat My Branch.
 4. Customer Branch Admin dan Customer tidak memperoleh tab My Branch.
-5. Customer Admin hanya melihat branch dari customer scope yang diberikan.
-6. Manipulasi ID/query/body tidak dapat mengakses customer/branch lain.
-7. Edit My Company memerlukan `update:branch` dan scope yang mencakup branch user.
+5. My Staff hanya diberikan kepada Customer Admin dan Customer Branch Admin.
+6. Customer Admin hanya melihat/mengubah staff pada seluruh branch di customer scope miliknya; Customer Branch Admin hanya pada branch scope yang ditugaskan.
+7. List/count My Staff difilter di backend dengan `read:my-customer-staff`; update memakai `update:my-customer-staff` dan target scope staff yang di-resolve dari relasi branch/customer tersimpan.
+8. Manipulasi ID staff tidak dapat mengubah staff di luar customer/branch scope.
+9. Customer Admin hanya melihat branch dari customer scope yang diberikan.
+10. Manipulasi ID/query/body tidak dapat mengakses customer/branch lain.
+11. Edit My Company memerlukan `update:branch` dan scope yang mencakup branch user.
 
 ## Catatan rollout
 
