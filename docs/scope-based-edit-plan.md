@@ -21,7 +21,7 @@ Per 2026-11-07:
 - Host `brocoders-api` setelah evaluator scope universal dan pin module: `dde44ba44dba0c3d49ac596129147af471d8dd09`.
 - Host `brocoders-react-web` setelah pin module customer untuk UI scope-aware: `5f510742e61d3af7d0e8d7a8c5f1df1eb93422ba`.
 - `bc-customer` code commit yang dipin oleh kedua host: `d01caf1ab6c3c801700672c96b22ee0bd961d2d6`.
-- `bc-customer` dokumentasi terbaru pada `main`: `9f5c8f65f6aa51097b3d1f239fa6c601280b44f3`.
+- `bc-customer` dokumentasi terbaru pada `main`: `fd0057f795dd3bcf258ab8e2ebcb28f146d83117`.
 - `bc-equipment` kontrak module options scope: `a1abe2a47c8a41a70bf1493b883da6bb7d07c820`.
 - `bc-region` kontrak module options scope: `e9cbdd97bb7b4211f1bb08b6d6c4feaae4d91f36`.
 
