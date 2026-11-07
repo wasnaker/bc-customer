@@ -67,10 +67,7 @@ export class CustomerAccessGuard implements CanActivate {
     const permission = action ? `${action}:${resource}` : null;
     const roleIds = [
       ...new Set(
-        [
-          ...(request.user?.roles ?? []).map((role) => role.id),
-          request.user?.role?.id,
-        ].filter(
+        (request.user?.roles ?? []).map((role) => role.id).filter(
           (id): id is number | string => id !== undefined && id !== null,
         ),
       ),
@@ -80,9 +77,6 @@ export class CustomerAccessGuard implements CanActivate {
       throw new ForbiddenException();
     }
 
-    // Multirole users receive the union of permissions from every assigned
-    // central role. Checking only the legacy singular role silently denied
-    // users whose required permission belonged to another assigned role.
     for (const roleId of roleIds) {
       if (await this.options.authorize(roleId, permission)) return true;
     }
