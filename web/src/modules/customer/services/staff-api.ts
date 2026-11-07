@@ -69,11 +69,10 @@ export function useGetStaffByIdService(profileMode = false) {
 export type StaffPostRequest = {
   branchId: Staff["branchId"];
   name: string;
-  /** Host user id — unik antar staff, API menolak `staffUserAlreadyLinked`. */
   password: string;
   position?: string | null;
   phone?: string | null;
-  email?: string | null;
+  email: string;
   nip?: string | null;
   addressLine?: string | null;
   provinceId?: number | null;

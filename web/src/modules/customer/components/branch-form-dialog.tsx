@@ -150,7 +150,6 @@ export function BranchFormDialog({
       vatNumber: form.vatNumber.trim() || null,
       vatType: form.vatType,
       isActive: form.isActive,
-      ...(!isEditing ? { adminName: form.adminName.trim(), adminEmail: form.adminEmail.trim().toLowerCase(), adminPassword: form.adminPassword } : {}),
     };
 
     try {
@@ -165,6 +164,9 @@ export function BranchFormDialog({
         const result = await createMutation.mutateAsync({
           customerId,
           ...payload,
+          adminName: form.adminName.trim(),
+          adminEmail: form.adminEmail.trim().toLowerCase(),
+          adminPassword: form.adminPassword,
         });
         onOpenChange(false);
         onSuccess(result.id);

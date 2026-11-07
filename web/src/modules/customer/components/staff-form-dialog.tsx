@@ -130,10 +130,9 @@ export function StaffFormDialog({
 
     const payload = {
       name: form.name.trim(),
-      ...(!isEditing ? { password: form.password } : {}),
       position: form.position.trim() || null,
       phone: form.phone.trim() || null,
-      email: form.email.trim() || null,
+      email: form.email.trim(),
       nip: form.nip.trim() || null,
       addressLine: form.addressLine.trim() || null,
       // Provinsi & kota opsional — hanya dikirim bila provinsi dipilih.
@@ -157,6 +156,7 @@ export function StaffFormDialog({
         const result = await createMutation.mutateAsync({
           branchId,
           ...payload,
+          password: form.password,
         });
         onOpenChange(false);
         onSuccess(result.id);
