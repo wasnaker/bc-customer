@@ -15,6 +15,7 @@ import {
   CUSTOMER_RESOURCE_METADATA,
   CUSTOMER_SELF_BRANCH_METADATA,
 } from './customer-resource.decorator';
+import { CUSTOMER_SCOPE_METADATA, CustomerScopeSource } from './customer-scope.decorator';
 import {
   CUSTOMER_DOCUMENT_OWNER_TYPES,
   CustomerDocumentOwnerTypeEnum,
@@ -56,6 +57,20 @@ export class CustomerAccessGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
     if (selfBranch) {
+      if (request.user?.id === undefined || request.user?.id === null) {
+        throw new ForbiddenException();
+      }
+      return true;
+    }
+
+    // Polymorphic documents derive their resource permission from the stored
+    // owner. CustomerScopeGuard resolves that owner and performs the complete
+    // permission + scope check; do not guess "customer" before that lookup.
+    const scopeSource = this.reflector?.getAllAndOverride<CustomerScopeSource>(
+      CUSTOMER_SCOPE_METADATA,
+      [context.getHandler(), context.getClass()],
+    );
+    if (scopeSource?.kind.startsWith('document-')) {
       if (request.user?.id === undefined || request.user?.id === null) {
         throw new ForbiddenException();
       }
