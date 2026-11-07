@@ -135,6 +135,25 @@ describe('CustomerScopeGuard', () => {
     );
   });
 
+  it('delegates new customer creation with no pre-existing scope', async () => {
+    await expect(
+      execute(
+        { kind: 'global-create' },
+        {
+          method: 'POST',
+          body: {},
+          user: { id: 39 },
+        },
+      ),
+    ).resolves.toBe(true);
+
+    expect(options.authorizeScoped).toHaveBeenCalledWith(
+      39,
+      'create:customer',
+      { scopes: [] },
+    );
+  });
+
   it('filters list scopes through the host callback', async () => {
     const request = { method: 'GET', user: { id: 44 } };
     await expect(
