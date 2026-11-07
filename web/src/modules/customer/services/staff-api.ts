@@ -108,13 +108,13 @@ export function useUpdateStaffService(profileMode = false) {
   const fetch = useFetch();
   return useCallback(
     (data: StaffPatchRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/staff/${data.id}`, {
+      return fetch(`${API_URL}/v1/customer/${profileMode ? "me/staff" : "staff"}/${data.id}`, {
         method: "PATCH",
         body: JSON.stringify(data.data),
         ...requestConfig,
       }).then(wrapperFetchJsonResponse<StaffPatchResponse>);
     },
-    [fetch],
+    [fetch, profileMode],
   );
 }
 
