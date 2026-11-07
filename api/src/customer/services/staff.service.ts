@@ -115,9 +115,11 @@ export class StaffService {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
     branchId?: Staff["branchId"] | null;
     customerId?: Staff["branchId"] | null;
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] };
     filterOptions?: FilterStaffDto | null;
     sortOptions?: SortStaffDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -133,6 +135,7 @@ export class StaffService {
       filterOptions,
       sortOptions,
       paginationOptions,
+      scope,
     });
   }
 
@@ -140,13 +143,14 @@ export class StaffService {
     branchId?: Staff["branchId"] | null,
     filterOptions?: FilterStaffDto | null,
     customerId?: Staff["branchId"] | null,
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number> {
     if (branchId != null) {
       await this.assertBranchExists(branchId);
     } else if (customerId != null) {
       await this.assertCustomerExists(customerId);
     }
-    return this.staffRepository.countMany(branchId, filterOptions, customerId);
+    return this.staffRepository.countMany(branchId, filterOptions, customerId, scope);
   }
 
   private async assertCustomerExists(
