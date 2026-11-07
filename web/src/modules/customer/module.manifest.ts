@@ -19,7 +19,7 @@ export default defineModuleManifest({
   menu: [
     {
       slug: "customer", label: { namespace: "module-customer", key: "menu.parent" },
-      href: "/admin/customer", position: 100, icon: Building2,
+      href: "/admin/customer/branch", position: 100, icon: Building2, permission: "read:branch",
       children: [
         { slug: "customers", label: { namespace: "module-customer", key: "menu.customer" }, href: "/admin/customer", position: 1, permission: "read:customer" },
         { slug: "branch", label: { namespace: "module-customer", key: "menu.branch" }, href: "/admin/customer/branch", position: 2, permission: "read:branch" },
