@@ -325,7 +325,7 @@ export function MyStaffTab() {
             className="h-9 w-full max-w-sm rounded-md border bg-background px-3 text-sm"
           />
           <span className="text-sm text-muted-foreground">
-            {table.total} {t("table.of")} {table.total}
+            {table.total} {t("staff.title")}
           </span>
         </div>
         <div className="overflow-x-auto rounded-lg border bg-card">
