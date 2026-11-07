@@ -194,3 +194,35 @@ Tidak ada fallback permission-only pada route yang sudah ditandai scoped. Bila s
 2. **Create customer:** keputusan implementasi saat ini adalah hanya global administrator core yang dapat membuat customer baru. Ubah hanya melalui keputusan kebijakan eksplisit.
 3. **Customer Admin tanpa head office:** manual assignment customer scope dengan approval dan audit adalah default aman; backfill otomatis harus berhenti untuk akun ambigu.
 4. **Dokumen polymorphic:** resolver memvalidasi ownerType/ownerId terhadap record domain dan mengotorisasi owner tersimpan serta tujuan bila owner diubah. Validasi data orphan/owner yang tidak konsisten tetap wajib pada audit PostgreSQL sebelum rollout.
+
+
+## 11. Keputusan final akses Profile dan menu Customer (2026-11-07)
+
+Bagian ini merupakan keputusan terbaru dan **menggantikan asumsi role/menu pada snapshot sebelumnya**.
+
+| Role | Menu Customer | Profile |
+|---|---|---|
+| Customer Admin | Tidak tampil | My Company + My Branch |
+| Customer Branch Admin | Tidak tampil | My Company |
+| Customer | Tidak tampil | My Company |
+
+Aturan implementasi:
+- Manifest frontend menetapkan `menu: []`. Tidak ada role yang melihat menu Customer di sidebar.
+- `My Company` menggunakan permission khusus `read:my-customer-company`; permission ini diberikan kepada ketiga role.
+- `My Branch` menggunakan permission khusus `read:my-customer-branch`; permission ini hanya diberikan kepada Customer Admin.
+- Permission Profile tidak menggantikan permission resource dan scope. Tombol Edit My Company tetap memerlukan `update:branch` dan scope branch/customer yang cocok.
+- Endpoint `GET /customer/me/branch` hanya mengambil branch dari user login dan kini memeriksa `read:my-customer-company` pada role user. Endpoint tidak menerima identitas target dari client.
+- Halaman administrasi yang sudah ada tetap memakai permission resource pada route. Tidak adanya menu bukan pengganti backend authorization; akses langsung tetap tunduk pada permission dan scope backend.
+- Customer dan Customer Branch Admin tidak memperoleh tab My Branch. Akses My Branch tidak boleh disimpulkan dari `read:branch`; tab memakai permission Profile tersendiri.
+- Customer role hanya dapat membaca data yang lolos scope assignment miliknya. Tidak boleh memperluas akses ke customer/branch lain dengan manipulasi URL, query, atau body.
+
+Negative tests yang harus ditambahkan:
+1. Ketiga role tidak melihat menu Customer.
+2. Ketiga role dapat melihat My Company; tanpa `read:my-customer-company`, endpoint `GET /customer/me/branch` mengembalikan 403.
+3. Hanya Customer Admin melihat My Branch; Customer Branch Admin dan Customer tidak melihat tab tersebut.
+4. Customer Admin dapat melihat branch customer yang ditugaskan saja melalui My Branch.
+5. Customer dan Customer Branch Admin tidak dapat memanggil capability My Branch melalui endpoint Profile khusus.
+6. Manipulasi customerId/branchId tidak dapat mengakses data di luar assignment role yang sama.
+7. My Company edit hanya tersedia bila role mempunyai `update:branch` dengan scope yang mencakup branch user.
+
+Catatan: `menu: []` menghilangkan navigasi Customer untuk seluruh role. Permission resource pada API/halaman tidak otomatis dihapus oleh keputusan menu ini; perubahan izin administrasi harus diputuskan terpisah agar tidak mengubah kemampuan operasional secara tidak sengaja.
