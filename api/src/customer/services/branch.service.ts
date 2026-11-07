@@ -1,6 +1,8 @@
 import {
   HttpStatus,
   Injectable,
+  Inject,
+  Optional,
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { CreateBranchDto } from "../dto/create-branch.dto";
@@ -12,6 +14,8 @@ import { BranchRepository } from "../infrastructure/persistence/branch.repositor
 import { NullableType } from "../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../utils/types/pagination-options";
 import { RegionValidationService } from "./region-validation.service";
+import { StaffRepository } from "../infrastructure/persistence/staff.repository";
+import { CUSTOMER_MODULE_OPTIONS, CustomerModuleOptions } from "../customer.options";
 
 @Injectable()
 export class BranchService {
@@ -19,11 +23,16 @@ export class BranchService {
     private readonly branchRepository: BranchRepository,
     private readonly customerRepository: CustomerRepository,
     private readonly regionValidation: RegionValidationService,
+    private readonly staffRepository: StaffRepository,
+    @Optional()
+    @Inject(CUSTOMER_MODULE_OPTIONS)
+    private readonly moduleOptions?: CustomerModuleOptions,
   ) {}
 
   async create(
     customerId: Branch["customerId"],
     createBranchDto: CreateBranchDto,
+    actorUserId: number,
   ): Promise<Branch> {
     const customer = await this.customerRepository.findById(customerId);
     if (!customer) {
@@ -44,7 +53,14 @@ export class BranchService {
       await this.assertHeadOfficeAvailable(customerId);
     }
 
-    return this.branchRepository.create({
+    if (!this.moduleOptions?.createLoginAccount || !this.moduleOptions.deleteLoginAccount) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { account: "accountProvisioningUnavailable" },
+      });
+    }
+
+    const branch = await this.branchRepository.create({
       customerId,
       name: createBranchDto.name,
       isHeadOffice: createBranchDto.isHeadOffice ?? false,
@@ -56,6 +72,39 @@ export class BranchService {
       vatType: createBranchDto.vatType ?? "npwp",
       isActive: createBranchDto.isActive ?? true,
     });
+
+    let accountId: number | null = null;
+    try {
+      const account = await this.moduleOptions.createLoginAccount({
+        email: createBranchDto.adminEmail,
+        password: createBranchDto.adminPassword,
+        name: createBranchDto.adminName,
+        roleKey: "customer-branch-admin",
+        scopeType: "branch",
+        scopeId: String(branch.id),
+        assignedBy: actorUserId,
+      });
+      accountId = account.id;
+      await this.staffRepository.create({
+        branchId: branch.id,
+        name: createBranchDto.adminName,
+        userId: account.id,
+        position: "Branch Administrator",
+        phone: null,
+        email: createBranchDto.adminEmail.trim().toLowerCase(),
+        nip: null,
+        addressLine: null,
+        provinceId: null,
+        cityId: null,
+        photoId: null,
+        isActive: true,
+      });
+      return branch;
+    } catch (error) {
+      if (accountId !== null) await this.moduleOptions.deleteLoginAccount(accountId);
+      await this.branchRepository.remove(branch.id);
+      throw error;
+    }
   }
 
   async findManyByCustomerId({

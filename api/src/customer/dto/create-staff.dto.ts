@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MinLength,
   IsUUID,
   MaxLength,
   Min,
@@ -18,16 +19,6 @@ export class CreateStaffDto {
   @IsString()
   @MaxLength(190)
   name: string;
-
-  @ApiPropertyOptional({
-    example: 5,
-    nullable: true,
-    description: 'Host user id (unique across all staff when set)',
-  })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  userId?: number | null;
 
   @ApiPropertyOptional({ example: 'Manager', maxLength: 100, nullable: true })
   @IsOptional()
@@ -41,15 +32,16 @@ export class CreateStaffDto {
   @MaxLength(20)
   phone?: string | null;
 
-  @ApiPropertyOptional({
-    example: 'budi@example.com',
-    maxLength: 190,
-    nullable: true,
-  })
-  @IsOptional()
+  @ApiProperty({ example: 'budi@example.com', maxLength: 190 })
+  @IsNotEmpty()
   @IsEmail()
   @MaxLength(190)
-  email?: string | null;
+  email: string;
+
+  @ApiProperty({ minLength: 6 })
+  @IsNotEmpty()
+  @MinLength(6)
+  password: string;
 
   @ApiPropertyOptional({ example: '19800001', maxLength: 50, nullable: true })
   @IsOptional()

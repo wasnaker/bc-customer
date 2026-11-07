@@ -15,7 +15,19 @@ export interface CustomerResolvedScopes {
   scopes: readonly CustomerAuthorizationScope[];
 }
 
+export interface CustomerLoginAccountInput {
+  email: string;
+  password: string;
+  name: string;
+  roleKey: string;
+  scopeType: string;
+  scopeId: string;
+  assignedBy: number | null;
+}
+
 export interface CustomerModuleOptions {
+  createLoginAccount?: (input: CustomerLoginAccountInput) => Promise<{ id: number }>;
+  deleteLoginAccount?: (userId: number) => Promise<void>;
   /** Delegate legacy permission checks to the host authorization service. */
   authorize: (
     roleId: number | string,

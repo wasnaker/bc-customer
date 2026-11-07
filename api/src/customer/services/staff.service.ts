@@ -1,6 +1,8 @@
 import {
   HttpStatus,
   Injectable,
+  Inject,
+  Optional,
   UnprocessableEntityException,
 } from "@nestjs/common";
 import { CreateStaffDto } from "../dto/create-staff.dto";
@@ -13,6 +15,7 @@ import { StaffRepository } from "../infrastructure/persistence/staff.repository"
 import { NullableType } from "../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../utils/types/pagination-options";
 import { RegionValidationService } from "./region-validation.service";
+import { CUSTOMER_MODULE_OPTIONS, CustomerModuleOptions } from "../customer.options";
 
 @Injectable()
 export class StaffService {
@@ -21,11 +24,15 @@ export class StaffService {
     private readonly branchRepository: BranchRepository,
     private readonly customerRepository: CustomerRepository,
     private readonly regionValidation: RegionValidationService,
+    @Optional()
+    @Inject(CUSTOMER_MODULE_OPTIONS)
+    private readonly moduleOptions?: CustomerModuleOptions,
   ) {}
 
   async create(
     branchId: Staff["branchId"],
     createStaffDto: CreateStaffDto,
+    actorUserId: number,
   ): Promise<Staff> {
     const branch = await this.branchRepository.findById(branchId);
     if (!branch) {
@@ -37,8 +44,11 @@ export class StaffService {
       });
     }
 
-    if (createStaffDto.userId !== undefined && createStaffDto.userId !== null) {
-      await this.assertUserNotLinked(createStaffDto.userId);
+    if (!this.moduleOptions?.createLoginAccount || !this.moduleOptions.deleteLoginAccount) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { account: "accountProvisioningUnavailable" },
+      });
     }
 
     if (
@@ -53,20 +63,34 @@ export class StaffService {
       );
     }
 
-    return this.staffRepository.create({
-      branchId,
+    const account = await this.moduleOptions.createLoginAccount({
+      email: createStaffDto.email,
+      password: createStaffDto.password,
       name: createStaffDto.name,
-      userId: createStaffDto.userId ?? null,
-      position: createStaffDto.position ?? null,
-      phone: createStaffDto.phone ?? null,
-      email: createStaffDto.email ?? null,
-      nip: createStaffDto.nip ?? null,
-      addressLine: createStaffDto.addressLine ?? null,
-      provinceId: createStaffDto.provinceId ?? null,
-      cityId: createStaffDto.cityId ?? null,
-      photoId: createStaffDto.photoId ?? null,
-      isActive: createStaffDto.isActive ?? true,
+      roleKey: "customer",
+      scopeType: "branch",
+      scopeId: String(branch.id),
+      assignedBy: actorUserId,
     });
+    try {
+      return await this.staffRepository.create({
+        branchId,
+        name: createStaffDto.name,
+        userId: account.id,
+        position: createStaffDto.position ?? null,
+        phone: createStaffDto.phone ?? null,
+        email: createStaffDto.email.trim().toLowerCase(),
+        nip: createStaffDto.nip ?? null,
+        addressLine: createStaffDto.addressLine ?? null,
+        provinceId: createStaffDto.provinceId ?? null,
+        cityId: createStaffDto.cityId ?? null,
+        photoId: createStaffDto.photoId ?? null,
+        isActive: createStaffDto.isActive ?? true,
+      });
+    } catch (error) {
+      await this.moduleOptions.deleteLoginAccount(account.id);
+      throw error;
+    }
   }
 
   async findManyByBranchId({

@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsEmail,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -9,6 +10,7 @@ import {
   IsString,
   MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
 
 export class CreateBranchDto {
@@ -77,6 +79,23 @@ export class CreateBranchDto {
   @IsOptional()
   @IsIn(['npwp', 'nitku'])
   vatType?: 'npwp' | 'nitku';
+
+  @ApiProperty({ example: 'Branch Admin Name', maxLength: 190 })
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(190)
+  adminName: string;
+
+  @ApiProperty({ example: 'branch.admin@example.com' })
+  @IsNotEmpty()
+  @IsEmail()
+  @MaxLength(190)
+  adminEmail: string;
+
+  @ApiProperty({ minLength: 6 })
+  @IsNotEmpty()
+  @MinLength(6)
+  adminPassword: string;
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()
