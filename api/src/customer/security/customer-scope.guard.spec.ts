@@ -162,6 +162,47 @@ describe('CustomerScopeGuard', () => {
     );
   });
 
+  it('checks both stored and destination scope when a document owner changes', async () => {
+    documents.findDocumentById.mockResolvedValue({
+      id: '5',
+      ownerType: 'customer',
+      ownerId: '16',
+    });
+    options.authorizeScoped
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false);
+
+    await expect(
+      execute(
+        { kind: 'document-lookup', param: 'id' },
+        {
+          method: 'PATCH',
+          params: { id: '5' },
+          body: { ownerType: 'branch', ownerId: '43' },
+          user: { id: 39 },
+        },
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+
+    expect(options.authorizeScoped).toHaveBeenNthCalledWith(
+      1,
+      39,
+      'update:customer',
+      { scopes: [{ type: 'customer', id: '16' }] },
+    );
+    expect(options.authorizeScoped).toHaveBeenNthCalledWith(
+      2,
+      39,
+      'update:branch',
+      {
+        scopes: [
+          { type: 'branch', id: '43' },
+          { type: 'customer', id: '17' },
+        ],
+      },
+    );
+  });
+
   it('delegates new customer creation with no pre-existing scope', async () => {
     await expect(
       execute(
