@@ -90,7 +90,8 @@ export class CustomerScopeGuard implements CanActivate {
       source.kind === 'staff-list' ||
       source.kind === 'customer-list'
     ) {
-      if (!this.options?.resolveScopes) {
+      const resolveScopes = this.options?.resolveScopes;
+      if (!resolveScopes) {
         throw new ForbiddenException('Scoped read authorization is not configured');
       }
       const resource =
@@ -99,7 +100,7 @@ export class CustomerScopeGuard implements CanActivate {
           : source.kind === 'staff-list'
             ? 'staff'
             : 'customer';
-      const resolvedScopes = await this.options.resolveScopes(
+      const resolvedScopes = await resolveScopes(
         userId,
         `read:${resource}`,
       );
@@ -115,7 +116,8 @@ export class CustomerScopeGuard implements CanActivate {
       return true;
     }
 
-    if (!this.options?.authorizeScoped) {
+    const authorizeScoped = this.options?.authorizeScoped;
+    if (!authorizeScoped) {
       throw new ForbiddenException('Scoped authorization is not configured');
     }
 
@@ -124,7 +126,7 @@ export class CustomerScopeGuard implements CanActivate {
     const permission = action ? `${action}:${resolved.resource}` : null;
     if (!permission) throw new ForbiddenException();
 
-    const allowed = await this.options.authorizeScoped(
+    const allowed = await authorizeScoped(
       userId,
       permission,
       resolved.target,
@@ -153,7 +155,7 @@ export class CustomerScopeGuard implements CanActivate {
         destinationOwnerId,
       );
       const destinationPermission = `${action}:${destination.resource}`;
-      const canMoveDocument = await this.options.authorizeScoped(
+      const canMoveDocument = await authorizeScoped(
         userId,
         destinationPermission,
         destination.target,
@@ -171,7 +173,7 @@ export class CustomerScopeGuard implements CanActivate {
       const customerOnlyTarget: CustomerAuthorizationTarget = {
         scopes: [{ type: 'customer', id: resolved.branch.customerId }],
       };
-      const canChangeHeadOffice = await this.options.authorizeScoped(
+      const canChangeHeadOffice = await authorizeScoped(
         userId,
         permission,
         customerOnlyTarget,
