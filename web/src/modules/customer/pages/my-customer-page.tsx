@@ -301,8 +301,7 @@ export function MyStaffTab() {
     Boolean(
       updateScope &&
         (updateScope.global ||
-          updateScope.customerIds.length > 0 &&
-          updateScope.customerIds.includes(String(item.customerId ?? "")) ||
+          updateScope.customerIds.length > 0 ||
           updateScope.branchIds.includes(String(item.branchId))),
     );
 
