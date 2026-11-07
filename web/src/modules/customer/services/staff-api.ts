@@ -22,12 +22,12 @@ export type StaffListRequest = {
 
 export type StaffListResponse = CustomerPagination<Staff>;
 
-export function useGetStaffService() {
+export function useGetStaffService(profileMode = false) {
   const fetch = useFetch();
   return useCallback(
     (data: StaffListRequest, requestConfig?: RequestConfigType) => {
       // Global list endpoint; branchId opsional sebagai filter server-side.
-      const url = new URL(`${API_URL}/v1/customer/staff`);
+      const url = new URL(`${API_URL}/v1/customer/${profileMode ? "me/staff" : "staff"}`);
       if (data.branchId != null) {
         url.searchParams.append("branchId", String(data.branchId));
       }
@@ -46,7 +46,7 @@ export function useGetStaffService() {
         wrapperFetchJsonResponse<StaffListResponse>,
       );
     },
-    [fetch],
+    [fetch, profileMode],
   );
 }
 
@@ -57,7 +57,7 @@ export function useGetStaffByIdService() {
   const fetch = useFetch();
   return useCallback(
     (data: StaffGetRequest, requestConfig?: RequestConfigType) => {
-      return fetch(`${API_URL}/v1/customer/staff/${data.id}`, {
+      return fetch(`${API_URL}/v1/customer/${profileMode ? "me/staff" : "staff"}/${data.id}`, {
         method: "GET",
         ...requestConfig,
       }).then(wrapperFetchJsonResponse<StaffGetResponse>);
@@ -104,7 +104,7 @@ export type StaffPatchRequest = {
 };
 export type StaffPatchResponse = Staff;
 
-export function useUpdateStaffService() {
+export function useUpdateStaffService(profileMode = false) {
   const fetch = useFetch();
   return useCallback(
     (data: StaffPatchRequest, requestConfig?: RequestConfigType) => {
@@ -130,6 +130,6 @@ export function useDeleteStaffService() {
         ...requestConfig,
       }).then(wrapperFetchJsonResponse<StaffDeleteResponse>);
     },
-    [fetch],
+    [fetch, profileMode],
   );
 }
