@@ -15,7 +15,9 @@ export abstract class CustomerRepository {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
+    scope?: { global: boolean; customerIds: readonly string[] };
     filterOptions?: FilterCustomerDto | null;
     sortOptions?: SortCustomerDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -29,6 +31,7 @@ export abstract class CustomerRepository {
 
   abstract countWithFilter(
     filterOptions?: FilterCustomerDto | null,
+    scope?: { global: boolean; customerIds: readonly string[] },
   ): Promise<number>;
 
   abstract update(
