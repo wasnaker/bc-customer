@@ -20,6 +20,7 @@ import { BranchesRelationalRepository } from "./infrastructure/persistence/relat
 import { StaffRelationalRepository } from "./infrastructure/persistence/relational/repositories/staff.repository";
 import { CustomerDocumentsRelationalRepository } from "./infrastructure/persistence/relational/repositories/customer-document.repository";
 import { CustomerAccessGuard } from "./security/customer-access.guard";
+import { CustomerScopeGuard } from "./security/customer-scope.guard";
 import { CustomerDemoDataSeedService } from "./database/seeds/demo-data/customer-demo-data.seed.service";
 import {
   CUSTOMER_MODULE_OPTIONS,
@@ -54,6 +55,7 @@ export type {
     CustomerDocumentService,
     RegionValidationService,
     CustomerAccessGuard,
+    CustomerScopeGuard,
     CustomerDemoDataSeedService,
     { provide: CustomerRepository, useClass: CustomersRelationalRepository },
     { provide: BranchRepository, useClass: BranchesRelationalRepository },
@@ -70,6 +72,7 @@ export type {
     StaffService,
     CustomerDocumentService,
     CustomerAccessGuard,
+    CustomerScopeGuard,
     CustomerDemoDataSeedService,
   ],
 })
