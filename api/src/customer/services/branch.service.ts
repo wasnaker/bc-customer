@@ -96,8 +96,10 @@ export class BranchService {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
     customerId?: Branch["customerId"] | null;
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] };
     filterOptions?: FilterBranchDto | null;
     sortOptions?: SortBranchDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -110,17 +112,19 @@ export class BranchService {
       filterOptions,
       sortOptions,
       paginationOptions,
+      scope,
     });
   }
 
   async countMany(
     customerId?: Branch["customerId"] | null,
     filterOptions?: FilterBranchDto | null,
+    scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number> {
     if (customerId != null) {
       await this.assertCustomerExists(customerId);
     }
-    return this.branchRepository.countMany(customerId, filterOptions);
+    return this.branchRepository.countMany(customerId, filterOptions, scope);
   }
 
   private async assertCustomerExists(
