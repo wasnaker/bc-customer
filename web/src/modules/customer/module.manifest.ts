@@ -17,16 +17,8 @@ export default defineModuleManifest({
     { path: "/admin/customer/branch", component: BranchPage, title: { namespace: "module-customer", key: "branch.title" }, permission: "read:branch" },
     { path: "/admin/customer/staff", component: StaffPage, title: { namespace: "module-customer", key: "staff.title" }, permission: "read:staff" },
   ],
-  menu: [
-    {
-      slug: "customer", label: { namespace: "module-customer", key: "menu.parent" },
-      href: "/admin/customer/branch", position: 100, icon: Building2, permission: "read:branch",
-      children: [
-        { slug: "customers", label: { namespace: "module-customer", key: "menu.customer" }, href: "/admin/customer", position: 1, permission: "read:customer" },
-        { slug: "branch", label: { namespace: "module-customer", key: "menu.branch" }, href: "/admin/customer/branch", position: 2, permission: "read:branch" },
-        { slug: "staff", label: { namespace: "module-customer", key: "menu.staff" }, href: "/admin/customer/staff", position: 3, permission: "read:staff" },
-      ],
-    },
-  ],
+  // Customer administration is intentionally not exposed in the sidebar for any role.
+  // Customer information is surfaced through the permission-gated Profile tabs.
+  menu: [],
   dashboardWidgets: [],
 });
