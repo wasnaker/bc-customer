@@ -19,6 +19,9 @@ Related:
 | Ancestor scope | customer assignment matches target containing customer ancestor | Allow |
 | Explicit global admin | Core role has protected wildcard permission | Allow |
 | Unknown/non-module role | No module registration and no core admin grant | Deny |
+| Administrator-created custom role | Module permission + `core-role:<roleId>` assignment matching target | Allow |
+| Custom role permission only | No `core-role:<roleId>` assignment | Deny |
+| Custom role global assignment | `global` scope declared by module manifest and explicit assignment exists | Allow |
 | Inactive role | Role inactive | Deny |
 | Invalid user/role IDs | Invalid or empty identifiers | Deny |
 | Assignment revoked | Assignment deleted before next request | Deny |
