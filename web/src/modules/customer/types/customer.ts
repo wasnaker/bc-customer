@@ -58,6 +58,8 @@ export interface Staff {
   branchName?: string | null;
   /** Nama customer atas cabang — terisi pada list global, null bila tak di-join. */
   customerName?: string | null;
+  /** Owning customer id — terisi pada list global/Profile. */
+  customerId?: string | null;
   name: string;
   /** Host user id — unik antar staff bila diisi. */
   userId: number | null;
