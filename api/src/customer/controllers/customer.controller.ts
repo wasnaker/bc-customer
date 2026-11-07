@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Inject,
+  Optional,
   Delete,
   Get,
   HttpCode,
@@ -49,6 +51,10 @@ import { CustomerAccessGuard } from "../security/customer-access.guard";
 import { CustomerScopeGuard } from "../security/customer-scope.guard";
 import { CustomerScope } from "../security/customer-scope.decorator";
 import {
+  CUSTOMER_MODULE_OPTIONS,
+  CustomerModuleOptions,
+} from "../customer.options";
+import {
   CustomerResource,
   CustomerSelfBranch,
 } from "../security/customer-resource.decorator";
@@ -75,6 +81,9 @@ export class CustomerController {
     private readonly branchService: BranchService,
     private readonly staffService: StaffService,
     private readonly customerDocumentService: CustomerDocumentService,
+    @Optional()
+    @Inject(CUSTOMER_MODULE_OPTIONS)
+    private readonly moduleOptions?: CustomerModuleOptions,
   ) {}
 
   // ─── Documents (polymorphic: customer / branch / staff) ───────────────────
@@ -225,6 +234,69 @@ export class CustomerController {
     );
 
     return infinityPagination(data, { page, limit }, total);
+  }
+
+  /**
+   * Returns the signed-in user's own resolved permissions/scopes for UI
+   * affordances. API guards still re-evaluate every operation independently.
+   */
+  @CustomerSelfBranch()
+  @Get("me/scope")
+  @HttpCode(HttpStatus.OK)
+  async findMyScope(
+    @Req() request: { user?: { id?: number | string } },
+  ): Promise<{
+    global: boolean;
+    permissions: Record<
+      string,
+      { global: boolean; customerIds: string[]; branchIds: string[] }
+    >;
+  }> {
+    const userId = request.user?.id;
+    if (userId === undefined || userId === null) {
+      throw new UnauthorizedException();
+    }
+    if (!this.moduleOptions?.resolveScopes) {
+      throw new NotFoundException();
+    }
+
+    const permissionNames = [
+      "read:customer",
+      "read:branch",
+      "read:staff",
+      "create:branch",
+      "update:branch",
+      "delete:branch",
+      "create:staff",
+      "update:staff",
+      "delete:staff",
+      "update:customer",
+      "delete:customer",
+    ];
+    const resolved = await Promise.all(
+      permissionNames.map(async (permission) => [
+        permission,
+        await this.moduleOptions!.resolveScopes!(userId, permission),
+      ] as const),
+    );
+    const permissions = Object.fromEntries(
+      resolved.map(([permission, scope]) => [
+        permission,
+        {
+          global: scope.global,
+          customerIds: scope.scopes
+            .filter((item) => item.type === "customer")
+            .map((item) => String(item.id)),
+          branchIds: scope.scopes
+            .filter((item) => item.type === "branch")
+            .map((item) => String(item.id)),
+        },
+      ]),
+    );
+    return {
+      global: resolved.some(([, scope]) => scope.global),
+      permissions,
+    };
   }
 
   /**
