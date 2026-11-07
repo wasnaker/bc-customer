@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { FindOptionsWhere, ILike, Repository } from 'typeorm';
+import { FindOptionsWhere, ILike, In, Repository } from 'typeorm';
 import { CustomerEntity } from '../entities/customer.entity';
 import { NullableType } from '../../../../../utils/types/nullable.type';
 import { FilterCustomerDto, SortCustomerDto } from '../../../../dto/query-customer.dto';
@@ -36,7 +36,9 @@ export class CustomersRelationalRepository implements CustomerRepository {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
+    scope?: { global: boolean; customerIds: readonly string[] };
     filterOptions?: FilterCustomerDto | null;
     sortOptions?: SortCustomerDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -47,6 +49,11 @@ export class CustomersRelationalRepository implements CustomerRepository {
     }
     if (filterOptions?.isActive !== undefined) {
       where.isActive = filterOptions.isActive;
+    }
+
+    if (scope && !scope.global) {
+      if (scope.customerIds.length === 0) return [];
+      where.id = In(scope.customerIds.map((id) => BigInt(id)));
     }
 
     const entities = await this.customerRepository.find({
@@ -86,6 +93,7 @@ export class CustomersRelationalRepository implements CustomerRepository {
 
   async countWithFilter(
     filterOptions?: FilterCustomerDto | null,
+    scope?: { global: boolean; customerIds: readonly string[] },
   ): Promise<number> {
     const where: FindOptionsWhere<CustomerEntity> = {};
     if (filterOptions?.name) {
@@ -93,6 +101,10 @@ export class CustomersRelationalRepository implements CustomerRepository {
     }
     if (filterOptions?.isActive !== undefined) {
       where.isActive = filterOptions.isActive;
+    }
+    if (scope && !scope.global) {
+      if (scope.customerIds.length === 0) return 0;
+      where.id = In(scope.customerIds.map((id) => BigInt(id)));
     }
     return this.customerRepository.count({ where });
   }
