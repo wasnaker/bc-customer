@@ -97,7 +97,9 @@ export class CustomerService {
     filterOptions,
     sortOptions,
     paginationOptions,
+    scope,
   }: {
+    scope?: { global: boolean; customerIds: readonly string[] };
     filterOptions?: FilterCustomerDto | null;
     sortOptions?: SortCustomerDto[] | null;
     paginationOptions: IPaginationOptions;
@@ -106,13 +108,15 @@ export class CustomerService {
       filterOptions,
       sortOptions,
       paginationOptions,
+      scope,
     });
   }
 
   async countWithFilter(
     filterOptions?: FilterCustomerDto | null,
+    scope?: { global: boolean; customerIds: readonly string[] },
   ): Promise<number> {
-    return this.customerRepository.countWithFilter(filterOptions);
+    return this.customerRepository.countWithFilter(filterOptions, scope);
   }
 
   async findCustomerById(id: Customer['id']): Promise<NullableType<Customer>> {
