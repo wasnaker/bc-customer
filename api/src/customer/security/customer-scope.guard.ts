@@ -278,6 +278,7 @@ export class CustomerScopeGuard implements CanActivate {
     ownerType: CustomerDocumentOwnerTypeEnum,
     ownerId: string,
   ): Promise<ResolvedCustomerTarget> {
+    if (!/^\d+$/.test(ownerId)) throw new NotFoundException();
     if (ownerType === CustomerDocumentOwnerTypeEnum.CUSTOMER) {
       const customer = await this.customers.findCustomerById(ownerId);
       if (!customer) throw new NotFoundException();
