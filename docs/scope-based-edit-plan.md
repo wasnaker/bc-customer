@@ -18,9 +18,9 @@ Target ini merupakan acceptance scenario dari data demo. ID, nama, dan hubungan 
 ## 2. Kondisi repository yang diperiksa
 
 Per 2026-11-07:
-- Host `brocoders-api` setelah evaluator scope universal dan pin module: `25c8955399f05490bd5420296384b6c30fbff3d7`.
-- Host `brocoders-react-web` setelah pin module customer untuk UI scope-aware: `964ab950062b82a98cc8206d192fe52d17256b43`.
-- `bc-customer` setelah implementasi scope, UI, test plan, dan SQL backfill: `d2ea5b8a555ea99f8281b079ca36ab2f00c821eb`.
+- Host `brocoders-api` setelah evaluator scope universal dan pin module: `dde44ba44dba0c3d49ac596129147af471d8dd09`.
+- Host `brocoders-react-web` setelah pin module customer untuk UI scope-aware: `5f510742e61d3af7d0e8d7a8c5f1df1eb93422ba`.
+- `bc-customer` setelah implementasi scope, UI, test plan, dan SQL backfill: `d01caf1ab6c3c801700672c96b22ee0bd961d2d6`.
 - `bc-equipment` kontrak module options scope: `a1abe2a47c8a41a70bf1493b883da6bb7d07c820`.
 - `bc-region` kontrak module options scope: `e9cbdd97bb7b4211f1bb08b6d6c4feaae4d91f36`.
 
