@@ -145,10 +145,18 @@ export class CustomerController {
   // as an id param by NestJS route matching.
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Branch) })
+  @CustomerScope({ kind: 'branch-list' })
   @CustomerResource("branch")
   @Get("branches")
   @HttpCode(HttpStatus.OK)
   async findAllBranches(
+    @Req() request: {
+      customerAuthorizationScope?: {
+        global: boolean;
+        customerIds: string[];
+        branchIds: string[];
+      };
+    },
     @Query() query: QueryBranchDto,
   ): Promise<InfinityPaginationResponseDto<Branch>> {
     const page = query?.page ?? 1;
@@ -156,23 +164,37 @@ export class CustomerController {
 
     const filterOptions: FilterBranchDto | null = query.filters ?? null;
     const customerId = query.customerId?.trim() || null;
+    const scope = request.customerAuthorizationScope ?? {
+      global: false,
+      customerIds: [],
+      branchIds: [],
+    };
 
     const data = await this.branchService.findMany({
       customerId,
       filterOptions,
       sortOptions: query.sort ?? null,
       paginationOptions: { page, limit },
+      scope,
     });
-    const total = await this.branchService.countMany(customerId, filterOptions);
+    const total = await this.branchService.countMany(customerId, filterOptions, scope);
 
     return infinityPagination(data, { page, limit }, total);
   }
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Staff) })
+  @CustomerScope({ kind: 'staff-list' })
   @CustomerResource("staff")
   @Get("staff")
   @HttpCode(HttpStatus.OK)
   async findAllStaff(
+    @Req() request: {
+      customerAuthorizationScope?: {
+        global: boolean;
+        customerIds: string[];
+        branchIds: string[];
+      };
+    },
     @Query() query: QueryStaffDto,
   ): Promise<InfinityPaginationResponseDto<Staff>> {
     const page = query?.page ?? 1;
@@ -181,6 +203,11 @@ export class CustomerController {
     const filterOptions: FilterStaffDto | null = query.filters ?? null;
     const branchId = query.branchId?.trim() || null;
     const customerId = query.customerId?.trim() || null;
+    const scope = request.customerAuthorizationScope ?? {
+      global: false,
+      customerIds: [],
+      branchIds: [],
+    };
 
     const data = await this.staffService.findMany({
       branchId,
@@ -188,11 +215,13 @@ export class CustomerController {
       filterOptions,
       sortOptions: query.sort ?? null,
       paginationOptions: { page, limit },
+      scope,
     });
     const total = await this.staffService.countMany(
       branchId,
       filterOptions,
       customerId,
+      scope,
     );
 
     return infinityPagination(data, { page, limit }, total);
@@ -247,21 +276,40 @@ export class CustomerController {
   }
 
   @ApiOkResponse({ type: InfinityPaginationResponse(Customer) })
+  @CustomerScope({ kind: 'customer-list' })
   @Get()
   @HttpCode(HttpStatus.OK)
   async findCustomers(
+    @Req() request: {
+      customerAuthorizationScope?: {
+        global: boolean;
+        customerIds: string[];
+        branchIds: string[];
+      };
+    },
     @Query() query: QueryCustomerDto,
   ): Promise<InfinityPaginationResponseDto<Customer>> {
     const page = query?.page ?? 1;
     const limit = Math.min(query?.limit ?? 10, 50);
+    const currentScope = request.customerAuthorizationScope ?? {
+      global: false,
+      customerIds: [],
+      branchIds: [],
+    };
+    const scope = {
+      global: currentScope.global,
+      customerIds: currentScope.customerIds,
+    };
 
     const data = await this.customerService.findManyWithPagination({
       filterOptions: query.filters ?? null,
       sortOptions: query.sort ?? null,
       paginationOptions: { page, limit },
+      scope,
     });
     const total = await this.customerService.countWithFilter(
       query.filters ?? null,
+      scope,
     );
 
     return infinityPagination(data, { page, limit }, total);
