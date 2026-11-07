@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { StaffEntity } from "../entities/staff.entity";
+import { BranchEntity } from "../entities/branch.entity";
 import { NullableType } from "../../../../../utils/types/nullable.type";
 import { FilterStaffDto, SortStaffDto } from "../../../../dto/query-staff.dto";
 import { Staff } from "../../../../domain/staff";
