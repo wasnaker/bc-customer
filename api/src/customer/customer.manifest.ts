@@ -51,14 +51,14 @@ export const moduleManifest: BackendModuleManifest = {
       name: 'Customer Admin',
       description: 'Administrator at the customer company / head-office scope.',
       scope: 'customer',
-      permissions: ['read:customer', 'create:customer', 'update:customer', 'delete:customer', 'read:branch', 'create:branch', 'update:branch', 'delete:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff', 'read:my-customer-company', 'read:my-customer-branch'],
+      permissions: ['read:customer', 'create:customer', 'update:customer', 'delete:customer', 'read:branch', 'create:branch', 'update:branch', 'delete:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff', 'read:my-customer-company', 'read:my-customer-branch', 'read:my-customer-staff', 'update:my-customer-staff'],
     },
     {
       key: 'customer-branch-admin',
       name: 'Customer Branch Admin',
       description: 'Administrator limited to one assigned branch.',
       scope: 'branch',
-      permissions: ['read:branch', 'update:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff', 'read:my-customer-company'],
+      permissions: ['read:branch', 'update:branch', 'read:staff', 'create:staff', 'update:staff', 'delete:staff', 'read:my-customer-company', 'read:my-customer-staff', 'update:my-customer-staff'],
     },
     {
       key: 'customer',
