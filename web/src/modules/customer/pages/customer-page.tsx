@@ -6,6 +6,7 @@ import {
   useCustomersServerSide,
   useCustomer,
   useDeleteCustomer,
+  useMyCustomerScope,
 } from "../hooks/use-customers";
 import { useMasterDetail } from "@/core/master-detail/use-master-detail";
 import { SmallTable, type SmallTableColumn } from "@/components/small-table";
@@ -24,6 +25,16 @@ import type { Customer } from "../types/customer";
 
 function PageInner() {
   const { t } = useTranslation("module-customer");
+  const { data: accessScope } = useMyCustomerScope();
+  const canManageCustomer = (permission: string, item: Customer) => {
+    const scope = accessScope?.permissions[permission];
+    return Boolean(
+      scope &&
+        (scope.global || scope.customerIds.includes(String(item.id))),
+    );
+  };
+  const canCreateCustomer =
+    accessScope?.permissions["create:customer"]?.global === true;
   const { selectedId, showDetail, select, close, toggle, afterSave } =
     useMasterDetail({ invalidateKey: ["customer"] });
   const [formOpen, setFormOpen] = useState(false);
@@ -121,27 +132,31 @@ function PageInner() {
   function toolbar(item: Customer) {
     return (
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          title={t("actions.edit")}
+        {canManageCustomer("update:customer", item) ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            title={t("actions.edit")}
           onClick={() => {
             setEditItem(item);
             setFormOpen(true);
           }}
-        >
-          <PencilIcon className="size-3.5" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          className="text-destructive hover:bg-destructive/10"
+          >
+            <PencilIcon className="size-3.5" />
+          </Button>
+        ) : null}
+        {canManageCustomer("delete:customer", item) ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            className="text-destructive hover:bg-destructive/10"
           title={t("actions.delete")}
           onClick={() => handleDelete(item.id)}
           disabled={deleteMutation.isPending}
-        >
-          <TrashIcon className="size-3.5" />
-        </Button>
+          >
+            <TrashIcon className="size-3.5" />
+          </Button>
+        ) : null}
         <Button
           variant="ghost"
           size="icon-sm"
@@ -182,14 +197,16 @@ function PageInner() {
             <p className="page-subtitle">{t("customer.subtitle")}</p>
           </div>
           <div className="page-header__actions">
-            <Button
-              onClick={() => {
-                setEditItem(null);
-                setFormOpen(true);
-              }}
-            >
-              {t("customer.create")}
-            </Button>
+            {canCreateCustomer ? (
+              <Button
+                onClick={() => {
+                  setEditItem(null);
+                  setFormOpen(true);
+                }}
+              >
+                {t("customer.create")}
+              </Button>
+            ) : null}
           </div>
         </div>
 
