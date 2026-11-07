@@ -262,6 +262,7 @@ export class CustomerController {
 
     const permissionNames = [
       "read:customer",
+      "create:customer",
       "read:branch",
       "read:staff",
       "create:branch",
