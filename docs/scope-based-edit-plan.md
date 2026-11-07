@@ -125,6 +125,10 @@ Bila endpoint create customer tetap global untuk Customer Admin, kebijakan itu h
 
 ## 8. Backfill dan kualitas data
 
+SQL audit dan backfill yang dapat direview:
+- [scope-assignment-audit.sql](./sql/scope-assignment-audit.sql) — read-only preflight.
+- [scope-assignment-backfill.sql](./sql/scope-assignment-backfill.sql) — idempotent, memvalidasi prasyarat dan default berakhir dengan `ROLLBACK`; ubah ke `COMMIT` hanya setelah hasil dry-run dan output review disetujui.
+
 Jangan jalankan backfill langsung dari dokumen. Buat query dry-run yang menampilkan:
 - user dan seluruh role;
 - staff record yang terhubung;
