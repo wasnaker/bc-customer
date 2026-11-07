@@ -384,6 +384,12 @@ function PageInner() {
           customerId={formCustomerId}
           editItem={editItem}
           hasHeadOffice={Boolean(headOffice)}
+          canChangeHeadOffice={Boolean(
+            accessScope?.permissions["update:branch"]?.global ||
+              accessScope?.permissions["update:branch"]?.customerIds.includes(
+                String(formCustomerId),
+              ),
+          )}
           onSuccess={(savedId) => afterSave(savedId)}
         />
       ) : null}
