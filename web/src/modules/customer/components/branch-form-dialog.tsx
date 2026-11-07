@@ -181,7 +181,7 @@ export function BranchFormDialog({
           cityId: fieldErrors.cityId,
           isHeadOffice: fieldErrors.isHeadOffice,
           adminName: fieldErrors.adminName,
-          adminEmail: fieldErrors.adminEmail,
+          adminEmail: fieldErrors.adminEmail ?? fieldErrors.email,
           adminPassword: fieldErrors.adminPassword,
         });
       }

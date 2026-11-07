@@ -84,6 +84,8 @@ export function StaffFormDialog({
         editItem
           ? {
               name: editItem.name ?? "",
+              password: "",
+              passwordConfirm: "",
               position: editItem.position ?? "",
               phone: editItem.phone ?? "",
               email: editItem.email ?? "",
