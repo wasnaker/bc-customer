@@ -1,16 +1,25 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useTranslation } from "@/services/i18n/client";
 import HTTP_CODES_ENUM from "@/services/api/types/http-codes";
 import { useGetMyBranchService } from "../services/branch-api";
 import { BranchOverviewTab } from "../components/branch-detail-tab";
+import { BranchFormDialog } from "../components/branch-form-dialog";
+import { useHeadOffice } from "../hooks/use-branches";
+import { useMyCustomerScope } from "../hooks/use-customers";
+import { Button } from "@/components/ui/button";
+import PencilIcon from "lucide-react/dist/esm/icons/pencil";
 import useAuth from "@/services/auth/use-auth";
 
 export function MyCompanyTab() {
   const { t } = useTranslation("module-customer");
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const getMyBranch = useGetMyBranchService();
+  const { data: accessScope } = useMyCustomerScope();
+  const [formOpen, setFormOpen] = useState(false);
   const {
     data: branch,
     isLoading,
@@ -27,6 +36,19 @@ export function MyCompanyTab() {
     },
     enabled: Boolean(user?.id),
   });
+  const { data: headOffice } = useHeadOffice(branch?.customerId ?? null);
+  const updateScope = accessScope?.permissions["update:branch"];
+  const canEdit = Boolean(
+    branch &&
+      updateScope &&
+      (updateScope.global ||
+        updateScope.customerIds.includes(String(branch.customerId)) ||
+        updateScope.branchIds.includes(String(branch.id))),
+  );
+  const canChangeHeadOffice = Boolean(
+    updateScope?.global ||
+      updateScope?.customerIds.includes(String(branch?.customerId)),
+  );
 
   return (
     <div className="page-content--narrow">
@@ -73,6 +95,12 @@ export function MyCompanyTab() {
                 >
                   {branch.isActive ? t("table.active") : t("table.inactive")}
                 </span>
+                {canEdit ? (
+                  <Button size="sm" variant="outline" onClick={() => setFormOpen(true)}>
+                    <PencilIcon className="mr-2 size-3.5" />
+                    {t("actions.edit")}
+                  </Button>
+                ) : null}
               </div>
             </div>
 
@@ -98,6 +126,22 @@ export function MyCompanyTab() {
           </section>
         )}
       </div>
+
+      {branch && canEdit ? (
+        <BranchFormDialog
+          open={formOpen}
+          onOpenChange={setFormOpen}
+          customerId={branch.customerId}
+          editItem={branch}
+          hasHeadOffice={Boolean(headOffice)}
+          canChangeHeadOffice={canChangeHeadOffice}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["customer", "my-branch"] });
+            queryClient.invalidateQueries({ queryKey: ["customer", "branches"] });
+            queryClient.invalidateQueries({ queryKey: ["customer", "head-office"] });
+          }}
+        />
+      ) : null}
     </div>
   );
 }
