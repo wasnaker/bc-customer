@@ -339,6 +339,7 @@ export class CustomerController {
   // ─── Customers ─────────────────────────────────────────────────────────────
 
   @ApiCreatedResponse({ type: Customer })
+  @CustomerScope({ kind: 'global-create' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   createCustomer(
