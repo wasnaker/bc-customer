@@ -39,8 +39,10 @@ function PageInner() {
   const { data: accessScope } = useMyCustomerScope();
   const readStaffScope = accessScope?.permissions["read:staff"];
   const allowedBranchIds = readStaffScope?.branchIds ?? [];
+  const readCustomerScope = accessScope?.permissions["read:customer"];
   const canSelectCustomer = Boolean(
-    readStaffScope?.global || (readStaffScope?.customerIds.length ?? 0) > 0,
+    readCustomerScope?.global ||
+      (readCustomerScope?.customerIds.length ?? 0) > 0,
   );
 
   // ── Cascade: customer → branch ──────────────────────────────────────────
