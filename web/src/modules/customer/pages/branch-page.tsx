@@ -34,6 +34,11 @@ function PageInner() {
   const { t } = useTranslation("module-customer");
   const { data: accessScope } = useMyCustomerScope();
 
+  const canSelectCustomer = Boolean(
+    accessScope?.permissions["read:customer"]?.global ||
+      (accessScope?.permissions["read:customer"]?.customerIds.length ?? 0) > 0,
+  );
+
   const canManageBranch = (
     permission: string,
     item: Branch,
@@ -282,36 +287,38 @@ function PageInner() {
           </div>
         </div>
 
-        {/* ── Filter customer (opsional — kosong = semua customer) ───── */}
-        <div className="mb-4 max-w-md space-y-1.5">
-          <Label htmlFor="branch-customer-picker">
-            {t("branch.selectCustomer")}
-          </Label>
-          <div className="flex items-center gap-2">
-            <SearchableSelect
-              id="branch-customer-picker"
-              ariaLabel={t("branch.selectCustomer")}
-              value={customer}
-              onSelect={handleCustomerChange}
-              fetchOptions={fetchCustomerOptions}
-              placeholder={t("branch.filterAllCustomers")}
-              loadingText={t("picker.loading")}
-              emptyText={t("picker.empty")}
-              errorText={t("picker.error")}
-              className="flex-1"
-            />
-            {customer && (
-              <Button
-                variant="outline"
-                size="sm"
-                title={t("branch.clearCustomerFilter")}
-                onClick={() => handleCustomerChange(null)}
-              >
-                <TrashIcon className="size-3.5" />
-              </Button>
-            )}
+        {canSelectCustomer ? (
+          {/* ── Filter customer (opsional — kosong = semua customer) ───── */}
+          <div className="mb-4 max-w-md space-y-1.5">
+            <Label htmlFor="branch-customer-picker">
+              {t("branch.selectCustomer")}
+            </Label>
+            <div className="flex items-center gap-2">
+              <SearchableSelect
+                id="branch-customer-picker"
+                ariaLabel={t("branch.selectCustomer")}
+                value={customer}
+                onSelect={handleCustomerChange}
+                fetchOptions={fetchCustomerOptions}
+                placeholder={t("branch.filterAllCustomers")}
+                loadingText={t("picker.loading")}
+                emptyText={t("picker.empty")}
+                errorText={t("picker.error")}
+                className="flex-1"
+              />
+              {customer && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  title={t("branch.clearCustomerFilter")}
+                  onClick={() => handleCustomerChange(null)}
+                >
+                  <TrashIcon className="size-3.5" />
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
 
         {/* ── Table (selalu tampil; tanpa customer = list global) ────── */}
         <SmallTable<Branch>
