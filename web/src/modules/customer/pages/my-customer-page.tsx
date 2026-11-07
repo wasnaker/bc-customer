@@ -12,6 +12,9 @@ import { useMyCustomerScope } from "../hooks/use-customers";
 import { Button } from "@/components/ui/button";
 import PencilIcon from "lucide-react/dist/esm/icons/pencil";
 import useAuth from "@/services/auth/use-auth";
+import { useStaffServerSide } from "../hooks/use-staff";
+import { StaffFormDialog } from "../components/staff-form-dialog";
+import type { Staff } from "../types/customer";
 
 export function MyCompanyTab() {
   const { t } = useTranslation("module-customer");
@@ -277,6 +280,112 @@ export function MyBranchTab() {
             queryClient.invalidateQueries({ queryKey: ["customer", "branches"] });
             queryClient.invalidateQueries({ queryKey: ["customer", "head-office"] });
             queryClient.invalidateQueries({ queryKey: ["customer", "my-branch"] });
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+
+/** Staff records visible through the signed-in user's Profile permission + scope. */
+export function MyStaffTab() {
+  const { t } = useTranslation("module-customer");
+  const queryClient = useQueryClient();
+  const { data: accessScope } = useMyCustomerScope();
+  const table = useStaffServerSide(null, null, true);
+  const [editItem, setEditItem] = useState<Staff | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const updateScope = accessScope?.permissions["update:my-customer-staff"];
+  const canEdit = (item: Staff) =>
+    Boolean(
+      updateScope &&
+        (updateScope.global ||
+          updateScope.customerIds.length > 0 &&
+          updateScope.customerIds.includes(String(item.customerId ?? "")) ||
+          updateScope.branchIds.includes(String(item.branchId))),
+    );
+
+  return (
+    <div className="page-content--wide">
+      <div className="page-content--body space-y-4">
+        <div>
+          <h1 className="page-title">{t("staff.title")}</h1>
+          <p className="page-subtitle">{t("staff.subtitle")}</p>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <input
+            aria-label={t("staff.searchLabel")}
+            value={table.search}
+            onChange={(event) => {
+              table.setSearch(event.target.value);
+              table.setPage(1);
+            }}
+            placeholder={t("staff.search")}
+            className="h-9 w-full max-w-sm rounded-md border bg-background px-3 text-sm"
+          />
+          <span className="text-sm text-muted-foreground">
+            {table.total} {t("table.of")} {table.total}
+          </span>
+        </div>
+        <div className="overflow-x-auto rounded-lg border bg-card">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-left">
+              <tr>
+                <th className="px-4 py-3 font-medium">{t("table.name")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.position")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.branch")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.email")}</th>
+                <th className="px-4 py-3 font-medium">{t("table.isActive")}</th>
+                <th className="px-4 py-3 text-right font-medium">{t("actions.edit")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {table.isLoading ? (
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">{t("table.loading")}</td></tr>
+              ) : table.error ? (
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-destructive">{t("table.error")}</td></tr>
+              ) : table.data.length === 0 ? (
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">{t("staff.empty")}</td></tr>
+              ) : table.data.map((item) => (
+                <tr key={item.id} className="border-t">
+                  <td className="px-4 py-3 font-medium">{item.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{item.position ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{item.branchName ?? item.branchId}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{item.email ?? "—"}</td>
+                  <td className="px-4 py-3">{item.isActive ? t("table.active") : t("table.inactive")}</td>
+                  <td className="px-4 py-3 text-right">
+                    {canEdit(item) ? (
+                      <Button size="sm" variant="outline" onClick={() => { setEditItem(item); setFormOpen(true); }}>
+                        <PencilIcon className="mr-2 size-3.5" />{t("actions.edit")}
+                      </Button>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-muted-foreground">
+            {table.total === 0 ? "0" : `${(table.page - 1) * table.limit + 1}–${Math.min(table.page * table.limit, table.total)}`} {t("table.of")} {table.total}
+          </span>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" disabled={table.page <= 1} onClick={() => table.setPage(table.page - 1)}>{t("actions.prev_page")}</Button>
+            <Button size="sm" variant="outline" disabled={table.page * table.limit >= table.total} onClick={() => table.setPage(table.page + 1)}>{t("actions.next_page")}</Button>
+          </div>
+        </div>
+      </div>
+      {editItem && canEdit(editItem) ? (
+        <StaffFormDialog
+          open={formOpen}
+          onOpenChange={(open) => { setFormOpen(open); if (!open) setEditItem(null); }}
+          branchId={editItem.branchId}
+          editItem={editItem}
+          profileMode
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["customer", "my-staff"] });
+            queryClient.invalidateQueries({ queryKey: ["customer", "staff"] });
           }}
         />
       ) : null}
