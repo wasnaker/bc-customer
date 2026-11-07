@@ -1,6 +1,6 @@
 # Arsitektur Otorisasi Berbasis Permission dan Scope
 
-Status: **rancangan normatif — implementasi bertahap**
+Status: **arsitektur normatif; fondasi core dan Customer phase 1 sudah di-commit, lifecycle assignment dan validasi production masih berjalan**
 Tanggal: 2026-11-07
 
 Dokumen ini menetapkan kontrak bersama antara Brocoders Authorization Core (host) dan module API. Setiap modul tetap memiliki domain data dan resolver scope sendiri; host menjadi satu-satunya otoritas untuk mengevaluasi role, permission, assignment, dan keputusan akses.
