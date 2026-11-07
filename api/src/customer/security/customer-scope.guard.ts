@@ -77,7 +77,9 @@ export class CustomerScopeGuard implements CanActivate {
       CUSTOMER_SCOPE_METADATA,
       [context.getHandler(), context.getClass()],
     );
-    if (!source) return true;
+    if (!source) {
+      throw new ForbiddenException('Customer route is missing scope policy metadata');
+    }
 
     const userId = request.user?.id;
     if (userId === undefined || userId === null) {
