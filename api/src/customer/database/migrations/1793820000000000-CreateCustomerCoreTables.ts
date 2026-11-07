@@ -17,10 +17,10 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * - Maks 1 HO per customer: partial unique index.
  * - branch/staff region FK memakai ON DELETE RESTRICT.
  */
-export class CreateCustomerCoreTables1793820000000000
+export class CreateCustomerCoreTables1793820000000
   implements MigrationInterface
 {
-  name = 'CreateCustomerCoreTables1793820000000000';
+  name = 'CreateCustomerCoreTables1793820000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`

@@ -12,10 +12,10 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * - salt            = 1 (placeholder; nanti dibekukan per modul via Settings, I7/I8)
  * - alphabet Crockford Base32 tanpa I/L/O/U.
  */
-export class AddCustomerCodeTriggers1793850000000000001
+export class AddCustomerCodeTriggers1793850000000
   implements MigrationInterface
 {
-  name = 'AddCustomerCodeTriggers1793850000000000001';
+  name = 'AddCustomerCodeTriggers1793850000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
@@ -51,6 +51,7 @@ export class AddCustomerCodeTriggers1793850000000000001
       END;
       $fn$ LANGUAGE plpgsql;
     `);
+    await queryRunner.query('DROP TRIGGER IF EXISTS "trg_customer_code" ON "customer"');
     await queryRunner.query(`
       CREATE TRIGGER "trg_customer_code"
       AFTER INSERT ON "customer"
@@ -69,6 +70,7 @@ export class AddCustomerCodeTriggers1793850000000000001
       END;
       $fn$ LANGUAGE plpgsql;
     `);
+    await queryRunner.query('DROP TRIGGER IF EXISTS "trg_branch_code" ON "branch"');
     await queryRunner.query(`
       CREATE TRIGGER "trg_branch_code"
       AFTER INSERT ON "branch"
