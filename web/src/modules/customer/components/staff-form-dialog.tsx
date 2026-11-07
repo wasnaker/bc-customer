@@ -39,6 +39,8 @@ interface FormState {
 interface FormErrors {
   name?: string;
   email?: string;
+  password?: string;
+  passwordConfirm?: string;
   provinceId?: string;
   cityId?: string;
 }
@@ -165,6 +167,7 @@ export function StaffFormDialog({
         setErrors({
           name: fieldErrors.name,
           email: fieldErrors.email,
+          password: fieldErrors.password,
           provinceId: fieldErrors.provinceId,
           cityId: fieldErrors.cityId,
         });
