@@ -25,6 +25,8 @@ Per 2026-11-07:
 - `bc-equipment` kontrak module options scope: `a1abe2a47c8a41a70bf1493b883da6bb7d07c820`.
 - `bc-region` kontrak module options scope: `e9cbdd97bb7b4211f1bb08b6d6c4feaae4d91f36`.
 
+Verifikasi dependency: kedua host mem-pin `bc-customer` pada code commit `d01caf1`; perbandingan Git menunjukkan 11 commit `bc-customer` setelah pin hanya mengubah tiga dokumen scope, bukan source code. Nilai di `package.json` dan `package-lock.json` backend/frontend konsisten.
+
 Implementasi yang sudah di-commit:
 - Host `ModuleAuthorizationService.hasScopedModulePermission` mengevaluasi permission dan assignment dari role yang sama: role module memakai `moduleId + moduleRoleKey`, sedangkan custom role core memakai key internal `core-role:<roleId>` dan `scopeTypes` manifest. Bypass sistem hanya dari wildcard core `*`.
 - Host `resolveModuleScopes` mengembalikan scope yang benar-benar dimiliki role pemegang permission; callback memuat ulang role user dari database pada setiap request.
