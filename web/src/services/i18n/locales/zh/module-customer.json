@@ -174,5 +174,10 @@
     "noBranch": "此账户尚未关联分支机构。",
     "error": "无法加载分支信息，请重试。",
     "branchDetails": "分支详情"
+  },
+  "myStaff": {
+    "tabTitle": "我的员工",
+    "title": "我的员工",
+    "subtitle": "查看和管理您获授权客户分支机构中的员工。"
   }
 }
