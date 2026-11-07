@@ -165,6 +165,7 @@
     "customerNotExists": "Customer not found.",
     "unknown": "Something went wrong. Please try again."
   },
+  "myBranch": { "title": "My Branch", "subtitle": "Manage branches belonging to your customer.", "tabTitle": "My Branch", "branchCount": "branches", "error": "Unable to determine your customer branch scope." },
   "myCompany": {
     "title": "My Company",
     "subtitle": "The branch linked to your account.",
