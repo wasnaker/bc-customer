@@ -161,10 +161,16 @@ export class BranchesRelationalRepository implements BranchRepository {
     let where: FindOptionsWhere<BranchEntity> | FindOptionsWhere<BranchEntity>[] = baseWhere;
     if (scope && !scope.global) {
       const scopedWhere: FindOptionsWhere<BranchEntity>[] = [];
-      if (scope.customerIds.length > 0) {
+      if (
+        scope.customerIds.length > 0 &&
+        (customerId == null || scope.customerIds.includes(String(customerId)))
+      ) {
         scopedWhere.push({
           ...baseWhere,
-          customerId: In(scope.customerIds.map((id) => BigInt(id))),
+          customerId:
+            customerId != null
+              ? BigInt(customerId)
+              : In(scope.customerIds.map((id) => BigInt(id))),
         });
       }
       if (scope.branchIds.length > 0) {
