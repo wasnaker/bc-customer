@@ -25,6 +25,7 @@ Related:
 
 ## 2. Customer resolver tests
 
+- Target-less `POST /customer` is allowed only for the explicit core wildcard administrator; a customer-scoped Customer Admin cannot create another tenant.
 - Customer ID resolves only an existing customer.
 - Branch ID resolves branch and its actual customerId from PostgreSQL.
 - Staff ID resolves staff → branch → customer.
@@ -53,6 +54,7 @@ Related:
 - A non-admin core role without a module role is not a global bypass.
 - Missing scope callback or resolver is a deny, never legacy permission-only.
 - Inactive customer, branch, staff, or document owner.
+- `GET /customer/me/scope` ignores client-supplied userId and resolves from authenticated user only.
 - Self-service endpoint ignores client-supplied userId and resolves from authenticated user only.
 - Assignment revoke takes effect on next request with the same login session.
 
