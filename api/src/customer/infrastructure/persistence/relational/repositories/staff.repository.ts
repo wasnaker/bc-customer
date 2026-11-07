@@ -189,13 +189,19 @@ export class StaffRelationalRepository implements StaffRepository {
           },
         });
       }
-      if (scope.branchIds.length > 0) {
+      if (
+        scope.branchIds.length > 0 &&
+        (branchId == null || scope.branchIds.includes(String(branchId)))
+      ) {
         scopedWhere.push({
           ...baseWhere,
           ...(customerId != null
             ? { branch: { customerId: BigInt(customerId) } }
             : {}),
-          branchId: In(scope.branchIds.map((id) => BigInt(id))),
+          branchId:
+            branchId != null
+              ? BigInt(branchId)
+              : In(scope.branchIds.map((id) => BigInt(id))),
         });
       }
       if (scopedWhere.length === 0) return 0;
