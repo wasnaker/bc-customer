@@ -35,7 +35,7 @@ Global administrator dikenali oleh Authorization Core melalui permission wildcar
 - ketiadaan module role;
 - assignment scope yang kosong.
 
-Core memvalidasi wildcard tersebut hanya dapat diberikan melalui administrasi global yang berwenang. Module tidak dapat mendeklarasikan wildcard untuk role miliknya. Jika kontrak wildcard yang ada belum memenuhi aturan ini, core harus menambahkan capability/flag system-admin yang eksplisit sebelum enforcement scope diaktifkan.
+Evaluator backend saat ini hanya mengakui wildcard bila permission dimiliki role core (`role.moduleId IS NULL`) dan permission itu sendiri bukan milik module (`permission.moduleId IS NULL`). Module seeder menolak deklarasi wildcard oleh module. Hak untuk menghubungkan wildcard ke role tetap harus dibatasi oleh administrasi role core; verifikasi otorisasi UI/API pemberian wildcard adalah rollout gate terpisah.
 
 ### 2.2 Module role dan assignment
 
