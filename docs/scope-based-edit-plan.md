@@ -18,11 +18,11 @@ Target ini merupakan acceptance scenario dari data demo. ID, nama, dan hubungan 
 ## 2. Kondisi repository yang diperiksa
 
 Per 2026-11-07:
-- Host `brocoders-api` terbaru: `c18184879d2310855d81e401636ffc7f3dfdc082`.
-- Host `brocoders-react-web` terbaru: `de4af8ecae932144545176ae4402f296e441dd09`.
-- `bc-customer` terbaru: `e3d64305502dd61e6715483d4c5eaa39a1a45774` (dokumen ini).
-- `bc-equipment` terbaru: `41ef498ae8568b0afd36a3faf22e7c6cd1a31b19`.
-- `bc-region` terbaru: `0203ffbf5813635dcdf3687dd84e41558576c8de`.
+- Host `brocoders-api` setelah perubahan scope core dan pin dependency: `aefcc535ffdf71704d862784bc0b0ace86ddb165`.
+- Host `brocoders-react-web` yang diperiksa: `de4af8ecae932144545176ae4402f296e441dd09` (tidak perlu perubahan untuk tahap ini).
+- `bc-customer` setelah implementasi scope, UI, test plan, dan SQL backfill: `132731bf0bf3dd245e8c5cd0443815b4faf82f13`.
+- `bc-equipment` kontrak module options scope: `a1abe2a47c8a41a70bf1493b883da6bb7d07c820`.
+- `bc-region` kontrak module options scope: `e9cbdd97bb7b4211f1bb08b6d6c4feaae4d91f36`.
 
 Implementasi yang sudah di-commit:
 - Host `ModuleAuthorizationService.hasScopedModulePermission` mengevaluasi permission dan assignment dari role yang sama (`moduleId + moduleRoleKey`) serta mengenali bypass global hanya dari wildcard core `*`.
