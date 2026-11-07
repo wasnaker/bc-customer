@@ -60,10 +60,10 @@ Manifest Customer saat ini mendeklarasikan role:
 - `customer-branch-admin` — branch scope;
 - `customer` — branch scope.
 
-Perubahan manifest yang direncanakan:
-- Tambahkan `update:branch` ke `customer-branch-admin` sesuai acceptance scenario.
-- Jangan menambahkan permission lain di luar kebutuhan yang disetujui.
-- Permission role tetap dikelola melalui module manifest dan Authorization Core; jangan hardcode role ID.
+Perubahan manifest yang sudah di-commit:
+- `customer-branch-admin` sudah memiliki `update:branch` sesuai acceptance scenario.
+- Tidak ada permission tambahan di luar kebutuhan Customer yang didefinisikan pada manifest.
+- Permission role dikelola melalui module manifest dan Authorization Core; tidak menggunakan role ID hardcode.
 
 Evaluasi contoh:
 - Vera: role `customer-admin` dengan assignment `customer:16` dapat mengakses scope path branch 38/39/40/41 yang memiliki ancestor customer 16. Assignment branch 38 milik role lain tidak memperluas customer scope.
@@ -72,7 +72,7 @@ Evaluasi contoh:
 
 ## 5. Resolusi target
 
-Tambahkan kontrak module-side yang tidak mengimpor entity host. Bentuk konseptual:
+Kontrak module-side yang sudah diimplementasikan tidak mengimpor entity host. Bentuk konseptual:
 
 ```ts
 interface CustomerAuthorizationTarget {
@@ -113,7 +113,7 @@ Semua endpoint di bawah wajib dievaluasi. Endpoint self-service hanya dikecualik
 | `GET /customer/me/branch` | self-service | authenticated user → staff → branch | self-only; tidak menerima userId/branchId dari client |
 | `GET /customer/me/scope` | self-service | authenticated user assignments | mengembalikan scope untuk UX; bukan bukti otorisasi API |
 
-Bila endpoint create customer tetap global untuk Customer Admin, kebijakan itu harus dinyatakan eksplisit dalam manifest/policy dan diuji. Jangan membuat pengecualian implisit karena route tidak memiliki target scope.
+Keputusan implementasi saat ini: `POST /customer` hanya dapat dilakukan oleh global administrator core. `Customer Admin` yang hanya memiliki customer scope ditolak karena customer baru belum memiliki target scope. Perubahan kebijakan ini memerlukan keputusan eksplisit, perubahan manifest/policy, dan test baru.
 
 ## 7. Kebijakan khusus Branch
 
@@ -159,16 +159,16 @@ Aturan backfill:
 
 Setiap tahap harus berupa commit kecil yang dapat direview dan diuji. Jangan mengaktifkan enforcement sebelum semua prasyarat tahap sebelumnya lulus.
 
-| Tahap | Repository | Perubahan | Gate sebelum lanjut |
-|---|---|---|---|
-| 0 | bc-customer | Dokumen arsitektur, implementasi, dan test plan diperbarui | Review desain |
-| 1 | brocoders-api | Core evaluator permission+scope universal, admin bypass eksplisit, matching roleKey, unit tests | Test core lulus; legacy API tetap kompatibel |
-| 2 | bc-customer | Resolver target customer/branch/staff/document dan callback contract; tanpa enforcement aktif | Unit tests resolver lulus |
-| 3 | bc-customer + brocoders-api | Assignment audit/dry-run/backfill dan migration permission branch-admin | Hasil dry-run disetujui; no unresolved users |
-| 4 | bc-customer | Enforcement update/create/delete di backend, fail-closed | Negative API tests lulus |
-| 5 | bc-customer | Read filtering untuk list/count/detail dan dokumen | Pagination/count/detail konsisten |
-| 6 | brocoders-react-web + bc-customer | Scope endpoint, route/menu permission, UI gating | UI tidak menyajikan aksi yang tidak diizinkan |
-| 7 | semua repo terkait | Integration regression dan dokumentasi operasi | Test matrix penuh lulus; baru aktifkan enforcement production |
+| Tahap | Repository | Perubahan | Status saat ini | Gate berikutnya |
+|---|---|---|---|---|
+| 0 | bc-customer | Dokumen arsitektur, implementasi, dan test plan | <badge label="Selesai" color="success"/> | Review akhir dokumen |
+| 1 | brocoders-api | Core evaluator permission+scope universal, admin bypass eksplisit, matching roleKey, unit tests | Kode dan unit test sudah di-commit; hasil eksekusi belum terverifikasi | Jalankan test core dan build |
+| 2 | bc-customer | Resolver target customer/branch/staff/document dan callback contract | Kode dan test resolver sudah di-commit; hasil eksekusi belum terverifikasi | Jalankan test resolver |
+| 3 | bc-customer + brocoders-api | Assignment audit/dry-run/backfill dan permission manifest | SQL audit/backfill serta permission manifest tersedia; belum dijalankan pada PostgreSQL target | Review dry-run, mapping user, dan approval |
+| 4 | bc-customer | Enforcement update/create/delete di backend, fail-closed | Kode sudah di-commit; hasil API test belum terverifikasi | Jalankan negative API tests |
+| 5 | bc-customer | Read filtering untuk list/count/detail dan dokumen | Query scoping sudah di-commit; hasil integrasi PostgreSQL belum terverifikasi | Uji pagination/count/detail dan dokumen |
+| 6 | brocoders-react-web + bc-customer | Scope endpoint, route/menu permission, UI gating | Kode UI dan dependency pin sudah di-commit; hasil build/E2E belum terverifikasi | Jalankan frontend build dan E2E |
+| 7 | semua repo terkait | Integration regression dan dokumentasi operasi | Belum selesai | Luluskan seluruh test matrix; baru pertimbangkan enforcement production |
 
 Tidak ada fallback permission-only pada route yang sudah ditandai scoped. Bila suatu tahap tidak bisa diselesaikan aman, hentikan di commit terakhir yang tetap kompatibel dan jangan aktifkan enforcement setengah jadi.
 
@@ -188,7 +188,7 @@ Tidak ada fallback permission-only pada route yang sudah ditandai scoped. Bila s
 
 ## 12. Keputusan operasional yang harus diverifikasi sebelum rollout
 
-1. Apakah wildcard global yang saat ini digunakan frontend (`*.*` atau format aktualnya) sudah menjadi permission core yang terlindungi? Jika tidak, buat system-admin capability di core.
-2. Apakah endpoint create customer memang harus dapat digunakan Customer Admin, dan apakah targetnya global atau customer scoped?
-3. Bagaimana mengelola Customer Admin yang tidak berada di head office: manual assignment customer scope dengan approval/audit adalah default aman.
-4. Apakah dokumen polymorphic memiliki ownerType/ownerId yang konsisten dan foreign key/validasi owner? Bila tidak, perbaiki sebelum scope enforcement dokumen.
+1. **Wildcard/global admin:** evaluator hanya mengakui wildcard core yang bukan milik module. Tetap verifikasi bahwa hanya administrator berwenang yang dapat memberikan wildcard melalui UI/API role management; ini rollout gate yang belum diverifikasi.
+2. **Create customer:** keputusan implementasi saat ini adalah hanya global administrator core yang dapat membuat customer baru. Ubah hanya melalui keputusan kebijakan eksplisit.
+3. **Customer Admin tanpa head office:** manual assignment customer scope dengan approval dan audit adalah default aman; backfill otomatis harus berhenti untuk akun ambigu.
+4. **Dokumen polymorphic:** resolver memvalidasi ownerType/ownerId terhadap record domain dan mengotorisasi owner tersimpan serta tujuan bila owner diubah. Validasi data orphan/owner yang tidak konsisten tetap wajib pada audit PostgreSQL sebelum rollout.
