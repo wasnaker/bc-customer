@@ -357,13 +357,20 @@ function PageInner() {
                     ))}
                   </>
                 ) : (
-                  allowedBranchIds.map((id) => (
+                  <>
+                    {allowedBranchIds.length > 1 ? (
+                      <SelectItem value="__all__">
+                        {t("staff.allBranches")}
+                      </SelectItem>
+                    ) : null}
+                    {allowedBranchIds.map((id) => (
                     <SelectItem key={id} value={id}>
                       {String(selectedBranch?.id) === id
                         ? selectedBranch?.name ?? id
                         : id}
                     </SelectItem>
-                  ))
+                    ))}
+                  </>
                 )}
               </SelectContent>
             </Select>
