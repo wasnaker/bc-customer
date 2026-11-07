@@ -8,7 +8,10 @@ import {
   useDeleteBranch,
   useHeadOffice,
 } from "../hooks/use-branches";
-import { useCustomerOptionsFetcher } from "../hooks/use-customers";
+import {
+  useCustomerOptionsFetcher,
+  useMyCustomerScope,
+} from "../hooks/use-customers";
 import { useProvinceOptions } from "../hooks/use-region-ref";
 import { useMasterDetail } from "@/core/master-detail/use-master-detail";
 import { SmallTable, type SmallTableColumn } from "@/components/small-table";
@@ -29,6 +32,30 @@ import type { Branch } from "../types/customer";
 
 function PageInner() {
   const { t } = useTranslation("module-customer");
+  const { data: accessScope } = useMyCustomerScope();
+
+  const canManageBranch = (
+    permission: string,
+    item: Branch,
+  ): boolean => {
+    const scope = accessScope?.permissions[permission];
+    return Boolean(
+      scope &&
+        (scope.global ||
+          scope.customerIds.includes(String(item.customerId)) ||
+          scope.branchIds.includes(String(item.id))),
+    );
+  };
+
+  const canCreateBranch = (() => {
+    const scope = accessScope?.permissions["create:branch"];
+    return Boolean(
+      scope &&
+        (scope.global ||
+          (customerId != null &&
+            scope.customerIds.includes(String(customerId)))),
+    );
+  })();
 
   // ── Pemilih customer (master dari master-detail) ────────────────────────
   const [customer, setCustomer] = useState<SearchableSelectOption | null>(null);
@@ -173,27 +200,31 @@ function PageInner() {
   function toolbar(item: Branch) {
     return (
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="icon-sm"
-          title={t("actions.edit")}
+        {canManageBranch("update:branch", item) ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            title={t("actions.edit")}
           onClick={() => {
             setEditItem(item);
             setFormOpen(true);
           }}
-        >
-          <PencilIcon className="size-3.5" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          className="text-destructive hover:bg-destructive/10"
+          >
+            <PencilIcon className="size-3.5" />
+          </Button>
+        ) : null}
+        {canManageBranch("delete:branch", item) ? (
+          <Button
+            variant="outline"
+            size="icon-sm"
+            className="text-destructive hover:bg-destructive/10"
           title={t("actions.delete")}
           onClick={() => handleDelete(item.id)}
           disabled={deleteMutation.isPending}
-        >
-          <TrashIcon className="size-3.5" />
-        </Button>
+          >
+            <TrashIcon className="size-3.5" />
+          </Button>
+        ) : null}
         <Button
           variant="ghost"
           size="icon-sm"
@@ -244,9 +275,11 @@ function PageInner() {
             <p className="page-subtitle">{t("branch.subtitle")}</p>
           </div>
           <div className="page-header__actions">
-            <Button onClick={openCreateDialog} disabled={!customerId}>
-              {t("branch.create")}
-            </Button>
+            {canCreateBranch ? (
+              <Button onClick={openCreateDialog} disabled={!customerId}>
+                {t("branch.create")}
+              </Button>
+            ) : null}
           </div>
         </div>
 
