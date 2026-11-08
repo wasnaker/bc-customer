@@ -258,7 +258,7 @@ export function StaffFormDialog({
       {/* Email / NIP */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="staff-email">{t("form.field.email")}</Label>
+          <Label htmlFor="staff-email">{t("form.field.email")} {!isEditing ? <span className="text-destructive">*</span> : null}</Label>
           <Input
             id="staff-email"
             type="email"
@@ -293,8 +293,8 @@ export function StaffFormDialog({
         <section className="space-y-3 rounded-md border p-4">
           <div><h3 className="text-sm font-semibold">{t("form.loginAccount.title")}</h3><p className="text-xs text-muted-foreground">{t("form.loginAccount.description")}</p></div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5"><Label htmlFor="staff-password">{t("form.field.password")}</Label><Input id="staff-password" type="password" value={form.password} onChange={(e) => setField("password", e.target.value)} />{errors.password ? <p className="text-xs text-destructive">{errors.password}</p> : null}</div>
-            <div className="space-y-1.5"><Label htmlFor="staff-password-confirm">{t("form.field.confirmPassword")}</Label><Input id="staff-password-confirm" type="password" value={form.passwordConfirm} onChange={(e) => setField("passwordConfirm", e.target.value)} />{errors.passwordConfirm ? <p className="text-xs text-destructive">{errors.passwordConfirm}</p> : null}</div>
+            <div className="space-y-1.5"><Label htmlFor="staff-password">{t("form.field.password")} <span className="text-destructive">*</span></Label><Input id="staff-password" type="password" value={form.password} onChange={(e) => setField("password", e.target.value)} />{errors.password ? <p className="text-xs text-destructive">{errors.password}</p> : null}</div>
+            <div className="space-y-1.5"><Label htmlFor="staff-password-confirm">{t("form.field.confirmPassword")} <span className="text-destructive">*</span></Label><Input id="staff-password-confirm" type="password" value={form.passwordConfirm} onChange={(e) => setField("passwordConfirm", e.target.value)} />{errors.passwordConfirm ? <p className="text-xs text-destructive">{errors.passwordConfirm}</p> : null}</div>
           </div>
         </section>
       ) : null}

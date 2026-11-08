@@ -244,18 +244,18 @@ export function BranchFormDialog({
         <section className="space-y-3 rounded-md border p-4">
           <div><h3 className="text-sm font-semibold">{t("form.branchAdmin.title")}</h3><p className="text-xs text-muted-foreground">{t("form.branchAdmin.description")}</p></div>
           <div className="space-y-1.5">
-            <Label htmlFor="branch-admin-name">{t("form.field.adminName")}</Label>
+            <Label htmlFor="branch-admin-name">{t("form.field.adminName")} <span className="text-destructive">*</span></Label>
             <Input id="branch-admin-name" value={form.adminName} onChange={(e) => setField("adminName", e.target.value)} maxLength={190} />
             {errors.adminName ? <p className="text-xs text-destructive">{t("errors." + errors.adminName)}</p> : null}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="branch-admin-email">{t("form.field.email")}</Label>
+            <Label htmlFor="branch-admin-email">{t("form.field.email")} <span className="text-destructive">*</span></Label>
             <Input id="branch-admin-email" type="email" value={form.adminEmail} onChange={(e) => setField("adminEmail", e.target.value)} maxLength={190} />
             {errors.adminEmail ? <p className="text-xs text-destructive">{t("errors." + errors.adminEmail)}</p> : null}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-1.5"><Label htmlFor="branch-admin-password">{t("form.field.password")}</Label><Input id="branch-admin-password" type="password" value={form.adminPassword} onChange={(e) => setField("adminPassword", e.target.value)} />{errors.adminPassword ? <p className="text-xs text-destructive">{errors.adminPassword}</p> : null}</div>
-            <div className="space-y-1.5"><Label htmlFor="branch-admin-password-confirm">{t("form.field.confirmPassword")}</Label><Input id="branch-admin-password-confirm" type="password" value={form.adminPasswordConfirm} onChange={(e) => setField("adminPasswordConfirm", e.target.value)} />{errors.adminPasswordConfirm ? <p className="text-xs text-destructive">{errors.adminPasswordConfirm}</p> : null}</div>
+            <div className="space-y-1.5"><Label htmlFor="branch-admin-password">{t("form.field.password")} <span className="text-destructive">*</span></Label><Input id="branch-admin-password" type="password" value={form.adminPassword} onChange={(e) => setField("adminPassword", e.target.value)} />{errors.adminPassword ? <p className="text-xs text-destructive">{errors.adminPassword}</p> : null}</div>
+            <div className="space-y-1.5"><Label htmlFor="branch-admin-password-confirm">{t("form.field.confirmPassword")} <span className="text-destructive">*</span></Label><Input id="branch-admin-password-confirm" type="password" value={form.adminPasswordConfirm} onChange={(e) => setField("adminPasswordConfirm", e.target.value)} />{errors.adminPasswordConfirm ? <p className="text-xs text-destructive">{errors.adminPasswordConfirm}</p> : null}</div>
           </div>
         </section>
       ) : null}
