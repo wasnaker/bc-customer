@@ -49,7 +49,8 @@
     "selectBranch": "分支",
     "selectBranchPlaceholder": "选择分支…",
     "selectBranchNeedCustomer": "请先选择客户",
-    "selectBranchFirst": "请先选择分支以查看其员工。"
+    "selectBranchFirst": "请先选择分支以查看其员工。",
+    "createSection": "添加员工"
   },
   "table": {
     "code": "代码",

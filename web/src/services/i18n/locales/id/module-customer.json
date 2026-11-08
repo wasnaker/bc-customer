@@ -49,7 +49,8 @@
     "selectBranch": "Cabang",
     "selectBranchPlaceholder": "Pilih cabang…",
     "selectBranchNeedCustomer": "Pilih pelanggan terlebih dahulu",
-    "selectBranchFirst": "Pilih cabang untuk melihat stafnya."
+    "selectBranchFirst": "Pilih cabang untuk melihat stafnya.",
+    "createSection": "Tambah Staf"
   },
   "table": {
     "code": "Kode",

@@ -49,7 +49,8 @@
     "selectBranch": "지점",
     "selectBranchPlaceholder": "지점 선택…",
     "selectBranchNeedCustomer": "먼저 고객을 선택하세요",
-    "selectBranchFirst": "지점을 선택하면 직원이 표시됩니다."
+    "selectBranchFirst": "지점을 선택하면 직원이 표시됩니다.",
+    "createSection": "직원 추가"
   },
   "table": {
     "code": "코드",

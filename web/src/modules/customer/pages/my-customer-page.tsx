@@ -335,8 +335,24 @@ export function MyStaffTab() {
   return (
     <div className="page-content--wide">
       <div className="page-content--body space-y-4">
-        <div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="page-title">{t("myStaff.title")}</h1><p className="page-subtitle">{t("myStaff.subtitle")}</p></div>{canCreateStaff ? <Button disabled={!selectedCreateBranchId} onClick={() => { setEditItem(null); setFormOpen(true); }}>{t("staff.create")}</Button> : null}</div>
-        {canChooseBranch ? <div className="max-w-sm space-y-1.5"><label className="text-sm font-medium" htmlFor="my-staff-create-branch">{t("staff.selectBranch")}</label><Select value={createBranchId} onValueChange={setCreateBranchId}><SelectTrigger id="my-staff-create-branch"><SelectValue placeholder={t("staff.selectBranchPlaceholder")} /></SelectTrigger><SelectContent>{branchOptions.map((branch) => <SelectItem key={String(branch.id)} value={String(branch.id)}>{branch.name}</SelectItem>)}</SelectContent></Select></div> : null}
+        <div className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="page-title">{t("myStaff.title")}</h1><p className="page-subtitle">{t("myStaff.subtitle")}</p></div></div>
+        {canCreateStaff ? (
+          <div className="rounded-lg border bg-card p-4 space-y-3">
+            <p className="text-sm font-medium text-muted-foreground">{t("staff.createSection")}</p>
+            <div className="flex flex-wrap items-end gap-3">
+              {canChooseBranch ? (
+                <div className="space-y-1.5 flex-1 min-w-[200px] max-w-sm">
+                  <label className="text-sm font-medium" htmlFor="my-staff-create-branch">{t("staff.selectBranch")}</label>
+                  <Select value={createBranchId} onValueChange={setCreateBranchId}>
+                    <SelectTrigger id="my-staff-create-branch"><SelectValue placeholder={t("staff.selectBranchPlaceholder")} /></SelectTrigger>
+                    <SelectContent>{branchOptions.map((branch) => <SelectItem key={String(branch.id)} value={String(branch.id)}>{branch.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              ) : null}
+              <Button disabled={!selectedCreateBranchId} onClick={() => { setEditItem(null); setFormOpen(true); }}>{t("staff.create")}</Button>
+            </div>
+          </div>
+        ) : null}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <input
             aria-label={t("staff.searchLabel")}
