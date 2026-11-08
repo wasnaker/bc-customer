@@ -163,7 +163,8 @@
     },
     "loginAccount": {
       "title": "Login Account",
-      "description": "This staff member will receive a login account with the Customer role."
+      "description": "This staff member will receive a login account with the Customer role.",
+      "emailDescription": "This email address will be used by the staff member to sign in."
     }
   },
   "errors": {

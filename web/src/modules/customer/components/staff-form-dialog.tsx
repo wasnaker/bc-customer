@@ -274,6 +274,7 @@ export function StaffFormDialog({
               {t(`errors.${errors.email}`)}
             </p>
           )}
+          {!isEditing ? <p className="text-xs text-muted-foreground">{t("form.loginAccount.emailDescription")}</p> : null}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="staff-nip">{t("form.field.nip")}</Label>

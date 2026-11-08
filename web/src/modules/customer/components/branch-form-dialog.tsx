@@ -252,6 +252,7 @@ export function BranchFormDialog({
             <Label htmlFor="branch-admin-email">{t("form.field.email")} <span className="text-destructive">*</span></Label>
             <Input id="branch-admin-email" type="email" value={form.adminEmail} onChange={(e) => setField("adminEmail", e.target.value)} maxLength={190} />
             {errors.adminEmail ? <p className="text-xs text-destructive">{t("errors." + errors.adminEmail)}</p> : null}
+            <p className="text-xs text-muted-foreground">{t("form.loginAccount.emailDescription")}</p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5"><Label htmlFor="branch-admin-password">{t("form.field.password")} <span className="text-destructive">*</span></Label><Input id="branch-admin-password" type="password" value={form.adminPassword} onChange={(e) => setField("adminPassword", e.target.value)} />{errors.adminPassword ? <p className="text-xs text-destructive">{errors.adminPassword}</p> : null}</div>

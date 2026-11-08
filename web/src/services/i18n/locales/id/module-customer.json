@@ -163,7 +163,8 @@
     },
     "loginAccount": {
       "title": "Akun Login",
-      "description": "Staff ini akan mendapatkan akun login dengan role Customer."
+      "description": "Staff ini akan mendapatkan akun login dengan role Customer.",
+      "emailDescription": "Email ini akan digunakan oleh staff untuk login."
     }
   },
   "errors": {
