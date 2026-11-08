@@ -92,4 +92,30 @@ describe("BranchService account provisioning", () => {
     expect(moduleOptions.deleteLoginAccount).toHaveBeenCalledWith(101);
     expect(branchRepository.remove).toHaveBeenCalledWith("42");
   });
+  it("still removes the branch if deleting the provisioned account fails", async () => {
+    const failure = new Error("staff insert failed");
+    staffRepository.create.mockRejectedValue(failure);
+    moduleOptions.deleteLoginAccount.mockRejectedValue(
+      new Error("account cleanup failed"),
+    );
+
+    await expect(
+      service.create(
+        "7",
+        {
+          name: "Branch Bandung",
+          addressLine: "Jl. Asia Afrika",
+          provinceId: 11,
+          cityId: 1101,
+          adminName: "Budi Santoso",
+          adminEmail: "budi@example.com",
+          adminPassword: "secret123",
+        } as never,
+        12,
+      ),
+    ).rejects.toBeInstanceOf(AggregateError);
+
+    expect(branchRepository.remove).toHaveBeenCalledWith("42");
+  });
+
 });

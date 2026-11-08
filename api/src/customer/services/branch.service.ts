@@ -78,8 +78,27 @@ export class BranchService {
       });
       return branch;
     } catch (error) {
-      if (accountId !== null) await this.moduleOptions.deleteLoginAccount(accountId);
-      await this.branchRepository.remove(branch.id);
+      // Compensation must attempt both cleanup steps independently. A failure
+      // while deleting the account must not leave the newly-created branch.
+      const cleanupErrors: unknown[] = [];
+      if (accountId !== null) {
+        try {
+          await this.moduleOptions.deleteLoginAccount(accountId);
+        } catch (cleanupError) {
+          cleanupErrors.push(cleanupError);
+        }
+      }
+      try {
+        await this.branchRepository.remove(branch.id);
+      } catch (cleanupError) {
+        cleanupErrors.push(cleanupError);
+      }
+      if (cleanupErrors.length > 0) {
+        throw new AggregateError(
+          [error, ...cleanupErrors],
+          "Branch creation failed and compensation was incomplete",
+        );
+      }
       throw error;
     }
   }
