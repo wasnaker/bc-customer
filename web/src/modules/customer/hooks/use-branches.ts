@@ -140,7 +140,11 @@ export function useCreateBranch() {
     mutationFn: async (data: Parameters<typeof service>[0]) => {
       const res = await service(data);
       assertOk(res.status, res.data);
-      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+      if (
+        (res.status !== HTTP_CODES_ENUM.OK &&
+          res.status !== HTTP_CODES_ENUM.CREATED) ||
+        !res.data
+      ) {
         throw new Error("Failed to save branch");
       }
       return res.data;
@@ -169,7 +173,11 @@ export function useUpdateBranch() {
     }) => {
       const res = await service({ id, data });
       assertOk(res.status, res.data);
-      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+      if (
+        (res.status !== HTTP_CODES_ENUM.OK &&
+          res.status !== HTTP_CODES_ENUM.CREATED) ||
+        !res.data
+      ) {
         throw new Error("Failed to save branch");
       }
       return res.data;

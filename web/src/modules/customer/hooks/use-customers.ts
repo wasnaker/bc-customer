@@ -99,7 +99,11 @@ export function useCreateCustomer() {
     mutationFn: async (data: Parameters<typeof service>[0]) => {
       const res = await service(data);
       assertOk(res.status, res.data);
-      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+      if (
+        (res.status !== HTTP_CODES_ENUM.OK &&
+          res.status !== HTTP_CODES_ENUM.CREATED) ||
+        !res.data
+      ) {
         throw new Error("Failed to save customer");
       }
       return res.data;
@@ -123,7 +127,11 @@ export function useUpdateCustomer() {
     }) => {
       const res = await service({ id, data });
       assertOk(res.status, res.data);
-      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+      if (
+        (res.status !== HTTP_CODES_ENUM.OK &&
+          res.status !== HTTP_CODES_ENUM.CREATED) ||
+        !res.data
+      ) {
         throw new Error("Failed to save customer");
       }
       return res.data;
@@ -239,7 +247,11 @@ export function useCreateCustomerDocument() {
     mutationFn: async (data: Parameters<typeof service>[0]) => {
       const res = await service(data);
       assertOk(res.status, res.data);
-      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+      if (
+        (res.status !== HTTP_CODES_ENUM.OK &&
+          res.status !== HTTP_CODES_ENUM.CREATED) ||
+        !res.data
+      ) {
         throw new Error("Failed to save document");
       }
       return res.data;
@@ -263,7 +275,11 @@ export function useUpdateCustomerDocument() {
     }) => {
       const res = await service({ id, data });
       assertOk(res.status, res.data);
-      if (res.status !== HTTP_CODES_ENUM.OK || !res.data) {
+      if (
+        (res.status !== HTTP_CODES_ENUM.OK &&
+          res.status !== HTTP_CODES_ENUM.CREATED) ||
+        !res.data
+      ) {
         throw new Error("Failed to save document");
       }
       return res.data;
