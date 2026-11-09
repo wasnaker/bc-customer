@@ -52,52 +52,98 @@ export class BranchService {
       await this.assertHeadOfficeAvailable(customerId);
     }
 
-    if (!this.moduleOptions?.createLoginAccount || !this.moduleOptions.deleteLoginAccount) {
-      throw new UnprocessableEntityException({ status: HttpStatus.UNPROCESSABLE_ENTITY, errors: { account: "accountProvisioningUnavailable" } });
+    if (
+      !this.moduleOptions?.createLoginAccount ||
+      !this.moduleOptions.deleteLoginAccount ||
+      !this.moduleOptions.transaction ||
+      !this.moduleOptions.recordBranchCreated
+    ) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { account: "accountProvisioningUnavailable" },
+      });
     }
-    const branch = await this.branchRepository.create({
-      customerId, name: createBranchDto.name, isHeadOffice: createBranchDto.isHeadOffice ?? false,
-      addressLine: createBranchDto.addressLine, provinceId: createBranchDto.provinceId,
-      cityId: createBranchDto.cityId, postalCode: createBranchDto.postalCode ?? null,
-      vatNumber: createBranchDto.vatNumber ?? null, vatType: createBranchDto.vatType ?? "npwp",
-      isActive: createBranchDto.isActive ?? true,
-    });
+
     let accountId: number | null = null;
+    const correlationId = randomUUID();
     try {
-      const account = await this.moduleOptions.createLoginAccount({
-        email: createBranchDto.adminEmail, password: createBranchDto.adminPassword,
-        name: createBranchDto.adminName, roleKey: "customer-branch-admin",
-        scopeType: "branch", scopeId: String(branch.id), assignedBy: actorUserId,
+      return await this.moduleOptions.transaction(async (manager) => {
+        // Branch and Staff are persisted through the same manager. If any
+        // later step fails, PostgreSQL rolls back both records and the outbox.
+        const branch = await this.branchRepository.create(
+          {
+            customerId,
+            name: createBranchDto.name,
+            isHeadOffice: createBranchDto.isHeadOffice ?? false,
+            addressLine: createBranchDto.addressLine,
+            provinceId: createBranchDto.provinceId,
+            cityId: createBranchDto.cityId,
+            postalCode: createBranchDto.postalCode ?? null,
+            vatNumber: createBranchDto.vatNumber ?? null,
+            vatType: createBranchDto.vatType ?? "npwp",
+            isActive: createBranchDto.isActive ?? true,
+          },
+          manager,
+        );
+
+        // Account provisioning is an external side effect and cannot join the
+        // PostgreSQL transaction. Its id is compensated if the DB transaction
+        // (including the outbox insert) later rolls back.
+        const account = await this.moduleOptions.createLoginAccount({
+          email: createBranchDto.adminEmail,
+          password: createBranchDto.adminPassword,
+          name: createBranchDto.adminName,
+          roleKey: "customer-branch-admin",
+          scopeType: "branch",
+          scopeId: String(branch.id),
+          assignedBy: actorUserId,
+        });
+        accountId = account.id;
+
+        await this.staffRepository.create(
+          {
+            branchId: branch.id,
+            name: createBranchDto.adminName,
+            userId: account.id,
+            position: "Branch Administrator",
+            phone: null,
+            email: createBranchDto.adminEmail.trim().toLowerCase(),
+            nip: null,
+            addressLine: null,
+            provinceId: null,
+            cityId: null,
+            photoId: null,
+            isActive: true,
+          },
+          manager,
+        );
+
+        await this.moduleOptions.recordBranchCreated(manager, {
+          entityId: branch.id,
+          actorUserId,
+          correlationId,
+          data: {
+            id: branch.id,
+            customerId: branch.customerId,
+            name: branch.name,
+            code: branch.code ?? null,
+            isHeadOffice: branch.isHeadOffice,
+            isActive: branch.isActive,
+          },
+        });
+
+        return branch;
       });
-      accountId = account.id;
-      await this.staffRepository.create({
-        branchId: branch.id, name: createBranchDto.adminName, userId: account.id,
-        position: "Branch Administrator", phone: null,
-        email: createBranchDto.adminEmail.trim().toLowerCase(), nip: null,
-        addressLine: null, provinceId: null, cityId: null, photoId: null, isActive: true,
-      });
-      return branch;
     } catch (error) {
-      // Compensation must attempt both cleanup steps independently. A failure
-      // while deleting the account must not leave the newly-created branch.
-      const cleanupErrors: unknown[] = [];
       if (accountId !== null) {
         try {
           await this.moduleOptions.deleteLoginAccount(accountId);
         } catch (cleanupError) {
-          cleanupErrors.push(cleanupError);
+          throw new AggregateError(
+            [error, cleanupError],
+            "Branch creation rolled back but account compensation failed",
+          );
         }
-      }
-      try {
-        await this.branchRepository.remove(branch.id);
-      } catch (cleanupError) {
-        cleanupErrors.push(cleanupError);
-      }
-      if (cleanupErrors.length > 0) {
-        throw new AggregateError(
-          [error, ...cleanupErrors],
-          "Branch creation failed and compensation was incomplete",
-        );
       }
       throw error;
     }
