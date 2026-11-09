@@ -27,6 +27,13 @@ export interface CustomerBranchCreatedEvent {
   data: Record<string, unknown>;
 }
 
+export interface CustomerBranchChangedEvent {
+  entityId: string | number | bigint;
+  actorUserId?: string | number | bigint | null;
+  correlationId: string;
+  data: Record<string, unknown>;
+}
+
 export interface CustomerModuleOptions {
   /** Run all Customer database writes for one use case on the same transaction manager. */
   transaction?: <T>(work: (manager: EntityManager) => Promise<T>) => Promise<T>;
@@ -34,6 +41,15 @@ export interface CustomerModuleOptions {
   recordBranchCreated?: (
     manager: EntityManager,
     event: CustomerBranchCreatedEvent,
+  ) => Promise<unknown>;
+  /** Persist update/delete events in the same transaction as the Branch write. */
+  recordBranchUpdated?: (
+    manager: EntityManager,
+    event: CustomerBranchChangedEvent,
+  ) => Promise<unknown>;
+  recordBranchDeleted?: (
+    manager: EntityManager,
+    event: CustomerBranchChangedEvent,
   ) => Promise<unknown>;
   createLoginAccount?: (input: CustomerLoginAccountInput) => Promise<{ id: number }>;
   deleteLoginAccount?: (userId: number) => Promise<void>;
