@@ -7,9 +7,13 @@ import type { EntityManager } from "typeorm";
 import { FilterBranchDto, SortBranchDto } from "../../dto/query-branch.dto";
 
 export abstract class BranchRepository {
+  /** Reserve a PostgreSQL-generated id before external account provisioning. */
+  abstract reserveId(): Promise<Branch["id"]>;
+
   abstract create(
     data: Omit<Branch, "id" | "createdAt" | "updatedAt" | "ulid" | "code">,
     manager?: EntityManager,
+    id?: Branch["id"],
   ): Promise<Branch>;
 
   abstract findManyByCustomerId({
