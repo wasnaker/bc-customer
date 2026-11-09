@@ -47,6 +47,11 @@ export const moduleManifest: BackendModuleManifest = {
       contractId: 'core.account-provisioning',
       version: '^1.0.0',
     },
+    {
+      providerModuleId: 'core',
+      contractId: 'core.authorization.registry',
+      version: '^1.0.0',
+    },
   ],
   providesServices: [
     {
