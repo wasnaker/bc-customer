@@ -21,8 +21,8 @@ export interface CustomerLoginAccountInput {
   scopeType: string; scopeId: string; assignedBy: number | null;
 }
 export interface CustomerBranchCreatedEvent {
-  entityId: string | number;
-  actorUserId: string | number;
+  entityId: string | number | bigint;
+  actorUserId: string | number | bigint;
   correlationId: string;
   data: Record<string, unknown>;
 }
