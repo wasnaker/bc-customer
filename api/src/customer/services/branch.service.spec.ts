@@ -13,6 +13,9 @@ describe("BranchService transactional account provisioning", () => {
   const branchRepository = {
     reserveId: jest.fn(),
     create: jest.fn(),
+    findById: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
   };
   const customerRepository = { findById: jest.fn() };
   const regionValidation = { assertRegionPair: jest.fn() };
@@ -20,6 +23,8 @@ describe("BranchService transactional account provisioning", () => {
   const moduleOptions = {
     transaction: jest.fn(async (work: (manager: typeof manager) => Promise<unknown>) => work(manager)),
     recordBranchCreated: jest.fn().mockResolvedValue(undefined),
+    recordBranchUpdated: jest.fn().mockResolvedValue(undefined),
+    recordBranchDeleted: jest.fn().mockResolvedValue(undefined),
     createLoginAccount: jest.fn(),
     deleteLoginAccount: jest.fn(),
   };
@@ -32,6 +37,9 @@ describe("BranchService transactional account provisioning", () => {
     regionValidation.assertRegionPair.mockResolvedValue(undefined);
     branchRepository.reserveId.mockResolvedValue("42");
     branchRepository.create.mockResolvedValue(branch);
+    branchRepository.findById.mockResolvedValue(branch);
+    branchRepository.update.mockResolvedValue({ ...branch, name: "Updated Branch" });
+    branchRepository.remove.mockResolvedValue(undefined);
     moduleOptions.createLoginAccount.mockResolvedValue({ id: 101 });
     moduleOptions.deleteLoginAccount.mockResolvedValue(undefined);
     staffRepository.create.mockResolvedValue({ id: "99" });
@@ -144,6 +152,44 @@ describe("BranchService transactional account provisioning", () => {
     ).rejects.toBe(failure);
 
     expect(moduleOptions.deleteLoginAccount).toHaveBeenCalledWith(101);
+  });
+
+  it("records branch updates in the same transaction as the repository update", async () => {
+    const updated = { ...branch, name: "Updated Branch" };
+    branchRepository.update.mockResolvedValue(updated);
+
+    await expect(service.update("42", { name: "Updated Branch" } as never))
+      .resolves.toBe(updated);
+
+    expect(branchRepository.update).toHaveBeenCalledWith(
+      "42",
+      { name: "Updated Branch" },
+      manager,
+    );
+    expect(moduleOptions.recordBranchUpdated).toHaveBeenCalledWith(
+      manager,
+      expect.objectContaining({
+        entityId: "42",
+        data: expect.objectContaining({ name: "Updated Branch" }),
+      }),
+    );
+  });
+
+  it("records a pre-delete branch snapshot in the delete transaction", async () => {
+    await expect(service.remove("42")).resolves.toBeUndefined();
+
+    expect(branchRepository.remove).toHaveBeenCalledWith("42", manager);
+    expect(moduleOptions.recordBranchDeleted).toHaveBeenCalledWith(
+      manager,
+      expect.objectContaining({
+        entityId: "42",
+        data: expect.objectContaining({
+          id: "42",
+          customerId: "7",
+          name: "Branch Bandung",
+        }),
+      }),
+    );
   });
 
   it("reports incomplete compensation if the external account cannot be deleted", async () => {
