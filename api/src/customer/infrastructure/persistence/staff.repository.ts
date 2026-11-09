@@ -2,12 +2,14 @@ import { DeepPartial } from "../../../utils/types/deep-partial.type";
 import { NullableType } from "../../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../../utils/types/pagination-options";
 import { Staff } from "../../domain/staff";
+import type { EntityManager } from "typeorm";
 
 import { FilterStaffDto, SortStaffDto } from "../../dto/query-staff.dto";
 
 export abstract class StaffRepository {
   abstract create(
     data: Omit<Staff, "id" | "createdAt" | "updatedAt" | "ulid">,
+    manager?: EntityManager,
   ): Promise<Staff>;
 
   abstract findManyByBranchId({
