@@ -1,15 +1,24 @@
 import { BranchService } from "./branch.service";
 
-describe("BranchService account provisioning", () => {
-  const branch = { id: "42", customerId: "7" };
+describe("BranchService transactional account provisioning", () => {
+  const branch = {
+    id: "42",
+    customerId: "7",
+    name: "Branch Bandung",
+    code: "BR-00042",
+    isHeadOffice: false,
+    isActive: true,
+  };
+  const manager = { transactionId: "tx-1" };
   const branchRepository = {
     create: jest.fn(),
-    remove: jest.fn(),
   };
   const customerRepository = { findById: jest.fn() };
   const regionValidation = { assertRegionPair: jest.fn() };
   const staffRepository = { create: jest.fn() };
   const moduleOptions = {
+    transaction: jest.fn(async (work: (manager: typeof manager) => Promise<unknown>) => work(manager)),
+    recordBranchCreated: jest.fn().mockResolvedValue(undefined),
     createLoginAccount: jest.fn(),
     deleteLoginAccount: jest.fn(),
   };
@@ -21,10 +30,10 @@ describe("BranchService account provisioning", () => {
     customerRepository.findById.mockResolvedValue({ id: "7" });
     regionValidation.assertRegionPair.mockResolvedValue(undefined);
     branchRepository.create.mockResolvedValue(branch);
-    branchRepository.remove.mockResolvedValue(undefined);
     moduleOptions.createLoginAccount.mockResolvedValue({ id: 101 });
     moduleOptions.deleteLoginAccount.mockResolvedValue(undefined);
     staffRepository.create.mockResolvedValue({ id: "99" });
+    moduleOptions.transaction.mockImplementation((work) => work(manager));
     service = new BranchService(
       branchRepository as never,
       customerRepository as never,
@@ -34,7 +43,7 @@ describe("BranchService account provisioning", () => {
     );
   });
 
-  it("creates the branch, a scoped Customer Branch Admin account, and its staff record", async () => {
+  it("creates Branch, scoped account, Staff and outbox event within one transaction", async () => {
     const result = await service.create(
       "7",
       {
@@ -50,6 +59,10 @@ describe("BranchService account provisioning", () => {
     );
 
     expect(result).toBe(branch);
+    expect(branchRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({ customerId: "7", name: "Branch Bandung" }),
+      manager,
+    );
     expect(moduleOptions.createLoginAccount).toHaveBeenCalledWith({
       email: " BUDI@example.com ",
       password: "secret123",
@@ -66,10 +79,23 @@ describe("BranchService account provisioning", () => {
         userId: 101,
         email: "budi@example.com",
       }),
+      manager,
+    );
+    expect(moduleOptions.recordBranchCreated).toHaveBeenCalledWith(
+      manager,
+      expect.objectContaining({
+        entityId: "42",
+        actorUserId: 12,
+        data: expect.objectContaining({
+          id: "42",
+          customerId: "7",
+          code: "BR-00042",
+        }),
+      }),
     );
   });
 
-  it("removes the created account and branch if the branch-admin staff record fails", async () => {
+  it("rolls back Branch and Staff and compensates the account when Staff insert fails", async () => {
     const failure = new Error("staff insert failed");
     staffRepository.create.mockRejectedValue(failure);
 
@@ -90,11 +116,34 @@ describe("BranchService account provisioning", () => {
     ).rejects.toBe(failure);
 
     expect(moduleOptions.deleteLoginAccount).toHaveBeenCalledWith(101);
-    expect(branchRepository.remove).toHaveBeenCalledWith("42");
+    expect(moduleOptions.recordBranchCreated).not.toHaveBeenCalled();
   });
-  it("still removes the branch if deleting the provisioned account fails", async () => {
-    const failure = new Error("staff insert failed");
-    staffRepository.create.mockRejectedValue(failure);
+
+  it("rolls back database work and compensates the account when outbox persistence fails", async () => {
+    const failure = new Error("outbox insert failed");
+    moduleOptions.recordBranchCreated.mockRejectedValue(failure);
+
+    await expect(
+      service.create(
+        "7",
+        {
+          name: "Branch Bandung",
+          addressLine: "Jl. Asia Afrika",
+          provinceId: 11,
+          cityId: 1101,
+          adminName: "Budi Santoso",
+          adminEmail: "budi@example.com",
+          adminPassword: "secret123",
+        } as never,
+        12,
+      ),
+    ).rejects.toBe(failure);
+
+    expect(moduleOptions.deleteLoginAccount).toHaveBeenCalledWith(101);
+  });
+
+  it("reports incomplete compensation if the external account cannot be deleted", async () => {
+    staffRepository.create.mockRejectedValue(new Error("staff insert failed"));
     moduleOptions.deleteLoginAccount.mockRejectedValue(
       new Error("account cleanup failed"),
     );
@@ -114,8 +163,5 @@ describe("BranchService account provisioning", () => {
         12,
       ),
     ).rejects.toBeInstanceOf(AggregateError);
-
-    expect(branchRepository.remove).toHaveBeenCalledWith("42");
   });
-
 });
