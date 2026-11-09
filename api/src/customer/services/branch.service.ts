@@ -125,7 +125,7 @@ export class BranchService {
         );
 
         await recordBranchCreated(manager, {
-          entityId: branch.id,
+          entityId: String(branch.id),
           actorUserId,
           correlationId,
           data: {
@@ -300,7 +300,7 @@ export class BranchService {
       }
 
       await recordBranchUpdated(manager, {
-        entityId: updated.id,
+        entityId: String(updated.id),
         correlationId: randomUUID(),
         data: {
           id: updated.id,
