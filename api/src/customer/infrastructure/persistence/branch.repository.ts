@@ -52,7 +52,10 @@ export abstract class BranchRepository {
     scope?: { global: boolean; customerIds: readonly string[]; branchIds: readonly string[] },
   ): Promise<number>;
 
-  abstract findById(id: Branch["id"]): Promise<NullableType<Branch>>;
+  abstract findById(
+    id: Branch["id"],
+    manager?: EntityManager,
+  ): Promise<NullableType<Branch>>;
 
   abstract findHeadOfficeByCustomerId(
     customerId: Branch["customerId"],
