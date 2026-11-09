@@ -13,6 +13,7 @@ import {
 /** Customer owns its admin pages and navigation; each capability is independently permission-gated. */
 export default defineModuleManifest({
   alias: "customer",
+  runtimeManaged: true,
   profileTabs: [
     { slug: "my-company", label: { namespace: "module-customer", key: "myCompany.tabTitle" }, position: 30, icon: Building2, permission: "read:my-customer-company", content: { kind: "component", component: MyCompanyTab } },
     { slug: "my-branch", label: { namespace: "module-customer", key: "myBranch.tabTitle" }, position: 31, icon: Building2, permission: "read:my-customer-branch", content: { kind: "component", component: MyBranchTab } },
