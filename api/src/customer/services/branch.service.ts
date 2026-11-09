@@ -71,9 +71,23 @@ export class BranchService {
     let accountId: number | null = null;
     const correlationId = randomUUID();
     try {
+      // Reserve the database-generated id before calling the external account
+      // service. This keeps network work outside the PostgreSQL transaction
+      // while allowing the account's branch scope to use its final id.
+      const branchId = await this.branchRepository.reserveId();
+      const account = await createLoginAccount({
+        email: createBranchDto.adminEmail,
+        password: createBranchDto.adminPassword,
+        name: createBranchDto.adminName,
+        roleKey: "customer-branch-admin",
+        scopeType: "branch",
+        scopeId: String(branchId),
+        assignedBy: actorUserId,
+      });
+      accountId = account.id;
+
       return await transaction(async (manager) => {
-        // Branch and Staff are persisted through the same manager. If any
-        // later step fails, PostgreSQL rolls back both records and the outbox.
+        // Branch, Staff and outbox are committed or rolled back together.
         const branch = await this.branchRepository.create(
           {
             customerId,
@@ -88,21 +102,8 @@ export class BranchService {
             isActive: createBranchDto.isActive ?? true,
           },
           manager,
+          branchId,
         );
-
-        // Account provisioning is an external side effect and cannot join the
-        // PostgreSQL transaction. Its id is compensated if the DB transaction
-        // (including the outbox insert) later rolls back.
-        const account = await createLoginAccount({
-          email: createBranchDto.adminEmail,
-          password: createBranchDto.adminPassword,
-          name: createBranchDto.adminName,
-          roleKey: "customer-branch-admin",
-          scopeType: "branch",
-          scopeId: String(branch.id),
-          assignedBy: actorUserId,
-        });
-        accountId = account.id;
 
         await this.staffRepository.create(
           {
@@ -139,6 +140,7 @@ export class BranchService {
         return branch;
       });
     } catch (error) {
+      // The database transaction has rolled back before this compensation.
       if (accountId !== null) {
         try {
           await deleteLoginAccount(accountId);
