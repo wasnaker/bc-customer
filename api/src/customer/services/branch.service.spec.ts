@@ -11,6 +11,7 @@ describe("BranchService transactional account provisioning", () => {
   };
   const manager = { transactionId: "tx-1" };
   const branchRepository = {
+    reserveId: jest.fn(),
     create: jest.fn(),
   };
   const customerRepository = { findById: jest.fn() };
@@ -29,6 +30,7 @@ describe("BranchService transactional account provisioning", () => {
     jest.clearAllMocks();
     customerRepository.findById.mockResolvedValue({ id: "7" });
     regionValidation.assertRegionPair.mockResolvedValue(undefined);
+    branchRepository.reserveId.mockResolvedValue("42");
     branchRepository.create.mockResolvedValue(branch);
     moduleOptions.createLoginAccount.mockResolvedValue({ id: 101 });
     moduleOptions.deleteLoginAccount.mockResolvedValue(undefined);
@@ -62,7 +64,9 @@ describe("BranchService transactional account provisioning", () => {
     expect(branchRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({ customerId: "7", name: "Branch Bandung" }),
       manager,
+      "42",
     );
+    expect(branchRepository.reserveId).toHaveBeenCalledTimes(1);
     expect(moduleOptions.createLoginAccount).toHaveBeenCalledWith({
       email: " BUDI@example.com ",
       password: "secret123",
