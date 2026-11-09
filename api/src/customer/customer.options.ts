@@ -35,6 +35,9 @@ export interface CustomerBranchChangedEvent {
 }
 
 export interface CustomerModuleOptions {
+  /** Host lifecycle gate; protected routes are unavailable while Customer is inactive. */
+  isModuleActive?: () => boolean | Promise<boolean>;
+
   /** Run all Customer database writes for one use case on the same transaction manager. */
   transaction?: <T>(work: (manager: EntityManager) => Promise<T>) => Promise<T>;
   /** Persist the after-insert event using the same transaction manager as the Branch/Staff writes. */
