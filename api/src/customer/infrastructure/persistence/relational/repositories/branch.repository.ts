@@ -20,16 +20,32 @@ export class BranchesRelationalRepository implements BranchRepository {
     private readonly branchRepository: Repository<BranchEntity>,
   ) {}
 
+  async reserveId(): Promise<Branch["id"]> {
+    const rows: Array<{ id: string | number | bigint }> =
+      await this.branchRepository.query(
+        "SELECT nextval(pg_get_serial_sequence('branch', 'id')) AS id",
+      );
+    if (!rows[0]?.id) {
+      throw new Error("Unable to reserve Branch id from PostgreSQL sequence");
+    }
+    return String(rows[0].id);
+  }
+
   async create(
     data: Omit<Branch, "id" | "createdAt" | "updatedAt" | "ulid" | "code">,
     manager?: EntityManager,
+    id?: Branch["id"],
   ): Promise<Branch> {
     const repository = manager
       ? manager.getRepository(BranchEntity)
       : this.branchRepository;
     const persistenceModel = BranchMapper.toPersistence(data as Branch);
+    const entityInput = {
+      ...persistenceModel,
+      ...(id != null ? { id: BigInt(id) } : {}),
+    };
     const newEntity = await repository.save(
-      repository.create(persistenceModel),
+      repository.create(entityInput),
     );
     // Kolom `code` diisi oleh trigger AFTER INSERT di database, sehingga tidak
     // terbawa oleh nilai kembalian save(). Baca ulang baris untuk memuatnya.
