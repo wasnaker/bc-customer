@@ -8,7 +8,8 @@ import {
 describe('CustomerAccessGuard self-service Profile permission', () => {
   const authorize = jest.fn();
   const isModuleActive = jest.fn();
-  const options = { authorize, isModuleActive };
+  const resolveScopes = jest.fn();
+  const options = { authorize, isModuleActive, resolveScopes };
   const execute = async (
     metadata: boolean | string,
     user: Record<string, unknown>,
@@ -35,6 +36,7 @@ describe('CustomerAccessGuard self-service Profile permission', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     isModuleActive.mockResolvedValue(true);
+    resolveScopes.mockResolvedValue({ global: false, scopes: [] });
   });
 
   it('denies all Customer routes while the module is inactive', async () => {
@@ -46,7 +48,10 @@ describe('CustomerAccessGuard self-service Profile permission', () => {
   });
 
   it('allows My Company only when one assigned role has its Profile permission', async () => {
-    authorize.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    resolveScopes.mockResolvedValueOnce({
+      global: false,
+      scopes: [{ type: 'customer', id: '42' }],
+    });
 
     await expect(
       execute('read:my-customer-company', {
@@ -55,12 +60,12 @@ describe('CustomerAccessGuard self-service Profile permission', () => {
       }),
     ).resolves.toBe(true);
 
-    expect(authorize).toHaveBeenNthCalledWith(1, 10, 'read:my-customer-company');
-    expect(authorize).toHaveBeenNthCalledWith(2, 11, 'read:my-customer-company');
+    expect(resolveScopes).toHaveBeenCalledWith(44, 'read:my-customer-company');
+    expect(authorize).not.toHaveBeenCalled();
   });
 
   it('denies My Company when no assigned role has the Profile permission', async () => {
-    authorize.mockResolvedValue(false);
+    resolveScopes.mockResolvedValue({ global: false, scopes: [] });
 
     await expect(
       execute('read:my-customer-company', {
