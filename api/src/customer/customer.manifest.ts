@@ -19,6 +19,11 @@ export interface BackendModuleManifest {
   scopeTypes?: readonly string[];
   roles?: readonly ModuleRoleDefinition[];
   requires?: readonly string[];
+  requiresServices?: readonly {
+    providerModuleId: string;
+    contractId: string;
+    version: string;
+  }[];
   providesServices?: readonly {
     contractId: string;
     version: string;
@@ -31,6 +36,18 @@ export const moduleManifest: BackendModuleManifest = {
   version: '0.1.3',
   capabilities: ['api', 'web'],
   requires: ['region'],
+  requiresServices: [
+    {
+      providerModuleId: 'core',
+      contractId: 'core.user-directory',
+      version: '^1.0.0',
+    },
+    {
+      providerModuleId: 'core',
+      contractId: 'core.account-provisioning',
+      version: '^1.0.0',
+    },
+  ],
   providesServices: [
     {
       contractId: 'customer.branch-directory',
