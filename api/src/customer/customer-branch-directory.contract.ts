@@ -28,27 +28,50 @@ interface ModuleServiceRegistry {
   }): () => void;
 }
 
+interface ModuleLifecycleRegistry {
+  registerRuntimeAdapter(
+    moduleId: string,
+    adapter: { activate(): void | (() => void | Promise<void>) | Promise<void | (() => void | Promise<void>)> },
+  ): () => void;
+}
+
 const MODULE_SERVICE_REGISTRY = Symbol.for(
   "@wasnaker/module-runtime/service-registry",
 );
+const MODULE_LIFECYCLE_SERVICE = Symbol.for(
+  "@wasnaker/module-runtime/lifecycle",
+);
 
 /**
- * Publishes a deliberately small Customer-owned read facade. Other modules
- * cannot reach Customer repositories or ORM entities through this contract.
+ * Customer publishes its read facade only while Customer is active. The
+ * lifecycle manager owns activation/deactivation and restores it after restart.
  */
 @Injectable()
 export class CustomerBranchDirectoryContract
   implements OnModuleInit, OnModuleDestroy
 {
-  private unregister?: () => void;
+  private unregisterAdapter?: () => void;
 
   constructor(
     private readonly branches: BranchService,
     @Inject(MODULE_SERVICE_REGISTRY)
     private readonly registry: ModuleServiceRegistry,
+    @Inject(MODULE_LIFECYCLE_SERVICE)
+    private readonly lifecycle: ModuleLifecycleRegistry,
   ) {}
 
   onModuleInit(): void {
+    this.unregisterAdapter = this.lifecycle.registerRuntimeAdapter("customer", {
+      activate: () => this.registerContract(),
+    });
+  }
+
+  onModuleDestroy(): void {
+    this.unregisterAdapter?.();
+    this.unregisterAdapter = undefined;
+  }
+
+  private registerContract(): () => void {
     const service: CustomerBranchDirectory = {
       findBranchById: async (id) => {
         const branch = await this.branches.findBranchById(id);
@@ -63,17 +86,12 @@ export class CustomerBranchDirectoryContract
       },
     };
 
-    this.unregister = this.registry.register({
+    return this.registry.register({
       providerModuleId: "customer",
       contractId: "customer.branch-directory",
       version: "1.0.0",
       consumers: ["equipment"],
       service,
     });
-  }
-
-  onModuleDestroy(): void {
-    this.unregister?.();
-    this.unregister = undefined;
   }
 }
