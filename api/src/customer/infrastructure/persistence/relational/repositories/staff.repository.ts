@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
+import { EntityManager, FindOptionsWhere, ILike, In, Repository } from "typeorm";
 import { StaffEntity } from "../entities/staff.entity";
 import { BranchEntity } from "../entities/branch.entity";
 import { NullableType } from "../../../../../utils/types/nullable.type";
@@ -20,10 +20,14 @@ export class StaffRelationalRepository implements StaffRepository {
 
   async create(
     data: Omit<Staff, "id" | "createdAt" | "updatedAt" | "ulid">,
+    manager?: EntityManager,
   ): Promise<Staff> {
+    const repository = manager
+      ? manager.getRepository(StaffEntity)
+      : this.staffRepository;
     const persistenceModel = StaffMapper.toPersistence(data as Staff);
-    const newEntity = await this.staffRepository.save(
-      this.staffRepository.create(persistenceModel),
+    const newEntity = await repository.save(
+      repository.create(persistenceModel),
     );
     return StaffMapper.toDomain(newEntity);
   }
