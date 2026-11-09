@@ -201,6 +201,13 @@ export function BranchFormDialog({
       onOpenChange={onOpenChange}
       title={isEditing ? t("branch.edit") : t("branch.create")}
       onSubmit={handleSubmit}
+      extensionTarget="customer.branch.form"
+      extensionContext={{
+        customerId,
+        branchId: editItem?.id ?? null,
+        branchCode: editItem?.code ?? null,
+        mode: isEditing ? "edit" : "create",
+      }}
       footer={
         <>
           <Button
