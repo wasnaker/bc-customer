@@ -6,6 +6,25 @@ exports.moduleManifest = {
     version: '0.1.3',
     capabilities: ['api', 'web'],
     requires: ['region'],
+    requiresServices: [
+        {
+            providerModuleId: 'core',
+            contractId: 'core.user-directory',
+            version: '^1.0.0',
+        },
+        {
+            providerModuleId: 'core',
+            contractId: 'core.account-provisioning',
+            version: '^1.0.0',
+        },
+    ],
+    providesServices: [
+        {
+            contractId: 'customer.branch-directory',
+            version: '1.0.0',
+            consumers: ['equipment'],
+        },
+    ],
     scopeTypes: ['global', 'customer', 'branch'],
     permissions: [
         { name: 'read:customer', description: 'Allows viewing customer administration data' },

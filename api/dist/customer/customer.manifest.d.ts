@@ -17,6 +17,16 @@ export interface BackendModuleManifest {
     scopeTypes?: readonly string[];
     roles?: readonly ModuleRoleDefinition[];
     requires?: readonly string[];
+    requiresServices?: readonly {
+        providerModuleId: string;
+        contractId: string;
+        version: string;
+    }[];
+    providesServices?: readonly {
+        contractId: string;
+        version: string;
+        consumers: readonly string[];
+    }[];
 }
 export declare const moduleManifest: BackendModuleManifest;
 export declare const customerModuleManifest: BackendModuleManifest;
