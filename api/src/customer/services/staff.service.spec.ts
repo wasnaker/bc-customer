@@ -6,9 +6,10 @@ describe("StaffService account provisioning", () => {
   const customerRepository = { findById: jest.fn() };
   const staffRepository = { create: jest.fn() };
   const regionValidation = { assertRegionPair: jest.fn() };
-  const moduleOptions = {
-    createLoginAccount: jest.fn(),
-    deleteLoginAccount: jest.fn(),
+  const moduleOptions = {};
+  const accountProvisioning = {
+    create: jest.fn(),
+    remove: jest.fn(),
   };
 
   let service: StaffService;
@@ -17,8 +18,8 @@ describe("StaffService account provisioning", () => {
     jest.clearAllMocks();
     branchRepository.findById.mockResolvedValue(branch);
     regionValidation.assertRegionPair.mockResolvedValue(undefined);
-    moduleOptions.createLoginAccount.mockResolvedValue({ id: 202 });
-    moduleOptions.deleteLoginAccount.mockResolvedValue(undefined);
+    accountProvisioning.create.mockResolvedValue({ id: 202 });
+    accountProvisioning.remove.mockResolvedValue(undefined);
     staffRepository.create.mockResolvedValue({ id: "100", userId: 202 });
     service = new StaffService(
       staffRepository as never,
@@ -26,6 +27,8 @@ describe("StaffService account provisioning", () => {
       customerRepository as never,
       regionValidation as never,
       moduleOptions as never,
+      undefined,
+      accountProvisioning as never,
     );
   });
 
@@ -40,7 +43,7 @@ describe("StaffService account provisioning", () => {
       12,
     );
 
-    expect(moduleOptions.createLoginAccount).toHaveBeenCalledWith({
+    expect(accountProvisioning.create).toHaveBeenCalledWith({
       email: " SITI@example.com ",
       password: "secret123",
       name: "Siti Aminah",
@@ -74,6 +77,6 @@ describe("StaffService account provisioning", () => {
       ),
     ).rejects.toBe(failure);
 
-    expect(moduleOptions.deleteLoginAccount).toHaveBeenCalledWith(202);
+    expect(accountProvisioning.remove).toHaveBeenCalledWith(202);
   });
 });
