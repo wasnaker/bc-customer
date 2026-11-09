@@ -254,29 +254,6 @@ export class BranchService {
     id: Branch["id"],
     updateBranchDto: UpdateBranchDto,
   ): Promise<Branch> {
-    const branch = await this.branchRepository.findById(id);
-    if (!branch) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          branch: "branchNotExists",
-        },
-      });
-    }
-
-    if (
-      updateBranchDto.provinceId !== undefined ||
-      updateBranchDto.cityId !== undefined
-    ) {
-      const provinceId = updateBranchDto.provinceId ?? branch.provinceId;
-      const cityId = updateBranchDto.cityId ?? branch.cityId;
-      await this.regionValidation.assertRegionPair(provinceId, cityId);
-    }
-
-    if (updateBranchDto.isHeadOffice && !branch.isHeadOffice) {
-      await this.assertHeadOfficeAvailable(branch.customerId);
-    }
-
     const transaction = this.moduleOptions?.transaction;
     const recordBranchUpdated = this.moduleOptions?.recordBranchUpdated;
     if (!transaction || !recordBranchUpdated) {
@@ -287,6 +264,28 @@ export class BranchService {
     }
 
     return transaction(async (manager) => {
+      // Read and lock the snapshot in the same transaction as update + outbox.
+      const branch = await this.branchRepository.findById(id, manager);
+      if (!branch) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: { branch: "branchNotExists" },
+        });
+      }
+
+      if (
+        updateBranchDto.provinceId !== undefined ||
+        updateBranchDto.cityId !== undefined
+      ) {
+        const provinceId = updateBranchDto.provinceId ?? branch.provinceId;
+        const cityId = updateBranchDto.cityId ?? branch.cityId;
+        await this.regionValidation.assertRegionPair(provinceId, cityId);
+      }
+
+      if (updateBranchDto.isHeadOffice && !branch.isHeadOffice) {
+        await this.assertHeadOfficeAvailable(branch.customerId);
+      }
+
       const updated = await this.branchRepository.update(
         id,
         { ...updateBranchDto },
@@ -316,16 +315,6 @@ export class BranchService {
   }
 
   async remove(id: Branch["id"]): Promise<void> {
-    const branch = await this.branchRepository.findById(id);
-    if (!branch) {
-      throw new UnprocessableEntityException({
-        status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          branch: "branchNotExists",
-        },
-      });
-    }
-
     const transaction = this.moduleOptions?.transaction;
     const recordBranchDeleted = this.moduleOptions?.recordBranchDeleted;
     if (!transaction || !recordBranchDeleted) {
@@ -336,11 +325,20 @@ export class BranchService {
     }
 
     try {
-      // The deletion and its snapshot event are committed atomically.
       await transaction(async (manager) => {
+        // Lock and snapshot the row before deletion; subscribers never need
+        // to query a row that no longer exists.
+        const branch = await this.branchRepository.findById(id, manager);
+        if (!branch) {
+          throw new UnprocessableEntityException({
+            status: HttpStatus.UNPROCESSABLE_ENTITY,
+            errors: { branch: "branchNotExists" },
+          });
+        }
+
         await this.branchRepository.remove(id, manager);
         await recordBranchDeleted(manager, {
-          entityId: branch.id,
+          entityId: String(branch.id),
           correlationId: randomUUID(),
           data: {
             id: branch.id,
@@ -361,9 +359,7 @@ export class BranchService {
       ) {
         throw new UnprocessableEntityException({
           status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            branch: "branchHasStaff",
-          },
+          errors: { branch: "branchHasStaff" },
         });
       }
       throw error;
