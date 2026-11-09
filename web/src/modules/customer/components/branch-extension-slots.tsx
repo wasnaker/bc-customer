@@ -31,25 +31,10 @@ export function BranchDetailMetadataExtension({ context }: ModuleExtensionProps)
   return (
     <section className="mt-4 grid grid-cols-1 gap-3 rounded-md border border-border p-3 text-sm sm:grid-cols-2">
       <div>
-        <p className="text-xs text-muted-foreground">{t("table.code")}</p>
-        <p className="font-mono">{item.code ?? "—"}</p>
-      </div>
-      <div>
         <p className="text-xs text-muted-foreground">{t("table.customer")}</p>
         <p className="font-mono">{String(item.customerId)}</p>
       </div>
     </section>
-  );
-}
-
-/** Clarifies the side effect of creating a Branch with its administrator. */
-export function BranchCreateGuidanceExtension({ context }: ModuleExtensionProps) {
-  const { t } = useTranslation("module-customer");
-  if (context?.mode !== "create") return null;
-  return (
-    <aside className="rounded-md border border-border bg-card px-3 py-2 text-xs text-muted-foreground">
-      {t("form.branchAdmin.description")}
-    </aside>
   );
 }
 
