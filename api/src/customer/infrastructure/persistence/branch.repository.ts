@@ -2,12 +2,14 @@ import { DeepPartial } from "../../../utils/types/deep-partial.type";
 import { NullableType } from "../../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../../utils/types/pagination-options";
 import { Branch } from "../../domain/branch";
+import type { EntityManager } from "typeorm";
 
 import { FilterBranchDto, SortBranchDto } from "../../dto/query-branch.dto";
 
 export abstract class BranchRepository {
   abstract create(
     data: Omit<Branch, "id" | "createdAt" | "updatedAt" | "ulid" | "code">,
+    manager?: EntityManager,
   ): Promise<Branch>;
 
   abstract findManyByCustomerId({
