@@ -4,6 +4,12 @@ import { CustomerPage } from "./pages/customer-page";
 import { BranchPage } from "./pages/branch-page";
 import { StaffPage } from "./pages/staff-page";
 import { MyCompanyTab, MyBranchTab, MyStaffTab } from "./pages/my-customer-page";
+import {
+  BranchStatusColumnExtension,
+  BranchDetailMetadataExtension,
+  BranchCreateGuidanceExtension,
+  BranchCodeFormExtension,
+} from "./components/branch-extension-slots";
 
 /** Customer owns its admin pages and navigation; each capability is independently permission-gated. */
 export default defineModuleManifest({
@@ -22,4 +28,38 @@ export default defineModuleManifest({
   // Customer information is surfaced through the permission-gated Profile tabs.
   menu: [],
   dashboardWidgets: [],
+  extensions: [
+    {
+      id: "branch.status-column",
+      slot: "table.columns",
+      target: "customer.branch.list",
+      component: BranchStatusColumnExtension,
+      position: 80,
+      permission: "read:branch",
+    },
+    {
+      id: "branch.detail-metadata",
+      slot: "detail.panels",
+      target: "customer.branch.list",
+      component: BranchDetailMetadataExtension,
+      position: 80,
+      permission: "read:branch",
+    },
+    {
+      id: "branch.create-guidance",
+      slot: "form.sections",
+      target: "customer.branch.form",
+      component: BranchCreateGuidanceExtension,
+      position: 10,
+      permission: "create:branch",
+    },
+    {
+      id: "branch.code-form-field",
+      slot: "form.fields",
+      target: "customer.branch.form",
+      component: BranchCodeFormExtension,
+      position: 90,
+      permission: "update:branch",
+    },
+  ],
 });
