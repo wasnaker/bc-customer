@@ -240,8 +240,12 @@ export class BranchesRelationalRepository implements BranchRepository {
   async update(
     id: Branch["id"],
     payload: Partial<Branch>,
+    manager?: EntityManager,
   ): Promise<Branch | null> {
-    const entity = await this.branchRepository.findOne({
+    const repository = manager
+      ? manager.getRepository(BranchEntity)
+      : this.branchRepository;
+    const entity = await repository.findOne({
       where: { id: BigInt(id) },
     });
 
@@ -258,15 +262,18 @@ export class BranchesRelationalRepository implements BranchRepository {
     delete persistenceModel.id; // tidak boleh masuk klausa SET
     delete persistenceModel.ulid; // immutable
     delete persistenceModel.code; // diisi trigger AFTER INSERT
-    await this.branchRepository.update({ id: BigInt(id) }, persistenceModel);
+    await repository.update({ id: BigInt(id) }, persistenceModel);
 
-    const updatedEntity = await this.branchRepository.findOneByOrFail({
+    const updatedEntity = await repository.findOneByOrFail({
       id: BigInt(id),
     });
     return BranchMapper.toDomain(updatedEntity);
   }
 
-  async remove(id: Branch["id"]): Promise<void> {
-    await this.branchRepository.delete({ id: BigInt(id) });
+  async remove(id: Branch["id"], manager?: EntityManager): Promise<void> {
+    const repository = manager
+      ? manager.getRepository(BranchEntity)
+      : this.branchRepository;
+    await repository.delete({ id: BigInt(id) });
   }
 }
