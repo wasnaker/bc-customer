@@ -7,7 +7,6 @@ import { MyCompanyTab, MyBranchTab, MyStaffTab } from "./pages/my-customer-page"
 import {
   BranchStatusColumnExtension,
   BranchDetailMetadataExtension,
-  BranchCreateGuidanceExtension,
   BranchCodeFormExtension,
 } from "./components/branch-extension-slots";
 
@@ -44,14 +43,6 @@ export default defineModuleManifest({
       component: BranchDetailMetadataExtension,
       position: 80,
       permission: "read:branch",
-    },
-    {
-      id: "branch.create-guidance",
-      slot: "form.sections",
-      target: "customer.branch.form",
-      component: BranchCreateGuidanceExtension,
-      position: 10,
-      permission: "create:branch",
     },
     {
       id: "branch.code-form-field",
