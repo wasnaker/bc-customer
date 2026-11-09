@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { FindOptionsWhere, ILike, In, Repository } from "typeorm";
+import { FindOptionsWhere, ILike, In, Repository, EntityManager } from "typeorm";
 import { BranchEntity } from "../entities/branch.entity";
 import { NullableType } from "../../../../../utils/types/nullable.type";
 import {
@@ -22,14 +22,18 @@ export class BranchesRelationalRepository implements BranchRepository {
 
   async create(
     data: Omit<Branch, "id" | "createdAt" | "updatedAt" | "ulid" | "code">,
+    manager?: EntityManager,
   ): Promise<Branch> {
+    const repository = manager
+      ? manager.getRepository(BranchEntity)
+      : this.branchRepository;
     const persistenceModel = BranchMapper.toPersistence(data as Branch);
-    const newEntity = await this.branchRepository.save(
-      this.branchRepository.create(persistenceModel),
+    const newEntity = await repository.save(
+      repository.create(persistenceModel),
     );
     // Kolom `code` diisi oleh trigger AFTER INSERT di database, sehingga tidak
     // terbawa oleh nilai kembalian save(). Baca ulang baris untuk memuatnya.
-    const savedEntity = await this.branchRepository.findOneByOrFail({
+    const savedEntity = await repository.findOneByOrFail({
       id: newEntity.id,
     });
     return BranchMapper.toDomain(savedEntity);
