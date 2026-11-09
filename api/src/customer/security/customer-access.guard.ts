@@ -52,6 +52,9 @@ export class CustomerAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    if (this.options?.isModuleActive && !(await this.options.isModuleActive())) {
+      throw new ForbiddenException('Customer module is inactive');
+    }
     const selfBranch = this.reflector?.getAllAndOverride<boolean | string>(
       CUSTOMER_SELF_BRANCH_METADATA,
       [context.getHandler(), context.getClass()],
