@@ -1,4 +1,5 @@
 import type { DynamicModule } from '@nestjs/common';
+import type { EntityManager } from 'typeorm';
 
 export interface CustomerAuthorizationScope {
   type: string;
@@ -19,7 +20,21 @@ export interface CustomerLoginAccountInput {
   email: string; password: string; name: string; roleKey: string;
   scopeType: string; scopeId: string; assignedBy: number | null;
 }
+export interface CustomerBranchCreatedEvent {
+  entityId: string | number;
+  actorUserId: string | number;
+  correlationId: string;
+  data: Record<string, unknown>;
+}
+
 export interface CustomerModuleOptions {
+  /** Run all Customer database writes for one use case on the same transaction manager. */
+  transaction?: <T>(work: (manager: EntityManager) => Promise<T>) => Promise<T>;
+  /** Persist the after-insert event using the same transaction manager as the Branch/Staff writes. */
+  recordBranchCreated?: (
+    manager: EntityManager,
+    event: CustomerBranchCreatedEvent,
+  ) => Promise<unknown>;
   createLoginAccount?: (input: CustomerLoginAccountInput) => Promise<{ id: number }>;
   deleteLoginAccount?: (userId: number) => Promise<void>;
   /** Delegate legacy permission checks to the host authorization service. */
