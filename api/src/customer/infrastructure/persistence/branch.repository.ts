@@ -66,7 +66,8 @@ export abstract class BranchRepository {
   abstract update(
     id: Branch["id"],
     payload: DeepPartial<Branch>,
+    manager?: EntityManager,
   ): Promise<Branch | null>;
 
-  abstract remove(id: Branch["id"]): Promise<void>;
+  abstract remove(id: Branch["id"], manager?: EntityManager): Promise<void>;
 }
