@@ -56,7 +56,7 @@ export interface CustomerModuleOptions {
   ) => Promise<unknown>;
   createLoginAccount?: (input: CustomerLoginAccountInput) => Promise<{ id: number }>;
   deleteLoginAccount?: (userId: number) => Promise<void>;
-  /** Delegate legacy permission checks to the host authorization service. */
+  /** Legacy Core-Role-only check. Module Roles must use authorizeScoped or resolveScopes. */
   authorize: (
     roleId: number | string,
     permission: string,
