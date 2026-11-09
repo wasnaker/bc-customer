@@ -33,7 +33,7 @@ export interface BackendModuleManifest {
 
 export const moduleManifest: BackendModuleManifest = {
   id: 'customer',
-  version: '0.1.3',
+  version: '0.1.4',
   capabilities: ['api', 'web'],
   requires: ['region'],
   requiresServices: [
