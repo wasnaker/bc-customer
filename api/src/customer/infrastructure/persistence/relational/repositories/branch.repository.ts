@@ -205,9 +205,16 @@ export class BranchesRelationalRepository implements BranchRepository {
     return this.branchRepository.count({ where });
   }
 
-  async findById(id: Branch["id"]): Promise<NullableType<Branch>> {
-    const entity = await this.branchRepository.findOne({
+  async findById(
+    id: Branch["id"],
+    manager?: EntityManager,
+  ): Promise<NullableType<Branch>> {
+    const repository = manager
+      ? manager.getRepository(BranchEntity)
+      : this.branchRepository;
+    const entity = await repository.findOne({
       where: { id: BigInt(id) },
+      ...(manager ? { lock: { mode: "pessimistic_write" as const } } : {}),
     });
     return entity ? BranchMapper.toDomain(entity) : null;
   }
