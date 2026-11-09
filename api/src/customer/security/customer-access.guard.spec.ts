@@ -7,7 +7,8 @@ import {
 
 describe('CustomerAccessGuard self-service Profile permission', () => {
   const authorize = jest.fn();
-  const options = { authorize };
+  const isModuleActive = jest.fn();
+  const options = { authorize, isModuleActive };
   const execute = async (
     metadata: boolean | string,
     user: Record<string, unknown>,
@@ -31,7 +32,18 @@ describe('CustomerAccessGuard self-service Profile permission', () => {
     return guard.canActivate(context as never);
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    isModuleActive.mockResolvedValue(true);
+  });
+
+  it('denies all Customer routes while the module is inactive', async () => {
+    isModuleActive.mockResolvedValue(false);
+    await expect(
+      execute(true, { id: 44, roles: [] }),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(authorize).not.toHaveBeenCalled();
+  });
 
   it('allows My Company only when one assigned role has its Profile permission', async () => {
     authorize.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
