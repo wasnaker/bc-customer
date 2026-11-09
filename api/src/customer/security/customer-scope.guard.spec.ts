@@ -9,7 +9,7 @@ describe('CustomerScopeGuard', () => {
   const branches = { findBranchById: jest.fn() };
   const staff = { findStaffById: jest.fn() };
   const documents = { findDocumentById: jest.fn() };
-  const options = { authorizeScoped: jest.fn(), resolveScopes: jest.fn() };
+  const options = { authorizeScoped: jest.fn(), resolveScopes: jest.fn(), isModuleActive: jest.fn() };
   let guard: CustomerScopeGuard;
 
   const execute = async (
@@ -43,6 +43,7 @@ describe('CustomerScopeGuard', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    options.isModuleActive.mockResolvedValue(true);
     customers.findCustomerById.mockResolvedValue({ id: '17' });
     branches.findBranchById.mockResolvedValue({
       id: '43',
@@ -55,6 +56,17 @@ describe('CustomerScopeGuard', () => {
       global: false,
       scopes: [{ type: 'branch', id: '43' }],
     });
+  });
+
+  it('denies scoped routes while the Customer module is inactive', async () => {
+    options.isModuleActive.mockResolvedValue(false);
+    await expect(
+      execute(
+        { kind: 'branch-lookup', param: 'id' },
+        { method: 'GET', params: { id: '43' }, user: { id: 44 } },
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(options.authorizeScoped).not.toHaveBeenCalled();
   });
 
   it('resolves branch and ancestor customer from stored data', async () => {
