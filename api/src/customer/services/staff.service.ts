@@ -16,6 +16,7 @@ import { NullableType } from "../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../utils/types/pagination-options";
 import { RegionValidationService } from "./region-validation.service";
 import { CUSTOMER_MODULE_OPTIONS, CustomerModuleOptions } from "../customer.options";
+import { CustomerCoreUserDirectoryClient } from "../customer-core-user-directory.client";
 
 @Injectable()
 export class StaffService {
@@ -26,6 +27,7 @@ export class StaffService {
     private readonly regionValidation: RegionValidationService,
     @Optional() @Inject(CUSTOMER_MODULE_OPTIONS)
     private readonly moduleOptions?: CustomerModuleOptions,
+    @Optional() private readonly coreUsers?: CustomerCoreUserDirectoryClient,
   ) {}
 
   async create(
@@ -194,6 +196,7 @@ export class StaffService {
 
   /** Resolve the signed-in host account to its single linked staff record. */
   async findStaffByUserId(userId: number): Promise<NullableType<Staff>> {
+    if (this.coreUsers && !(await this.coreUsers.findById(userId))) return null;
     return this.staffRepository.findByUserId(userId);
   }
 
