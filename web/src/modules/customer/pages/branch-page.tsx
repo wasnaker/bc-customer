@@ -342,6 +342,8 @@ function PageInner() {
           sort={sort}
           onSortChange={setSort}
           columns={columns}
+          extensionTarget="customer.branch.list"
+          extensionContext={{ customerId }}
           selectedId={selectedId}
           onSelectId={select}
           getItemId={(item) => item.id}
