@@ -16,6 +16,7 @@ import { NullableType } from "../../utils/types/nullable.type";
 import { IPaginationOptions } from "../../utils/types/pagination-options";
 import { RegionValidationService } from "./region-validation.service";
 import { CUSTOMER_MODULE_OPTIONS, CustomerModuleOptions } from "../customer.options";
+import { CustomerCoreAccountProvisioningClient } from "../customer-core-account-provisioning.client";
 import { CustomerCoreUserDirectoryClient } from "../customer-core-user-directory.client";
 
 @Injectable()
@@ -28,6 +29,7 @@ export class StaffService {
     @Optional() @Inject(CUSTOMER_MODULE_OPTIONS)
     private readonly moduleOptions?: CustomerModuleOptions,
     @Optional() private readonly coreUsers?: CustomerCoreUserDirectoryClient,
+    @Optional() private readonly accountProvisioning?: CustomerCoreAccountProvisioningClient,
   ) {}
 
   async create(
@@ -45,7 +47,7 @@ export class StaffService {
       });
     }
 
-    if (!this.moduleOptions?.createLoginAccount || !this.moduleOptions.deleteLoginAccount) {
+    if (!this.accountProvisioning) {
       throw new UnprocessableEntityException({ status: HttpStatus.UNPROCESSABLE_ENTITY, errors: { account: "accountProvisioningUnavailable" } });
     }
 
@@ -61,7 +63,7 @@ export class StaffService {
       );
     }
 
-    const account = await this.moduleOptions.createLoginAccount({
+    const account = await this.accountProvisioning.create({
       email: createStaffDto.email, password: createStaffDto.password, name: createStaffDto.name,
       roleKey: "customer", scopeType: "branch", scopeId: String(branch.id), assignedBy: actorUserId,
     });
@@ -75,7 +77,7 @@ export class StaffService {
         isActive: createStaffDto.isActive ?? true,
       });
     } catch (error) {
-      await this.moduleOptions.deleteLoginAccount(account.id);
+      await this.accountProvisioning.remove(account.id);
       throw error;
     }
   }
