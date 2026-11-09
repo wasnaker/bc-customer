@@ -277,18 +277,42 @@ export class BranchService {
       await this.assertHeadOfficeAvailable(branch.customerId);
     }
 
-    const updated = await this.branchRepository.update(id, {
-      ...updateBranchDto,
-    });
-    if (!updated) {
+    const transaction = this.moduleOptions?.transaction;
+    const recordBranchUpdated = this.moduleOptions?.recordBranchUpdated;
+    if (!transaction || !recordBranchUpdated) {
       throw new UnprocessableEntityException({
         status: HttpStatus.UNPROCESSABLE_ENTITY,
-        errors: {
-          branch: "branchNotExists",
-        },
+        errors: { lifecycle: "branchLifecycleUnavailable" },
       });
     }
-    return updated;
+
+    return transaction(async (manager) => {
+      const updated = await this.branchRepository.update(
+        id,
+        { ...updateBranchDto },
+        manager,
+      );
+      if (!updated) {
+        throw new UnprocessableEntityException({
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          errors: { branch: "branchNotExists" },
+        });
+      }
+
+      await recordBranchUpdated(manager, {
+        entityId: updated.id,
+        correlationId: randomUUID(),
+        data: {
+          id: updated.id,
+          customerId: updated.customerId,
+          name: updated.name,
+          code: updated.code ?? null,
+          isHeadOffice: updated.isHeadOffice,
+          isActive: updated.isActive,
+        },
+      });
+      return updated;
+    });
   }
 
   async remove(id: Branch["id"]): Promise<void> {
@@ -302,9 +326,32 @@ export class BranchService {
       });
     }
 
+    const transaction = this.moduleOptions?.transaction;
+    const recordBranchDeleted = this.moduleOptions?.recordBranchDeleted;
+    if (!transaction || !recordBranchDeleted) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: { lifecycle: "branchLifecycleUnavailable" },
+      });
+    }
+
     try {
-      // staff.branchId is FK RESTRICT — the DB owns referential integrity.
-      await this.branchRepository.remove(id);
+      // The deletion and its snapshot event are committed atomically.
+      await transaction(async (manager) => {
+        await this.branchRepository.remove(id, manager);
+        await recordBranchDeleted(manager, {
+          entityId: branch.id,
+          correlationId: randomUUID(),
+          data: {
+            id: branch.id,
+            customerId: branch.customerId,
+            name: branch.name,
+            code: branch.code ?? null,
+            isHeadOffice: branch.isHeadOffice,
+            isActive: branch.isActive,
+          },
+        });
+      });
     } catch (error) {
       if (
         error &&
