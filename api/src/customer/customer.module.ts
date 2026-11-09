@@ -23,6 +23,7 @@ import { CustomerAccessGuard } from "./security/customer-access.guard";
 import { CustomerScopeGuard } from "./security/customer-scope.guard";
 import { CustomerDemoDataSeedService } from "./database/seeds/demo-data/customer-demo-data.seed.service";
 import { CustomerBranchDirectoryContract } from "./customer-branch-directory.contract";
+import { CustomerCoreUserDirectoryClient } from "./customer-core-user-directory.client";
 import {
   CUSTOMER_MODULE_OPTIONS,
   CustomerModuleAsyncOptions,
@@ -59,6 +60,7 @@ export type {
     CustomerScopeGuard,
     CustomerDemoDataSeedService,
     CustomerBranchDirectoryContract,
+    CustomerCoreUserDirectoryClient,
     { provide: CustomerRepository, useClass: CustomersRelationalRepository },
     { provide: BranchRepository, useClass: BranchesRelationalRepository },
     { provide: StaffRepository, useClass: StaffRelationalRepository },
