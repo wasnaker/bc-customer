@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CustomerDocumentRepository = exports.StaffRepository = exports.BranchRepository = exports.CustomerRepository = exports.CustomerController = exports.RegionValidationService = exports.CustomerDocumentService = exports.StaffService = exports.BranchService = exports.CustomerService = exports.CustomerDocumentOwnerTypeEnum = exports.CustomerDocument = exports.Staff = exports.Branch = exports.Customer = exports.CUSTOMER_ENTITIES = exports.CustomerDocumentEntity = exports.StaffEntity = exports.BranchEntity = exports.CustomerEntity = exports.CUSTOMER_RESOURCE_METADATA = exports.CustomerResource = exports.CustomerAccessGuard = exports.CUSTOMER_MODULE_OPTIONS = exports.CustomerModule = void 0;
+exports.moduleDefinition = exports.customerModuleManifest = exports.moduleManifest = exports.CustomerDocumentRepository = exports.StaffRepository = exports.BranchRepository = exports.CustomerRepository = exports.CustomerController = exports.RegionValidationService = exports.CustomerDocumentService = exports.StaffService = exports.BranchService = exports.CustomerService = exports.CustomerDocumentOwnerTypeEnum = exports.CustomerDocument = exports.Staff = exports.Branch = exports.Customer = exports.CUSTOMER_ENTITIES = exports.CustomerDocumentEntity = exports.StaffEntity = exports.BranchEntity = exports.CustomerEntity = exports.CUSTOMER_RESOURCE_METADATA = exports.CustomerResource = exports.CustomerAccessGuard = exports.CUSTOMER_MODULE_OPTIONS = exports.CustomerModule = void 0;
 var customer_module_1 = require("./customer/customer.module");
 Object.defineProperty(exports, "CustomerModule", { enumerable: true, get: function () { return customer_module_1.CustomerModule; } });
 Object.defineProperty(exports, "CUSTOMER_MODULE_OPTIONS", { enumerable: true, get: function () { return customer_module_1.CUSTOMER_MODULE_OPTIONS; } });
@@ -45,3 +45,8 @@ var staff_repository_1 = require("./customer/infrastructure/persistence/staff.re
 Object.defineProperty(exports, "StaffRepository", { enumerable: true, get: function () { return staff_repository_1.StaffRepository; } });
 var customer_document_repository_1 = require("./customer/infrastructure/persistence/customer-document.repository");
 Object.defineProperty(exports, "CustomerDocumentRepository", { enumerable: true, get: function () { return customer_document_repository_1.CustomerDocumentRepository; } });
+var customer_manifest_1 = require("./customer/customer.manifest");
+Object.defineProperty(exports, "moduleManifest", { enumerable: true, get: function () { return customer_manifest_1.moduleManifest; } });
+Object.defineProperty(exports, "customerModuleManifest", { enumerable: true, get: function () { return customer_manifest_1.customerModuleManifest; } });
+var customer_definition_1 = require("./customer/customer.definition");
+Object.defineProperty(exports, "moduleDefinition", { enumerable: true, get: function () { return customer_definition_1.moduleDefinition; } });

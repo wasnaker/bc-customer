@@ -26,3 +26,6 @@ export { CustomerRepository } from './customer/infrastructure/persistence/custom
 export { BranchRepository } from './customer/infrastructure/persistence/branch.repository';
 export { StaffRepository } from './customer/infrastructure/persistence/staff.repository';
 export { CustomerDocumentRepository } from './customer/infrastructure/persistence/customer-document.repository';
+
+export { moduleManifest, customerModuleManifest } from './customer/customer.manifest';
+export { moduleDefinition } from './customer/customer.definition';

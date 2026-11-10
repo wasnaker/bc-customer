@@ -47,7 +47,7 @@ export interface CustomerModuleOptions {
         id: number;
     }>;
     deleteLoginAccount?: (userId: number) => Promise<void>;
-    /** Delegate legacy permission checks to the host authorization service. */
+    /** Legacy Core-Role-only check. Module Roles must use authorizeScoped or resolveScopes. */
     authorize: (roleId: number | string, permission: string) => boolean | Promise<boolean>;
     /**
      * Required by every route protected by CustomerScopeGuard.

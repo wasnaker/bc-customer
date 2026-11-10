@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.customerModuleManifest = exports.moduleManifest = void 0;
 exports.moduleManifest = {
     id: 'customer',
-    version: '0.1.3',
+    version: '0.1.4',
     capabilities: ['api', 'web'],
     requires: ['region'],
     requiresServices: [
@@ -15,6 +15,11 @@ exports.moduleManifest = {
         {
             providerModuleId: 'core',
             contractId: 'core.account-provisioning',
+            version: '^1.0.0',
+        },
+        {
+            providerModuleId: 'core',
+            contractId: 'core.authorization.registry',
             version: '^1.0.0',
         },
     ],

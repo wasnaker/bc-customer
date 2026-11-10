@@ -43,28 +43,18 @@ let CustomerAccessGuard = class CustomerAccessGuard {
                 throw new common_1.ForbiddenException();
             }
             if (typeof selfBranch === 'string') {
-                const assignedRoles = request.user?.roles?.length
-                    ? request.user.roles
-                    : request.user?.role
-                        ? [request.user.role]
-                        : [];
-                const roleIds = [...new Set(assignedRoles.map((role) => role.id).filter((id) => id !== undefined && id !== null))];
-                if (!this.options?.authorize || roleIds.length === 0) {
-                    throw new common_1.ForbiddenException();
-                }
-                for (const roleId of roleIds) {
-                    if (await this.options.authorize(roleId, selfBranch))
-                        return true;
-                }
+                const resolved = await this.options?.resolveScopes?.(request.user.id, selfBranch);
+                if (resolved && (resolved.global || resolved.scopes.length > 0))
+                    return true;
                 throw new common_1.ForbiddenException();
             }
             return true;
         }
-        // Polymorphic documents derive their resource permission from the stored
-        // owner. CustomerScopeGuard resolves that owner and performs the complete
-        // permission + scope check; do not guess "customer" before that lookup.
+        // Every route with CustomerScope metadata is authorized by the following
+        // CustomerScopeGuard, which resolves the actual resource and calls the
+        // versioned Core Authorization Registry. This guard only verifies identity.
         const scopeSource = this.reflector?.getAllAndOverride(customer_scope_decorator_1.CUSTOMER_SCOPE_METADATA, [context.getHandler(), context.getClass()]);
-        if (scopeSource?.kind.startsWith('document-')) {
+        if (scopeSource) {
             if (request.user?.id === undefined || request.user?.id === null) {
                 throw new common_1.ForbiddenException();
             }
